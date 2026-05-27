@@ -30,6 +30,25 @@ export function buildVietQRUrl(params: {
 }
 
 /**
+ * Tạo deep link VietQR để mở thẳng app ngân hàng trên mobile
+ * Chuẩn NAPAS: https://dl.vietqr.io/pay
+ */
+export function buildPaymentDeepLink(params: {
+  bankCode: string;
+  accountNumber: string;
+  amount: number;
+  description: string;
+}): string {
+  const { bankCode, accountNumber, amount, description } = params;
+  const qs = new URLSearchParams({
+    ba: `${bankCode}-${accountNumber}`,
+    am: String(amount),
+    tn: description,
+  });
+  return `https://dl.vietqr.io/pay?${qs.toString()}`;
+}
+
+/**
  * Format tiền VND
  */
 export function formatCurrency(amount: number): string {

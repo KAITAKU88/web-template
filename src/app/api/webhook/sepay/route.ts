@@ -88,6 +88,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
     }
 
+    // Tăng lượt tải của sản phẩm (atomic, fire-and-forget)
+    await supabase.rpc("increment_download_count", {
+      p_product_id: order.product_id,
+    }).catch(() => {});
+
     // Cập nhật/upsert bảng customers để phục vụ remarketing
     await supabase.rpc("upsert_customer_on_order", {
       p_email: order.customer_email,

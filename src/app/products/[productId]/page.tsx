@@ -7,6 +7,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { StarRating } from "@/components/StarRating";
 import { FaqAccordion } from "@/components/FaqAccordion";
+import SocialProofToast from "@/components/SocialProofToast";
 
 const TYPE_LABEL: Record<string, string> = { notion: "Notion", google_sheet: "Google Sheets" };
 const TYPE_ICON: Record<string, string>  = { notion: "📓", google_sheet: "📊" };
@@ -48,6 +49,7 @@ export default async function ProductPage({ params }: Props) {
   const hasDiscount = !!(product.original_price && product.original_price > product.price);
 
   return (
+    <>
     <div className="mx-auto max-w-3xl">
 
       {/* ── Breadcrumb ── */}
@@ -375,5 +377,8 @@ export default async function ProductPage({ params }: Props) {
       </section>
 
     </div>
+
+    <SocialProofToast />
+    </>
   );
 }

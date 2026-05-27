@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
-import { generateOrderId, buildVietQRUrl } from "@/lib/utils";
+import { generateOrderId, buildVietQRUrl, buildPaymentDeepLink } from "@/lib/utils";
 import type { CreateOrderRequest } from "@/types";
 
 export async function POST(req: NextRequest) {
   try {
     const body: CreateOrderRequest = await req.json();
-    const { product_id, customer_email } = body;
+    const { product_id, customer_email, customer_phone, bump_product_id } = body;
 
-    // Validate input
     if (!product_id || !customer_email) {
       return NextResponse.json(
         { error: "Thiếu product_id hoặc customer_email." },
@@ -23,7 +22,7 @@ export async function POST(req: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Lấy thông tin sản phẩm
+    // Lấy thông tin sản phẩm chính
     const { data: product, error: productError } = await supabase
       .from("products")
       .select("id, price, name")
@@ -34,14 +33,37 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Sản phẩm không tồn tại." }, { status: 404 });
     }
 
-    // Tạo order ID và đơn hàng
+    // Tính giá bump từ DB (không tin giá từ client)
+    let bump_amount: number | null = null;
+    let resolvedBumpId: string | null = null;
+
+    if (bump_product_id) {
+      const { data: bumpProduct } = await supabase
+        .from("products")
+        .select("id, price")
+        .eq("id", bump_product_id)
+        .neq("id", product_id)
+        .single();
+
+      if (bumpProduct) {
+        resolvedBumpId = bumpProduct.id;
+        bump_amount = Math.round(bumpProduct.price / 2 / 1000) * 1000;
+      }
+    }
+
+    const totalAmount = product.price + (bump_amount ?? 0);
+
+    // Tạo đơn hàng
     const order_id = generateOrderId();
     const { error: insertError } = await supabase.from("orders").insert({
       id: order_id,
-      customer_email,
+      customer_email: customer_email.toLowerCase().trim(),
+      customer_phone: customer_phone?.trim() || null,
       product_id,
-      amount: product.price,
+      amount: totalAmount,
       status: "pending",
+      bump_product_id: resolvedBumpId,
+      bump_amount,
     });
 
     if (insertError) {
@@ -52,21 +74,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Tạo URL QR
+    // Tạo URL QR với tổng tiền thực tế
     const bankCode = process.env.BANK_CODE ?? "";
     const accountNumber = process.env.BANK_ACCOUNT_NUMBER ?? "";
 
     let qr_url = "";
+    let payment_url = "";
     if (bankCode && accountNumber) {
       qr_url = buildVietQRUrl({
         bankCode,
         accountNumber,
-        amount: product.price,
+        amount: totalAmount,
+        description: order_id,
+      });
+      payment_url = buildPaymentDeepLink({
+        bankCode,
+        accountNumber,
+        amount: totalAmount,
         description: order_id,
       });
     }
 
-    return NextResponse.json({ order_id, amount: product.price, qr_url });
+    return NextResponse.json({ order_id, amount: totalAmount, qr_url, payment_url });
   } catch (err) {
     console.error("Create order error:", err);
     return NextResponse.json({ error: "Lỗi máy chủ." }, { status: 500 });

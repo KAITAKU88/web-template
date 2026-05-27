@@ -15,16 +15,19 @@ export interface Product {
   created_at: string;
 }
 
-export type OrderStatus = "pending" | "success" | "expired";
+export type OrderStatus = "pending" | "success" | "expired" | "cancelled";
 
 export interface Order {
   id: string;
   customer_email: string;
+  customer_phone: string | null;
   product_id: string;
   amount: number;
   status: OrderStatus;
   created_at: string;
   paid_at: string | null;
+  bump_product_id: string | null;
+  bump_amount: number | null;
 }
 
 export interface Customer {
@@ -38,12 +41,15 @@ export interface Customer {
 export interface CreateOrderRequest {
   product_id: string;
   customer_email: string;
+  customer_phone?: string;
+  bump_product_id?: string;
 }
 
 export interface CreateOrderResponse {
   order_id: string;
   amount: number;
   qr_url: string;
+  payment_url: string;
 }
 
 // SePay webhook payload
