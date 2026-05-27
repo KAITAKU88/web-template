@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Giá bundle = 50% tổng giá lẻ, làm tròn 1.000đ
-    const originalTotal = products.reduce((s, p) => s + p.price, 0);
+    const originalTotal = products.reduce((s: number, p: { id: string; price: number }) => s + p.price, 0);
     const bundleAmount  = Math.round(originalTotal * 0.5 / 1000) * 1000;
 
     const order_id = generateOrderId();
