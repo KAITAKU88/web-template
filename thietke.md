@@ -85,7 +85,7 @@
 | Tên cột | Kiểu dữ liệu | Ràng buộc | Mô tả |
 | :--- | :--- | :--- | :--- |
 | `email` | `text` | `PK` | Email định danh khách hàng |
-| `full_name` | `text` | | Họ tên khách hàng (nếu có) |
+| `full_name` | `text` | | Họ tên khách (nếu có) |
 | `total_orders` | `int4` | `default: 0` | Tổng số đơn hàng đã mua |
 | `last_purchase` | `timestamptz` | | Lần mua gần nhất |
 
