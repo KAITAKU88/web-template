@@ -389,6 +389,30 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
             )}
           </div>
 
+          {/* Nút lưu mã QR — chỉ hiện trên mobile khi QR đã load */}
+          {isMobile && qrUrl && (
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch(qrUrl);
+                  const blob = await res.blob();
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `QR-${orderId}.png`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                } catch {
+                  window.open(qrUrl, "_blank");
+                }
+              }}
+              className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-green-600 bg-white px-4 py-3 text-sm font-semibold text-green-700 shadow-sm transition hover:bg-green-50 active:scale-95"
+            >
+              <span>⬇️</span>
+              Lưu mã QR về máy
+            </button>
+          )}
+
           {/* Nút mở app ngân hàng — chỉ hiện trên thiết bị di động */}
           {isMobile && paymentUrl && (
             <button
@@ -414,8 +438,8 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
                   <h3 className="text-base font-semibold text-gray-800">Chọn ứng dụng ngân hàng</h3>
                   <button onClick={() => setShowBankModal(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
                 </div>
-                <p className="mb-3 text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
-                  💡 Đảm bảo đã đăng nhập sẵn vào app ngân hàng để thông tin được điền tự động
+                <p className="mb-3 text-xs text-blue-700 bg-blue-50 rounded-lg px-3 py-2">
+                  💡 Lưu mã QR → Mở app → Quét mã QR → Chọn ảnh từ thư viện ảnh
                 </p>
                 <div className="grid grid-cols-4 gap-3">
                   {([
