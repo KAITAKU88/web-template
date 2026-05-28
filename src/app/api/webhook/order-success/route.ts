@@ -164,7 +164,7 @@ function buildEmailHtml(params: {
 
       <p style="margin:24px 0 0;font-size:13px;color:#9ca3af;line-height:1.6;">
         Link template dùng được vĩnh viễn — chỉ cần Duplicate 1 lần vào tài khoản của bạn.<br>
-        Nếu cần hỗ trợ, hãy reply email này hoặc liên hệ qua trang web.
+        Nếu cần hỗ trợ, hãy liên hệ qua trang web.
       </p>
     </div>
 

@@ -40,7 +40,7 @@ export default function RootLayout({
         <Header />
         <main className="mx-auto max-w-5xl px-4 py-10">{children}</main>
 
-        <footer className="mt-20 border-t border-gray-100 bg-white py-6 dark:border-gray-800 dark:bg-gray-900">
+<footer className="mt-20 border-t border-gray-100 bg-white py-6 dark:border-gray-800 dark:bg-gray-900">
           <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-3 px-4 text-sm text-gray-400 sm:flex-row">
             <span>© {new Date().getFullYear()} TemplateLab</span>
             <a
