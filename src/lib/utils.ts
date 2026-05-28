@@ -29,9 +29,30 @@ export function buildVietQRUrl(params: {
   return `${base}?${qs.toString()}`;
 }
 
+// BIN số của các ngân hàng VN (chuẩn NAPAS) — dùng cho deep link VietQR
+const BANK_BIN_MAP: Record<string, string> = {
+  VCB: "970436", VIETCOMBANK: "970436",
+  TCB: "970407", TECHCOMBANK: "970407",
+  MB:  "970422", MBBANK: "970422",
+  ACB: "970416",
+  BIDV: "970418",
+  VTB: "970415", VIETINBANK: "970415",
+  AGR: "970405", AGRIBANK: "970405",
+  TPB: "970423", TPBANK: "970423",
+  VPB: "970432", VPBANK: "970432",
+  OCB: "970448",
+  SHB: "970443",
+  MSB: "970426",
+  STB: "970403", SACOMBANK: "970403",
+  HDB: "970437", HDBANK: "970437",
+  EIB: "970431", EXIMBANK: "970431",
+  BVB: "970438",
+};
+
 /**
  * Tạo deep link VietQR để mở thẳng app ngân hàng trên mobile
  * Chuẩn NAPAS: https://dl.vietqr.io/pay
+ * ba phải dùng BIN số thay vì text code để app ngân hàng nhận diện đúng
  */
 export function buildPaymentDeepLink(params: {
   bankCode: string;
@@ -40,8 +61,9 @@ export function buildPaymentDeepLink(params: {
   description: string;
 }): string {
   const { bankCode, accountNumber, amount, description } = params;
+  const bin = BANK_BIN_MAP[bankCode.toUpperCase()] ?? bankCode;
   const qs = new URLSearchParams({
-    ba: `${bankCode}-${accountNumber}`,
+    ba: `${bin}-${accountNumber}`,
     am: String(amount),
     tn: description,
   });

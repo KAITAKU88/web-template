@@ -33,6 +33,7 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
   const [paymentUrl, setPaymentUrl] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [showBankModal, setShowBankModal] = useState(false);
+  const openingBankApp = useRef(false);
   const [upsellCountdown, setUpsellCountdown] = useState(10 * 60);
   const [isBundleOrder, setIsBundleOrder] = useState(false);
 
@@ -90,9 +91,11 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
   }, [step]);
 
   // F5 / đóng tab → hủy đơn qua sendBeacon
+  // Bỏ qua khi user đang mở app ngân hàng (deep link navigation)
   useEffect(() => {
     if (step !== "waiting") return;
     const handleUnload = () => {
+      if (openingBankApp.current) return;
       navigator.sendBeacon(`/api/orders/${orderIdRef.current}`);
     };
     window.addEventListener("beforeunload", handleUnload);
@@ -410,32 +413,42 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
                   <button onClick={() => setShowBankModal(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
                 </div>
                 <div className="grid grid-cols-4 gap-3">
-                  {[
-                    { code: "vcb", name: "Vietcombank" },
-                    { code: "tcb", name: "Techcombank" },
-                    { code: "mb",  name: "MB Bank" },
-                    { code: "acb", name: "ACB" },
-                    { code: "bidv",name: "BIDV" },
-                    { code: "vtb", name: "Vietinbank" },
-                    { code: "agr", name: "Agribank" },
-                    { code: "tpb", name: "TPBank" },
-                    { code: "vpb", name: "VPBank" },
-                    { code: "ocb", name: "OCB" },
-                    { code: "shb", name: "SHB" },
-                    { code: "msb", name: "MSB" },
-                    { code: "stb", name: "Sacombank" },
-                    { code: "hdb", name: "HDBank" },
-                    { code: "eib", name: "Eximbank" },
-                    { code: "bvb", name: "BaoViet" },
-                  ].map((bank) => (
-                    <a
+                  {([
+                    { code: "vcb",  name: "Vietcombank", short: "VCB",  color: "#007B40" },
+                    { code: "tcb",  name: "Techcombank",  short: "TCB",  color: "#E31837" },
+                    { code: "mb",   name: "MB Bank",      short: "MB",   color: "#0066B3" },
+                    { code: "acb",  name: "ACB",          short: "ACB",  color: "#005BAA" },
+                    { code: "bidv", name: "BIDV",         short: "BIDV", color: "#1A4F9C" },
+                    { code: "vtb",  name: "Vietinbank",   short: "VTB",  color: "#CC0000" },
+                    { code: "agr",  name: "Agribank",     short: "AGR",  color: "#D30000" },
+                    { code: "tpb",  name: "TPBank",       short: "TPB",  color: "#6B21A8" },
+                    { code: "vpb",  name: "VPBank",       short: "VPB",  color: "#00AA44" },
+                    { code: "ocb",  name: "OCB",          short: "OCB",  color: "#E65C00" },
+                    { code: "shb",  name: "SHB",          short: "SHB",  color: "#B91C1C" },
+                    { code: "msb",  name: "MSB",          short: "MSB",  color: "#0088CC" },
+                    { code: "stb",  name: "Sacombank",    short: "STB",  color: "#003087" },
+                    { code: "hdb",  name: "HDBank",       short: "HDB",  color: "#004B9B" },
+                    { code: "eib",  name: "Eximbank",     short: "EIB",  color: "#003082" },
+                    { code: "bvb",  name: "BaoViet",      short: "BVB",  color: "#008000" },
+                  ] as const).map((bank) => (
+                    <button
                       key={bank.code}
-                      href={`${paymentUrl}&app=${bank.code}`}
-                      className="flex flex-col items-center gap-1 rounded-xl border border-gray-100 p-2 text-center text-xs text-gray-700 hover:bg-gray-50 active:scale-95 transition"
+                      onClick={() => {
+                        openingBankApp.current = true;
+                        setTimeout(() => { openingBankApp.current = false; }, countdown * 1000);
+                        const ru = encodeURIComponent(window.location.href);
+                        window.location.href = `${paymentUrl}&app=${bank.code}&ru=${ru}`;
+                      }}
+                      className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-100 p-2 text-center text-xs text-gray-700 hover:bg-gray-50 active:scale-95 transition"
                     >
-                      <span className="text-2xl">🏦</span>
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-xl text-[10px] font-bold text-white"
+                        style={{ backgroundColor: bank.color }}
+                      >
+                        {bank.short}
+                      </div>
                       <span className="leading-tight">{bank.name}</span>
-                    </a>
+                    </button>
                   ))}
                 </div>
               </div>
