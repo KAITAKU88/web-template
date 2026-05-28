@@ -86,14 +86,14 @@ async function generateWithGemini(prompt: string, apiKey: string): Promise<Produ
   let response;
   try {
     response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model: "gemini-1.5-flash",
       contents: prompt,
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("429") || msg.includes("RESOURCE_EXHAUSTED") || msg.includes("quota")) {
       throw new Error(
-        "Gemini API hết quota free tier (limit = 0). Lấy API key mới tại aistudio.google.com/apikey — key từ AI Studio có 1500 req/ngày miễn phí."
+        "Gemini API lỗi quota. Model gemini-1.5-flash miễn phí 1500 req/ngày — nếu vẫn lỗi hãy kiểm tra API key tại aistudio.google.com/apikey."
       );
     }
     if (msg.includes("401") || msg.includes("403") || msg.includes("API_KEY_INVALID")) {
