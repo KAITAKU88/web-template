@@ -31,13 +31,13 @@ export default async function HomePage() {
       </Suspense>
 
       {/* Trust signals */}
-      <div className="mt-16 grid grid-cols-3 gap-4 text-center text-sm text-gray-500">
+      <div className="mt-16 flex flex-wrap justify-center gap-4 text-center text-sm text-gray-500">
         {[
           { icon: "⚡", title: "Nhận ngay tức thì", desc: "Link giao tự động qua email sau khi thanh toán" },
           { icon: "🔒", title: "Thanh toán an toàn", desc: "QR VietQR chuẩn ngân hàng, không qua bên thứ 3" },
           { icon: "♾️", title: "Dùng vĩnh viễn", desc: "Duplicate 1 lần, sử dụng mãi mãi" },
         ].map((item) => (
-          <div key={item.title} className="card p-5 dark:bg-gray-800">
+          <div key={item.title} className="card p-5 dark:bg-gray-800 min-w-64 flex-1">
             <div className="text-2xl mb-2">{item.icon}</div>
             <div className="font-semibold text-gray-700 dark:text-gray-200">{item.title}</div>
             <div className="dark:text-gray-400">{item.desc}</div>
