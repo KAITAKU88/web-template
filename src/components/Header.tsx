@@ -5,7 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils";
-import type { Order, Product } from "@/types";
+import type { Product } from "@/types";
 
 type Theme = "light" | "dark" | "system";
 
@@ -157,20 +157,11 @@ function SearchBar() {
 }
 
 // ── Settings Menu — gộp Theme + Lịch sử mua hàng ────
-interface OrderWithProduct extends Order {
-  products: { name: string } | null;
-}
-
 function SettingsMenu() {
   const [open, setOpen]     = useState(false);
   const [tab, setTab]       = useState<"theme" | "history">("history");
   const [theme, setTheme]   = useState<Theme>("system");
-  const [email, setEmail]   = useState("");
-  const [loading, setLoading] = useState(false);
-  const [orders, setOrders] = useState<OrderWithProduct[]>([]);
-  const [searched, setSearched] = useState(false);
   const ref     = useRef<HTMLDivElement>(null);
-  const supabase = createClient();
 
   useEffect(() => {
     const stored = (localStorage.getItem("theme") as Theme) || "system";
@@ -199,24 +190,8 @@ function SettingsMenu() {
     applyTheme(t);
   }
 
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email) return;
-    setLoading(true); setSearched(false);
-    const { data } = await supabase
-      .from("orders")
-      .select("*, products(name)")
-      .eq("customer_email", email.toLowerCase().trim())
-      .order("created_at", { ascending: false })
-      .limit(20);
-    setOrders((data as OrderWithProduct[]) ?? []);
-    setSearched(true); setLoading(false);
-  }
-
   const THEME_ICONS:  Record<Theme, string> = { light: "☀️", dark: "🌙", system: "💻" };
   const THEME_LABELS: Record<Theme, string> = { light: "Sáng", dark: "Tối", system: "Tự động" };
-  const STATUS_LABEL: Record<string, string> = { success: "✅ Thành công", pending: "⏳ Chờ TT", expired: "❌ Hết hạn" };
-  const STATUS_COLOR: Record<string, string> = { success: "text-green-600", pending: "text-amber-500", expired: "text-red-400" };
 
   return (
     <div ref={ref} className="relative shrink-0">
@@ -280,54 +255,15 @@ function SettingsMenu() {
 
             {/* Tab: Lịch sử */}
             {tab === "history" && (
-              <div>
-                <form onSubmit={handleSearch} className="mb-3 flex gap-2">
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email của bạn..."
-                    className="min-w-0 flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none transition focus:border-green-500 focus:ring-1 focus:ring-green-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="rounded-xl bg-green-600 px-3 py-2 text-sm font-semibold text-white transition hover:bg-green-700 disabled:opacity-50"
-                  >
-                    {loading ? "…" : "Tra"}
-                  </button>
-                </form>
-
-                {searched && orders.length === 0 && (
-                  <p className="py-4 text-center text-sm text-gray-400">
-                    Không tìm thấy đơn hàng nào.
-                  </p>
-                )}
-
-                {orders.length > 0 && (
-                  <div className="max-h-64 space-y-2 overflow-y-auto">
-                    {orders.map((o) => (
-                      <div key={o.id} className="rounded-xl border border-gray-100 p-3 dark:border-gray-700">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
-                              {o.products?.name ?? "Template"}
-                            </p>
-                            <p className="font-mono text-xs text-gray-400">{o.id}</p>
-                          </div>
-                          <span className={`shrink-0 text-xs font-semibold ${STATUS_COLOR[o.status]}`}>
-                            {STATUS_LABEL[o.status]}
-                          </span>
-                        </div>
-                        <div className="mt-1 flex items-center justify-between text-xs text-gray-400">
-                          <span>{formatCurrency(o.amount)}</span>
-                          <span>{new Date(o.created_at).toLocaleDateString("vi-VN")}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              <div className="py-2 text-center">
+                <p className="mb-3 text-sm text-gray-500">Tra cứu đơn hàng theo email của bạn.</p>
+                <Link
+                  href="/orders"
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700"
+                >
+                  🧾 Xem lịch sử mua hàng
+                </Link>
               </div>
             )}
           </div>
