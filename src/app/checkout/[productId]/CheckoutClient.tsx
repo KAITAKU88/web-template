@@ -32,6 +32,7 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
   const [orderAmount, setOrderAmount] = useState(0);
   const [paymentUrl, setPaymentUrl] = useState("");
   const [isMobile, setIsMobile] = useState(false);
+  const [showBankModal, setShowBankModal] = useState(false);
   const [upsellCountdown, setUpsellCountdown] = useState(10 * 60);
   const [isBundleOrder, setIsBundleOrder] = useState(false);
 
@@ -385,13 +386,60 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
 
           {/* Nút mở app ngân hàng — chỉ hiện trên thiết bị di động */}
           {isMobile && paymentUrl && (
-            <a
-              href={paymentUrl}
+            <button
+              onClick={() => setShowBankModal(true)}
               className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white shadow transition hover:bg-green-700 active:scale-95"
             >
               <span>🏦</span>
               Mở ứng dụng ngân hàng
-            </a>
+            </button>
+          )}
+
+          {/* Modal chọn ngân hàng */}
+          {showBankModal && (
+            <div
+              className="fixed inset-0 z-50 flex items-end justify-center bg-black/50"
+              onClick={() => setShowBankModal(false)}
+            >
+              <div
+                className="w-full max-w-lg rounded-t-2xl bg-white p-5 pb-8"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-base font-semibold text-gray-800">Chọn ứng dụng ngân hàng</h3>
+                  <button onClick={() => setShowBankModal(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+                </div>
+                <div className="grid grid-cols-4 gap-3">
+                  {[
+                    { code: "vcb", name: "Vietcombank" },
+                    { code: "tcb", name: "Techcombank" },
+                    { code: "mb",  name: "MB Bank" },
+                    { code: "acb", name: "ACB" },
+                    { code: "bidv",name: "BIDV" },
+                    { code: "vtb", name: "Vietinbank" },
+                    { code: "agr", name: "Agribank" },
+                    { code: "tpb", name: "TPBank" },
+                    { code: "vpb", name: "VPBank" },
+                    { code: "ocb", name: "OCB" },
+                    { code: "shb", name: "SHB" },
+                    { code: "msb", name: "MSB" },
+                    { code: "stb", name: "Sacombank" },
+                    { code: "hdb", name: "HDBank" },
+                    { code: "eib", name: "Eximbank" },
+                    { code: "bvb", name: "BaoViet" },
+                  ].map((bank) => (
+                    <a
+                      key={bank.code}
+                      href={`${paymentUrl}&app=${bank.code}`}
+                      className="flex flex-col items-center gap-1 rounded-xl border border-gray-100 p-2 text-center text-xs text-gray-700 hover:bg-gray-50 active:scale-95 transition"
+                    >
+                      <span className="text-2xl">🏦</span>
+                      <span className="leading-tight">{bank.name}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
           )}
 
           <div className="space-y-2 text-center text-sm text-gray-500">
