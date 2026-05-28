@@ -17,9 +17,10 @@ interface Props {
   product: Product;
   companion: BumpCompanion | null;
   bundle: BundleOffer | null;
+  siteName?: string;
 }
 
-export default function CheckoutClient({ product, companion, bundle }: Props) {
+export default function CheckoutClient({ product, companion, bundle, siteName = "TemplateLab" }: Props) {
   const router = useRouter();
   const [step, setStep] = useState<CheckoutStep>("form");
   const [email, setEmail] = useState("");
@@ -220,7 +221,7 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
             <div className="text-sm text-gray-500 truncate">{product.description}</div>
           )}
         </div>
-        <div className="text-lg font-bold text-green-600 flex-shrink-0">
+        <div className="text-lg font-bold text-brand flex-shrink-0">
           {formatCurrency(product.price)}
         </div>
       </div>
@@ -401,7 +402,7 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
                   window.open(qrUrl, "_blank");
                 }
               }}
-              className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-green-600 bg-white px-4 py-3 text-sm font-semibold text-green-700 shadow-sm transition hover:bg-green-50 active:scale-95"
+              className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-brand bg-white px-4 py-3 text-sm font-semibold text-brand shadow-sm transition hover:bg-brand-subtle active:scale-95"
             >
               <span>⬇️</span>
               Lưu mã QR về máy
@@ -412,7 +413,7 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
           {isMobile && paymentUrl && (
             <button
               onClick={() => setShowBankModal(true)}
-              className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-4 py-3 text-sm font-semibold text-white shadow transition hover:bg-green-700 active:scale-95"
+              className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl bg-brand px-4 py-3 text-sm font-semibold text-white shadow transition hover:bg-brand-dim active:scale-95"
             >
               <span>🏦</span>
               Mở ứng dụng ngân hàng
@@ -531,7 +532,7 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
           <div className="card p-6 text-center">
             <div className="mb-2 text-5xl">🎉</div>
             <h1 className="mb-1 text-2xl font-bold text-gray-900">Thanh toán thành công!</h1>
-            <p className="text-sm text-gray-500">Cảm ơn bạn đã tin tưởng TemplateLab</p>
+            <p className="text-sm text-gray-500">Cảm ơn bạn đã tin tưởng {siteName}</p>
           </div>
 
           {/* Upsell banner với countdown — ẩn nếu đã mua bundle */}

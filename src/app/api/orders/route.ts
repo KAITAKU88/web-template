@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { generateOrderId, buildVietQRUrl, buildPaymentDeepLink } from "@/lib/utils";
+import { getSettings } from "@/lib/settings";
 import type { CreateOrderRequest } from "@/types";
 
 export async function POST(req: NextRequest) {
@@ -74,9 +75,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Tạo URL QR với tổng tiền thực tế
-    const bankCode = process.env.BANK_CODE ?? "";
-    const accountNumber = process.env.BANK_ACCOUNT_NUMBER ?? "";
+    // Tạo URL QR — đọc từ settings DB (ưu tiên) hoặc env var fallback
+    const settings = await getSettings();
+    const bankCode = settings.bank_code || process.env.BANK_CODE || "";
+    const accountNumber = settings.bank_account_number || process.env.BANK_ACCOUNT_NUMBER || "";
 
     let qr_url = "";
     let payment_url = "";

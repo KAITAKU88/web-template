@@ -3,8 +3,9 @@
 import { updateSettings } from "@/lib/settings";
 
 const ALL_KEYS = [
-  "site_name", "brand_name", "logo_url", "brand_color", "favicon_url", "og_image_url",
+  "site_name", "site_description", "brand_name", "logo_url", "brand_color", "favicon_url", "og_image_url",
   "zalo_link", "facebook_link",
+  "bank_code",
   "sepay_api_key", "bank_account_number", "bank_name", "bank_account_holder",
   "resend_api_key", "resend_from_email", "resend_from_name",
   "ai_provider", "claude_api_key", "gemini_api_key",

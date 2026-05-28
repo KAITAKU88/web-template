@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getSettings } from "@/lib/settings";
 import type { Product } from "@/types";
 import { notFound } from "next/navigation";
 import CheckoutClient from "./CheckoutClient";
@@ -72,5 +73,8 @@ export default async function CheckoutPage({ params }: Props) {
         }
       : null;
 
-  return <CheckoutClient product={product as Product} companion={companion} bundle={bundle} />;
+  const settings = await getSettings();
+  const siteName = settings.site_name ?? "TemplateLab";
+
+  return <CheckoutClient product={product as Product} companion={companion} bundle={bundle} siteName={siteName} />;
 }

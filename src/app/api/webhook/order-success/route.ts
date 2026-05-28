@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/server";
+import { getSettings } from "@/lib/settings";
 import { formatCurrency } from "@/lib/utils";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Payload Supabase gửi khi row trong bảng orders được UPDATE
 interface SupabaseWebhookPayload {
   type: "INSERT" | "UPDATE" | "DELETE";
   table: string;
@@ -21,13 +19,10 @@ interface SupabaseWebhookPayload {
     paid_at: string | null;
     created_at: string;
   };
-  old_record: {
-    status: string;
-  };
+  old_record: { status: string };
 }
 
 export async function POST(req: NextRequest) {
-  // Xác thực secret
   const secret = req.headers.get("x-webhook-secret");
   if (secret !== process.env.SUPABASE_WEBHOOK_SECRET) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -35,7 +30,6 @@ export async function POST(req: NextRequest) {
 
   const payload: SupabaseWebhookPayload = await req.json();
 
-  // Chỉ xử lý khi status vừa chuyển sang "success"
   if (
     payload.type !== "UPDATE" ||
     payload.record.status !== "success" ||
@@ -47,7 +41,6 @@ export async function POST(req: NextRequest) {
   const order = payload.record;
   const supabase = createAdminClient();
 
-  // Lấy thông tin sản phẩm chính và bump (nếu có)
   const productIds = [order.product_id, order.bump_product_id].filter(Boolean) as string[];
   const { data: products } = await supabase
     .from("products")
@@ -55,25 +48,35 @@ export async function POST(req: NextRequest) {
     .in("id", productIds);
 
   type ProductRow = { id: string; name: string; template_link: string; type: string | null };
-  const mainProduct  = (products as ProductRow[] | null)?.find((p) => p.id === order.product_id);
-  const bumpProduct  = order.bump_product_id
+  const mainProduct = (products as ProductRow[] | null)?.find((p) => p.id === order.product_id);
+  const bumpProduct = order.bump_product_id
     ? (products as ProductRow[] | null)?.find((p) => p.id === order.bump_product_id)
     : null;
 
   if (!mainProduct) {
-    console.error("order-success webhook: product not found for order", order.id);
+    console.error("order-success webhook: product not found", order.id);
     return NextResponse.json({ error: "Product not found" }, { status: 500 });
   }
+
+  // Đọc cấu hình từ settings DB (ưu tiên) với ENV fallback
+  const settings = await getSettings();
+  const siteName   = settings.site_name   ?? "TemplateLab";
+  const brandColor = settings.brand_color ?? "#16a34a";
+  const apiKey     = settings.resend_api_key  || process.env.RESEND_API_KEY || "";
+  const fromName   = settings.resend_from_name  ?? siteName;
+  const fromEmail  = settings.resend_from_email || process.env.RESEND_FROM?.match(/<(.+)>/)?.[1] || "no-reply@example.com";
+  const from       = `${fromName} <${fromEmail}>`;
 
   const paidAt = order.paid_at
     ? new Date(order.paid_at).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })
     : new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
 
+  const resend = new Resend(apiKey);
   const { error } = await resend.emails.send({
-    from: process.env.RESEND_FROM ?? "TemplateLab <no-reply@templatelab.store>",
+    from,
     to: order.customer_email,
-    subject: `✅ Đơn hàng ${order.id} đã được xác nhận – TemplateLab`,
-    html: buildEmailHtml({ order, mainProduct, bumpProduct, paidAt }),
+    subject: `✅ Đơn hàng ${order.id} đã được xác nhận – ${siteName}`,
+    html: buildEmailHtml({ order, mainProduct, bumpProduct, paidAt, siteName, brandColor }),
   });
 
   if (error) {
@@ -89,8 +92,10 @@ function buildEmailHtml(params: {
   mainProduct: { name: string; template_link: string; type: string | null };
   bumpProduct: { name: string; template_link: string; type: string | null } | null | undefined;
   paidAt: string;
+  siteName: string;
+  brandColor: string;
 }) {
-  const { order, mainProduct, bumpProduct, paidAt } = params;
+  const { order, mainProduct, bumpProduct, paidAt, siteName, brandColor } = params;
 
   const typeLabel = (type: string | null) =>
     type === "google_sheet" ? "Google Sheets" : "Notion";
@@ -101,11 +106,15 @@ function buildEmailHtml(params: {
         <span style="font-size:12px;font-weight:400;color:#6b7280;">(${typeLabel(type)})</span>
       </p>
       <a href="${link}"
-         style="display:inline-block;background:#16a34a;color:#fff;text-decoration:none;
+         style="display:inline-block;background:${brandColor};color:#fff;text-decoration:none;
                 padding:10px 20px;border-radius:8px;font-size:14px;font-weight:600;">
         Truy cập template →
       </a>
     </div>`;
+
+  // Màu nhạt cho background box (10% opacity giả lập bằng hex)
+  const lightBg = "#f0fdf4";
+  const lightBorder = "#bbf7d0";
 
   return `<!DOCTYPE html>
 <html lang="vi">
@@ -114,8 +123,8 @@ function buildEmailHtml(params: {
   <div style="max-width:560px;margin:32px auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.08);">
 
     <!-- Header -->
-    <div style="background:#16a34a;padding:28px 32px;">
-      <p style="margin:0;font-size:13px;color:#bbf7d0;letter-spacing:.5px;">TEMPLATELAB</p>
+    <div style="background:${brandColor};padding:28px 32px;">
+      <p style="margin:0;font-size:13px;color:rgba(255,255,255,.7);letter-spacing:.5px;text-transform:uppercase;">${siteName}</p>
       <h1 style="margin:8px 0 0;font-size:22px;color:#fff;font-weight:700;">
         ✅ Thanh toán thành công!
       </h1>
@@ -124,12 +133,12 @@ function buildEmailHtml(params: {
     <!-- Body -->
     <div style="padding:28px 32px;">
       <p style="margin:0 0 20px;font-size:15px;color:#374151;">
-        Xin chào${order.customer_phone ? "" : ","}<br>
+        Xin chào,<br>
         Đơn hàng của bạn đã được xác nhận. Dưới đây là link truy cập template:
       </p>
 
       <!-- Template links -->
-      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;margin-bottom:24px;">
+      <div style="background:${lightBg};border:1px solid ${lightBorder};border-radius:12px;padding:20px;margin-bottom:24px;">
         <p style="margin:0 0 14px;font-size:13px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:.5px;">
           Template của bạn
         </p>
@@ -145,7 +154,7 @@ function buildEmailHtml(params: {
         </tr>
         <tr>
           <td style="padding:8px 0;color:#6b7280;border-bottom:1px solid #f3f4f6;">Số tiền</td>
-          <td style="padding:8px 0;text-align:right;font-weight:700;color:#16a34a;border-bottom:1px solid #f3f4f6;">${formatCurrency(order.amount)}</td>
+          <td style="padding:8px 0;text-align:right;font-weight:700;color:${brandColor};border-bottom:1px solid #f3f4f6;">${formatCurrency(order.amount)}</td>
         </tr>
         <tr>
           <td style="padding:8px 0;color:#6b7280;border-bottom:1px solid #f3f4f6;">Email</td>
@@ -171,7 +180,7 @@ function buildEmailHtml(params: {
     <!-- Footer -->
     <div style="padding:16px 32px;background:#f9fafb;border-top:1px solid #f3f4f6;">
       <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
-        © TemplateLab · Email này được gửi tự động, vui lòng không reply trực tiếp.
+        © ${siteName} · Email này được gửi tự động, vui lòng không reply trực tiếp.
       </p>
     </div>
   </div>

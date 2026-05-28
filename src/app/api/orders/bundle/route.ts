@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { generateOrderId, buildVietQRUrl, buildPaymentDeepLink } from "@/lib/utils";
+import { getSettings } from "@/lib/settings";
 
 export async function POST(req: NextRequest) {
   try {
@@ -46,8 +47,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Không thể tạo đơn hàng." }, { status: 500 });
     }
 
-    const bankCode      = process.env.BANK_CODE ?? "";
-    const accountNumber = process.env.BANK_ACCOUNT_NUMBER ?? "";
+    const settings = await getSettings();
+    const bankCode      = settings.bank_code || process.env.BANK_CODE || "";
+    const accountNumber = settings.bank_account_number || process.env.BANK_ACCOUNT_NUMBER || "";
 
     let qr_url = "", payment_url = "";
     if (bankCode && accountNumber) {

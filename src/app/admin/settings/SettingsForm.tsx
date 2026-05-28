@@ -37,6 +37,13 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           hint="Hiển thị trên tab trình duyệt và footer"
         />
         <Field
+          label="Mô tả site"
+          name="site_description"
+          defaultValue={settings.site_description ?? ""}
+          placeholder="Mua template chất lượng cao, nhận link qua email tức thì"
+          hint="Dùng cho SEO (meta description) và chia sẻ mạng xã hội"
+        />
+        <Field
           label="Tên brand"
           name="brand_name"
           defaultValue={settings.brand_name ?? ""}
@@ -101,17 +108,12 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           hasValue={!!settings.sepay_api_key}
           hint="Để trống = giữ nguyên key cũ"
         />
+        <BankCodeField defaultValue={settings.bank_code ?? ""} />
         <Field
           label="Số tài khoản ngân hàng"
           name="bank_account_number"
           defaultValue={settings.bank_account_number ?? ""}
           placeholder="0123456789"
-        />
-        <Field
-          label="Ngân hàng"
-          name="bank_name"
-          defaultValue={settings.bank_name ?? ""}
-          placeholder="MB, Vietcombank, TPBank…"
         />
         <Field
           label="Tên chủ tài khoản"
@@ -344,6 +346,48 @@ function SecretField({
             )}
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+const BANKS = [
+  { code: "MB",   name: "MB Bank" },
+  { code: "VCB",  name: "Vietcombank" },
+  { code: "TCB",  name: "Techcombank" },
+  { code: "ACB",  name: "ACB" },
+  { code: "BIDV", name: "BIDV" },
+  { code: "VTB",  name: "Vietinbank" },
+  { code: "AGR",  name: "Agribank" },
+  { code: "TPB",  name: "TPBank" },
+  { code: "VPB",  name: "VPBank" },
+  { code: "STB",  name: "Sacombank" },
+  { code: "HDB",  name: "HDBank" },
+  { code: "OCB",  name: "OCB" },
+  { code: "SHB",  name: "SHB" },
+  { code: "MSB",  name: "MSB" },
+  { code: "EIB",  name: "Eximbank" },
+];
+
+function BankCodeField({ defaultValue }: { defaultValue: string }) {
+  return (
+    <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
+      <div>
+        <label htmlFor="bank_code" className="block text-sm font-medium text-gray-300">Ngân hàng</label>
+        <p className="mt-0.5 text-xs text-gray-500">Dùng để tạo mã QR VietQR</p>
+      </div>
+      <div className="sm:col-span-2">
+        <select
+          id="bank_code"
+          name="bank_code"
+          defaultValue={defaultValue}
+          className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
+        >
+          <option value="">-- Chọn ngân hàng --</option>
+          {BANKS.map((b) => (
+            <option key={b.code} value={b.code}>{b.name} ({b.code})</option>
+          ))}
+        </select>
       </div>
     </div>
   );

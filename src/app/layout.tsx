@@ -12,7 +12,7 @@ const inter = Inter({ subsets: ["latin", "vietnamese"] });
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const siteName = settings.site_name ?? "TemplateLab";
-  const description = "Mua template Notion và Google Sheets chất lượng cao. Thanh toán nhanh qua QR, nhận link ngay sau khi chuyển khoản.";
+  const description = settings.site_description ?? "Mua template Notion và Google Sheets chất lượng cao. Thanh toán nhanh qua QR, nhận link ngay sau khi chuyển khoản.";
   const faviconUrl = settings.favicon_url ?? undefined;
   const ogImageUrl = settings.og_image_url ?? undefined;
 

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getSettings } from "@/lib/settings";
 import { formatCurrency, calcDiscountPercent, formatCount } from "@/lib/utils";
 import { getProductCopy, type ProductCopy, type PainItem, type FeatureItem, type TestiItem, type IncludeItem, type FaqItem } from "@/lib/productContent";
 import type { Product } from "@/types";
@@ -19,16 +20,18 @@ interface Props { params: Promise<{ productId: string }> }
 
 export async function generateMetadata({ params }: Props) {
   const { productId } = await params;
-  const supabase = await createClient();
+  const [supabase, settings] = await Promise.all([createClient(), getSettings()]);
   const { data } = await supabase.from("products").select("name,description,price,image_url").eq("id", productId).single();
   if (!data) return {};
   const { formatCurrency } = await import("@/lib/utils");
+  const siteName = settings.site_name ?? "TemplateLab";
+  const desc = data.description ?? `Mua ${data.name} trên ${siteName}. Nhận link qua email tức thì sau khi chuyển khoản.`;
   return {
-    title: `${data.name} — ${formatCurrency(data.price)} | TemplateStore`,
-    description: data.description ?? `Mua ${data.name} trên TemplateStore. Nhận link qua email tức thì sau khi chuyển khoản.`,
+    title: `${data.name} — ${formatCurrency(data.price)} | ${siteName}`,
+    description: desc,
     openGraph: {
       title: data.name,
-      description: data.description ?? "",
+      description: desc,
       images: data.image_url ? [{ url: data.image_url }] : [],
     },
   };
@@ -115,7 +118,7 @@ export default async function ProductPage({ params }: Props) {
           {/* Giá + CTA */}
           <div className="flex items-end gap-5">
             <div>
-              <div className="text-3xl font-extrabold text-green-600">{formatCurrency(product.price)}</div>
+              <div className="text-3xl font-extrabold text-brand">{formatCurrency(product.price)}</div>
               {hasDiscount && (
                 <div className="mt-0.5 flex items-center gap-2">
                   <span className="text-sm text-gray-400 line-through">{formatCurrency(product.original_price!)}</span>
@@ -143,7 +146,7 @@ export default async function ProductPage({ params }: Props) {
           2. NỖI ĐAU
       ══════════════════════════════════════════ */}
       <section className="mb-2 rounded-2xl border border-gray-100 bg-gray-50 p-6">
-        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-green-600">Bạn có đang gặp phải?</span>
+        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">Bạn có đang gặp phải?</span>
         <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900">
           Nghe quen không?
         </h2>
@@ -162,7 +165,7 @@ export default async function ProductPage({ params }: Props) {
           3. GIẢI PHÁP
       ══════════════════════════════════════════ */}
       <section className="card mb-2 p-6">
-        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-green-600">Giải pháp</span>
+        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">Giải pháp</span>
         <h2 className="mb-3 text-xl font-extrabold tracking-tight text-gray-900">{copy.solutionTitle}</h2>
         <p className="mb-6 leading-relaxed text-gray-500">{copy.solutionDesc}</p>
 
@@ -180,7 +183,7 @@ export default async function ProductPage({ params }: Props) {
           <span className="text-2xl font-black text-green-400">=</span>
           <div className="flex flex-col items-center gap-1">
             <span className="text-3xl">{copy.solutionFormula.result.split(" ")[0]}</span>
-            <span className="text-xs font-bold text-green-600">{copy.solutionFormula.result.slice(copy.solutionFormula.result.indexOf(" ") + 1)}</span>
+            <span className="text-xs font-bold text-brand">{copy.solutionFormula.result.slice(copy.solutionFormula.result.indexOf(" ") + 1)}</span>
           </div>
         </div>
       </section>
@@ -189,7 +192,7 @@ export default async function ProductPage({ params }: Props) {
           4. GIAO DIỆN THỰC TẾ
       ══════════════════════════════════════════ */}
       <section className="mb-2 rounded-2xl border border-gray-100 bg-gray-50 p-6">
-        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-green-600">Giao diện thực tế</span>
+        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">Giao diện thực tế</span>
         <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900">Nhìn thấy trước khi mua</h2>
 
         {product.image_url ? (
@@ -225,7 +228,7 @@ export default async function ProductPage({ params }: Props) {
           5. ĐIỂM KHÁC BIỆT
       ══════════════════════════════════════════ */}
       <section className="card mb-2 p-6">
-        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-green-600">Điểm khác biệt</span>
+        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">Điểm khác biệt</span>
         <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900">Tất cả những gì bạn cần</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           {copy.features.map((f: FeatureItem, i: number) => (
@@ -246,7 +249,7 @@ export default async function ProductPage({ params }: Props) {
           6. ĐÁNH GIÁ CỦA NGƯỜI DÙNG
       ══════════════════════════════════════════ */}
       <section className="mb-2 rounded-2xl border border-gray-100 bg-gray-50 p-6">
-        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-green-600">Đánh giá</span>
+        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">Đánh giá</span>
         <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900">Người dùng nói gì?</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           {copy.testimonials.map((t: TestiItem, i: number) => (
@@ -276,7 +279,7 @@ export default async function ProductPage({ params }: Props) {
           7. LỜI CHÀO HÀNG
       ══════════════════════════════════════════ */}
       <section className="card mb-2 overflow-hidden">
-        <div className="bg-green-600 px-6 py-3 text-center text-xs font-bold uppercase tracking-widest text-white">
+        <div className="bg-brand px-6 py-3 text-center text-xs font-bold uppercase tracking-widest text-white">
           🎁 Ưu đãi đặc biệt — Mua 1 lần, dùng vĩnh viễn
         </div>
         <div className="grid gap-6 p-6 sm:grid-cols-2">
@@ -298,7 +301,7 @@ export default async function ProductPage({ params }: Props) {
 
           {/* Price card */}
           <div className="flex flex-col rounded-xl border-2 border-green-500 bg-green-50 p-5">
-            <div className="mb-1 text-4xl font-extrabold tracking-tight text-green-600">
+            <div className="mb-1 text-4xl font-extrabold tracking-tight text-brand">
               {formatCurrency(product.price)}
             </div>
             {hasDiscount && (
@@ -326,7 +329,7 @@ export default async function ProductPage({ params }: Props) {
           8. CÁCH NHẬN TEMPLATE
       ══════════════════════════════════════════ */}
       <section className="mb-2 rounded-2xl border border-gray-100 bg-gray-50 p-6">
-        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-green-600">Cách nhận</span>
+        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">Cách nhận</span>
         <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900">3 bước đơn giản</h2>
         <div className="grid grid-cols-3 gap-4 text-center">
           {[
@@ -354,7 +357,7 @@ export default async function ProductPage({ params }: Props) {
           9. CÂU HỎI THƯỜNG GẶP
       ══════════════════════════════════════════ */}
       <section className="card mb-6 p-6">
-        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-green-600">FAQ</span>
+        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">FAQ</span>
         <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900">Câu hỏi thường gặp</h2>
         <FaqAccordion items={copy.faqs} />
       </section>
@@ -362,7 +365,7 @@ export default async function ProductPage({ params }: Props) {
       {/* ══════════════════════════════════════════
           FINAL CTA
       ══════════════════════════════════════════ */}
-      <section className="mb-8 rounded-2xl bg-gradient-to-br from-green-600 to-emerald-600 p-8 text-center text-white">
+      <section className="mb-8 rounded-2xl bg-gradient-to-br bg-brand p-8 text-center text-white">
         <div className="mb-1 text-3xl font-extrabold">{formatCurrency(product.price)}</div>
         <p className="mb-5 text-sm text-green-100">Thanh toán 1 lần — dùng vĩnh viễn</p>
         <Link
