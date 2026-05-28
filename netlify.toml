@@ -4,7 +4,7 @@
   ignore = "exit 1"
 
 [functions]
-  timeout = 30
+  timeout = 26
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
