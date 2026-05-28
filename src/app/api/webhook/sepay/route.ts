@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { getSettings } from "@/lib/settings";
 import type { SepayWebhookPayload } from "@/types";
 
 /**
@@ -15,7 +16,9 @@ import type { SepayWebhookPayload } from "@/types";
 export async function POST(req: NextRequest) {
   try {
     // Xác thực secret header (SePay gửi trong header Authorization)
-    const secret = process.env.SEPAY_WEBHOOK_SECRET;
+    // Ưu tiên đọc từ DB settings (cấu hình qua Dashboard), fallback về env var
+    const settings = await getSettings();
+    const secret = settings.sepay_webhook_secret || process.env.SEPAY_WEBHOOK_SECRET || null;
     if (secret) {
       const authHeader = req.headers.get("Authorization");
       const token = authHeader?.replace("Apikey ", "").trim();

@@ -23,12 +23,18 @@ interface SupabaseWebhookPayload {
 }
 
 export async function POST(req: NextRequest) {
-  const secret = req.headers.get("x-webhook-secret");
-  if (secret !== process.env.SUPABASE_WEBHOOK_SECRET) {
+  // Đọc settings 1 lần — dùng cho cả xác thực webhook lẫn gửi email
+  // Ưu tiên settings DB (cấu hình qua Dashboard), fallback về env var
+  const [settings, payload] = await Promise.all([
+    getSettings(),
+    req.json() as Promise<SupabaseWebhookPayload>,
+  ]);
+
+  const incomingSecret = req.headers.get("x-webhook-secret");
+  const expectedSecret = settings.supabase_webhook_secret || process.env.SUPABASE_WEBHOOK_SECRET;
+  if (incomingSecret !== expectedSecret) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-
-  const payload: SupabaseWebhookPayload = await req.json();
 
   if (
     payload.type !== "UPDATE" ||
@@ -58,8 +64,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Product not found" }, { status: 500 });
   }
 
-  // Đọc cấu hình từ settings DB (ưu tiên) với ENV fallback
-  const settings = await getSettings();
+  // settings đã được đọc ở đầu hàm (dùng chung)
   const siteName   = settings.site_name   ?? "TemplateLab";
   const brandColor = settings.brand_color ?? "#16a34a";
   const apiKey     = settings.resend_api_key  || process.env.RESEND_API_KEY || "";

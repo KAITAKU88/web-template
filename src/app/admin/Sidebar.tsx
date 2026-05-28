@@ -41,6 +41,15 @@ const navItems = [
       </svg>
     ),
   },
+  {
+    href: "/admin/setup",
+    label: "Hướng dẫn",
+    icon: (
+      <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+      </svg>
+    ),
+  },
 ];
 
 export default function AdminSidebar({ brandName = "Admin" }: { brandName?: string }) {
@@ -50,6 +59,20 @@ export default function AdminSidebar({ brandName = "Admin" }: { brandName?: stri
   async function handleLogout() {
     await fetch("/api/admin/auth", { method: "DELETE" });
     router.replace("/admin/login");
+  }
+
+  // Chặn navigation khi đang có unsaved changes trên trang Settings
+  function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    const leavingSettings = pathname.startsWith("/admin/settings") && !href.startsWith("/admin/settings");
+    const dirty = typeof window !== "undefined" &&
+      (window as Window & { __adminSettingsDirty?: boolean }).__adminSettingsDirty;
+    if (leavingSettings && dirty) {
+      e.preventDefault();
+      if (window.confirm("Bạn có thay đổi chưa được lưu.\nRời khỏi trang Cấu hình không?")) {
+        (window as Window & { __adminSettingsDirty?: boolean }).__adminSettingsDirty = false;
+        router.push(href);
+      }
+    }
   }
 
   return (
@@ -75,6 +98,7 @@ export default function AdminSidebar({ brandName = "Admin" }: { brandName?: stri
             <Link
               key={item.href}
               href={item.href}
+              onClick={(e) => handleNavClick(e, item.href)}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                 active
                   ? "bg-emerald-500/10 text-emerald-400"

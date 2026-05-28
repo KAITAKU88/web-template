@@ -43,7 +43,8 @@ export default async function RootLayout({
   const siteName = settings.site_name ?? "TemplateLab";
   const brandName = settings.brand_name ?? siteName;
   const logoValue = settings.logo_url ?? undefined;
-  const zaloLink = settings.zalo_link ?? "https://zalo.me/g/crgzsa7qsx96olfpcerb";
+  const zaloLink = settings.zalo_link ?? null;
+  const gaId = settings.ga_id || process.env.NEXT_PUBLIC_GA_ID || null;
 
   return (
     <html
@@ -61,12 +62,12 @@ export default async function RootLayout({
         />
 
         {/* Google Analytics 4 */}
-        {process.env.NEXT_PUBLIC_GA_ID && (
+        {gaId && (
           <>
-            <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} />
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
             <script
               dangerouslySetInnerHTML={{
-                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${process.env.NEXT_PUBLIC_GA_ID}',{page_path:window.location.pathname});`,
+                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}',{page_path:window.location.pathname});`,
               }}
             />
           </>

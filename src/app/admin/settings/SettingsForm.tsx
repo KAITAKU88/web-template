@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useState, useRef } from "react";
+import { useTransition, useState, useRef, useEffect } from "react";
 import { saveSettings } from "./actions";
 import type { SettingsMap } from "@/lib/settings";
 
@@ -9,6 +9,39 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
   const [saved, setSaved] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Auto-focus field khi navigate đến /admin/settings#field_name (từ Hướng dẫn)
+  useEffect(() => {
+    const focusFromHash = () => {
+      const hash = window.location.hash.replace("#", "");
+      if (!hash) return;
+      const el = document.getElementById(hash);
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      (el as HTMLInputElement).focus?.();
+      el.style.transition = "box-shadow 0.2s ease";
+      el.style.boxShadow = "0 0 0 3px #10b981, 0 0 0 5px rgba(16,185,129,0.25)";
+      setTimeout(() => { el.style.boxShadow = ""; }, 2500);
+    };
+    const t = setTimeout(focusFromHash, 150);
+    window.addEventListener("hashchange", focusFromHash);
+    return () => { clearTimeout(t); window.removeEventListener("hashchange", focusFromHash); };
+  }, []);
+
+  // Cảnh báo khi đóng/refresh tab mà chưa lưu
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
+    if (isDirty) window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
+
+  // Expose dirty state để Sidebar có thể chặn navigation
+  useEffect(() => {
+    (window as Window & { __adminSettingsDirty?: boolean }).__adminSettingsDirty = isDirty;
+    return () => {
+      (window as Window & { __adminSettingsDirty?: boolean }).__adminSettingsDirty = false;
+    };
+  }, [isDirty]);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -100,14 +133,8 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
       {/* ── Thanh toán ────────────────────────────────────────── */}
       <Section
         title="Thanh toán (SePay)"
-        description="API key SePay và thông tin tài khoản ngân hàng để tạo QR"
+        description="Thông tin tài khoản ngân hàng để tạo QR và xác thực webhook SePay"
       >
-        <SecretField
-          label="SePay API Key"
-          name="sepay_api_key"
-          hasValue={!!settings.sepay_api_key}
-          hint="Để trống = giữ nguyên key cũ"
-        />
         <BankCodeField defaultValue={settings.bank_code ?? ""} />
         <Field
           label="Số tài khoản ngân hàng"
@@ -120,6 +147,18 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           name="bank_account_holder"
           defaultValue={settings.bank_account_holder ?? ""}
           placeholder="NGUYEN VAN A"
+        />
+        <SecretField
+          label="SePay Webhook Secret"
+          name="sepay_webhook_secret"
+          hasValue={!!settings.sepay_webhook_secret}
+          hint="Secret để xác thực request từ SePay — phải khớp với cấu hình trong SePay Dashboard → Webhook → API Key"
+        />
+        <SecretField
+          label="SePay API Key"
+          name="sepay_api_key"
+          hasValue={!!settings.sepay_api_key}
+          hint="API Key để gọi SePay API (dùng cho tính năng nâng cao — để trống nếu chưa cần)"
         />
       </Section>
 
@@ -149,6 +188,26 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
         />
       </Section>
 
+      {/* ── Analytics & Webhook nội bộ ────────────────────────── */}
+      <Section
+        title="Analytics & Cấu hình nâng cao"
+        description="Google Analytics và webhook secret nội bộ — cần thiết khi triển khai"
+      >
+        <Field
+          label="Google Analytics ID"
+          name="ga_id"
+          defaultValue={settings.ga_id ?? ""}
+          placeholder="G-XXXXXXXXXX"
+          hint="Mã GA4 để theo dõi lượt truy cập — lấy tại Google Analytics → Admin → Data Streams"
+        />
+        <SecretField
+          label="Supabase Webhook Secret"
+          name="supabase_webhook_secret"
+          hasValue={!!settings.supabase_webhook_secret}
+          hint="Secret để xác thực webhook từ Supabase Database — phải khớp khi cấu hình Database Webhooks trong Supabase Dashboard"
+        />
+      </Section>
+
       {/* ── AI Provider ───────────────────────────────────────── */}
       <Section
         title="AI — Sinh Landing Page"
@@ -162,26 +221,36 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
       </Section>
 
       {/* ── Submit ────────────────────────────────────────────── */}
-      <div className="flex items-center gap-4 pt-2">
-        <button
-          type="submit"
-          disabled={!isDirty || pending}
-          className={`rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 ${
-            isDirty && !pending
-              ? "bg-emerald-500 hover:bg-emerald-400 shadow-sm"
-              : "bg-emerald-500/30 cursor-not-allowed"
-          }`}
-        >
-          {pending ? "Đang lưu…" : "Lưu cấu hình"}
-        </button>
-        {saved && (
-          <span className="flex items-center gap-1.5 text-sm text-emerald-400">
-            <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15 3.293 9.879a1 1 0 111.414-1.414L8.414 12.172l6.879-6.879a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            Đã lưu thành công
-          </span>
-        )}
+      <div className={`sticky bottom-0 -mx-0 rounded-2xl transition-all duration-300 ${
+        isDirty ? "bg-gray-950/95 backdrop-blur border border-emerald-500/30 px-6 py-4 shadow-xl shadow-emerald-900/20" : "px-0 py-2"
+      }`}>
+        <div className="flex items-center gap-4">
+          <button
+            type="submit"
+            disabled={!isDirty || pending}
+            className={`rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 ${
+              isDirty && !pending
+                ? "bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/30 animate-pulse-once"
+                : "bg-emerald-500/30 cursor-not-allowed"
+            }`}
+          >
+            {pending ? "Đang lưu…" : "Lưu cấu hình"}
+          </button>
+          {isDirty && !pending && (
+            <span className="text-xs text-amber-400 flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
+              Có thay đổi chưa lưu
+            </span>
+          )}
+          {saved && (
+            <span className="flex items-center gap-1.5 text-sm text-emerald-400">
+              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15 3.293 9.879a1 1 0 111.414-1.414L8.414 12.172l6.879-6.879a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              Đã lưu thành công
+            </span>
+          )}
+        </div>
       </div>
     </form>
   );
