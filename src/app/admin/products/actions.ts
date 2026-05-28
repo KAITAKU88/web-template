@@ -1,5 +1,7 @@
 "use server";
 
+import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/settings";
 import { revalidatePath } from "next/cache";
@@ -68,7 +70,6 @@ function parseJson(raw: string): ProductCopy {
 }
 
 async function generateWithClaude(prompt: string, apiKey: string): Promise<ProductCopy> {
-  const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const client = new Anthropic({ apiKey });
   const message = await client.messages.create({
     model: "claude-sonnet-4-5",
@@ -81,7 +82,6 @@ async function generateWithClaude(prompt: string, apiKey: string): Promise<Produ
 }
 
 async function generateWithGemini(prompt: string, apiKey: string): Promise<ProductCopy> {
-  const { GoogleGenAI } = await import("@google/genai");
   const ai = new GoogleGenAI({ apiKey });
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",

@@ -218,7 +218,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
                   Đang sinh nội dung…
                 </>
               ) : (
-                <>✨ Generate với Claude</>
+                <>✨ Generate với AI</>
               )}
             </button>
             {landing && (
