@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { expireStaleOrders } from "@/lib/expireOrders";
 
-// Được gọi bởi Netlify Scheduled Function mỗi 5 phút
+// Được gọi bởi external cron (cron-job.org) mỗi 5 phút
 // Bảo vệ bằng CRON_SECRET để tránh ai gọi tùy tiện
 export async function POST(req: NextRequest) {
   const secret = req.headers.get("x-cron-secret");

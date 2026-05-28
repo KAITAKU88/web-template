@@ -30,10 +30,10 @@ const ENV_GROUPS = [
     ],
   },
   {
-    group: "Netlify — Bảo mật Admin",
-    href: "https://app.netlify.com/",
-    hrefLabel: "Netlify Dashboard → Site → Configuration → Env vars",
-    note: "Chọn site → Site configuration → Environment variables → Add variable",
+    group: "Cloudflare Pages — Bảo mật Admin",
+    href: "https://dash.cloudflare.com/",
+    hrefLabel: "Cloudflare Dashboard → Pages → Project → Settings → Env vars",
+    note: "Chọn project → Settings → Environment variables → Add variable",
     items: [
       {
         key: "ADMIN_PASSWORD" as const,
@@ -71,8 +71,8 @@ export default async function AdminSettingsPage() {
   const host =
     headersList.get("x-forwarded-host") ||
     headersList.get("host") ||
-    process.env.URL?.replace("https://", "") ||
-    "your-domain.netlify.app";
+    process.env.CF_PAGES_URL?.replace("https://", "") ||
+    "your-domain.pages.dev";
   const siteUrl = `https://${host}`;
 
   // Kiểm tra trạng thái các env vars bắt buộc
@@ -113,7 +113,7 @@ export default async function AdminSettingsPage() {
           )}
         </div>
         <p className="text-sm text-gray-500">
-          Các thông số này phải cấu hình trực tiếp trên Netlify hoặc Supabase Dashboard — không thể
+          Các thông số này phải cấu hình trực tiếp trên Cloudflare Pages hoặc Supabase Dashboard — không thể
           set qua giao diện vì lý do bảo mật (cần để khởi động ứng dụng).
         </p>
 

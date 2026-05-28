@@ -1,0 +1,7 @@
+name = "web-template"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+# Production env vars được set trong Cloudflare Dashboard, không hardcode ở đây
+# Cloudflare Dashboard → Pages → Project → Settings → Environment variables
