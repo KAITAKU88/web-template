@@ -1,6 +1,10 @@
 [build]
   command = "npm run build"
   publish = ".next"
-  ignore = "exit 1" 
+  ignore = "exit 1"
+
+[functions]
+  timeout = 30
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"

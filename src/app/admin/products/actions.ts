@@ -1,5 +1,7 @@
 "use server";
 
+import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI } from "@google/genai";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/settings";
 import { revalidatePath } from "next/cache";
@@ -59,30 +61,35 @@ Hãy tạo nội dung marketing hoàn chỉnh bằng tiếng Việt. Trả về 
 }
 
 function parseJson(raw: string): ProductCopy {
-  const jsonMatch = raw.match(/```json\s*([\s\S]*?)\s*```/) ?? raw.match(/(\{[\s\S]*\})/);
-  return JSON.parse(jsonMatch ? jsonMatch[1] : raw) as ProductCopy;
+  try {
+    const jsonMatch = raw.match(/```json\s*([\s\S]*?)\s*```/) ?? raw.match(/(\{[\s\S]*\})/);
+    return JSON.parse(jsonMatch ? jsonMatch[1] : raw) as ProductCopy;
+  } catch {
+    throw new Error(`AI trả về format không hợp lệ. Raw: ${raw.slice(0, 200)}`);
+  }
 }
 
 async function generateWithClaude(prompt: string, apiKey: string): Promise<ProductCopy> {
-  const Anthropic = (await import("@anthropic-ai/sdk")).default;
   const client = new Anthropic({ apiKey });
   const message = await client.messages.create({
-    model: "claude-sonnet-4-6",
+    model: "claude-sonnet-4-5",
     max_tokens: 4096,
     messages: [{ role: "user", content: prompt }],
   });
   const raw = message.content[0].type === "text" ? message.content[0].text : "";
+  if (!raw) throw new Error("Claude không trả về nội dung. Thử lại.");
   return parseJson(raw);
 }
 
 async function generateWithGemini(prompt: string, apiKey: string): Promise<ProductCopy> {
-  const { GoogleGenAI } = await import("@google/genai");
   const ai = new GoogleGenAI({ apiKey });
   const response = await ai.models.generateContent({
     model: "gemini-2.0-flash",
     contents: prompt,
   });
-  return parseJson(response.text ?? "");
+  const raw = response.text ?? "";
+  if (!raw) throw new Error("Gemini không trả về nội dung. Thử lại.");
+  return parseJson(raw);
 }
 
 export async function generateLandingContent(
@@ -95,15 +102,20 @@ export async function generateLandingContent(
   const provider = settings.ai_provider ?? "claude";
   const prompt = buildPrompt(name, type, description, audience);
 
-  if (provider === "gemini") {
-    const apiKey = settings.gemini_api_key;
-    if (!apiKey) throw new Error("Gemini API key chưa được cấu hình trong Settings");
-    return generateWithGemini(prompt, apiKey);
-  }
+  try {
+    if (provider === "gemini") {
+      const apiKey = settings.gemini_api_key;
+      if (!apiKey) throw new Error("Gemini API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key.");
+      return await generateWithGemini(prompt, apiKey);
+    }
 
-  const apiKey = settings.claude_api_key;
-  if (!apiKey) throw new Error("Claude API key chưa được cấu hình trong Settings");
-  return generateWithClaude(prompt, apiKey);
+    const apiKey = settings.claude_api_key;
+    if (!apiKey) throw new Error("Claude API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key.");
+    return await generateWithClaude(prompt, apiKey);
+  } catch (err) {
+    if (err instanceof Error) throw err;
+    throw new Error("Lỗi không xác định khi gọi AI. Kiểm tra API key và thử lại.");
+  }
 }
 
 export async function createProduct(formData: FormData) {
