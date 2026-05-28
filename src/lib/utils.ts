@@ -41,6 +41,7 @@ export function buildPaymentDeepLink(params: {
 }): string {
   const { bankCode, accountNumber, amount, description } = params;
   const qs = new URLSearchParams({
+    app: bankCode.toLowerCase(),
     ba: `${bankCode}-${accountNumber}`,
     am: String(amount),
     tn: description,
