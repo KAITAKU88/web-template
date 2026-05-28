@@ -55,6 +55,20 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           name="brand_color"
           defaultValue={settings.brand_color ?? "#10b981"}
         />
+        <Field
+          label="Favicon URL"
+          name="favicon_url"
+          defaultValue={settings.favicon_url ?? ""}
+          placeholder="https://yourdomain.com/favicon.ico"
+          hint="Icon nhỏ hiển thị trên tab trình duyệt"
+        />
+        <Field
+          label="Ảnh chia sẻ mạng xã hội"
+          name="og_image_url"
+          defaultValue={settings.og_image_url ?? ""}
+          placeholder="https://yourdomain.com/og.png"
+          hint="Hiển thị khi chia sẻ link lên Facebook, Zalo, Telegram… — khuyến nghị 1200×630px"
+        />
       </Section>
 
       {/* ── Liên hệ ───────────────────────────────────────────── */}

@@ -12,10 +12,26 @@ const inter = Inter({ subsets: ["latin", "vietnamese"] });
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const siteName = settings.site_name ?? "TemplateLab";
+  const description = "Mua template Notion và Google Sheets chất lượng cao. Thanh toán nhanh qua QR, nhận link ngay sau khi chuyển khoản.";
+  const faviconUrl = settings.favicon_url ?? undefined;
+  const ogImageUrl = settings.og_image_url ?? undefined;
+
   return {
     title: `${siteName} — Template Notion & Google Sheets`,
-    description:
-      "Mua template Notion và Google Sheets chất lượng cao. Thanh toán nhanh qua QR, nhận link ngay sau khi chuyển khoản.",
+    description,
+    icons: faviconUrl ? { icon: faviconUrl } : undefined,
+    openGraph: {
+      title: siteName,
+      description,
+      siteName,
+      ...(ogImageUrl && { images: [{ url: ogImageUrl, width: 1200, height: 630 }] }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: siteName,
+      description,
+      ...(ogImageUrl && { images: [ogImageUrl] }),
+    },
   };
 }
 
