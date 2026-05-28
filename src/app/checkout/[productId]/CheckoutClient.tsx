@@ -33,12 +33,14 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
   const [paymentUrl, setPaymentUrl] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [showBankModal, setShowBankModal] = useState(false);
+  const [currentUrl, setCurrentUrl] = useState("");
   const openingBankApp = useRef(false);
   const [upsellCountdown, setUpsellCountdown] = useState(10 * 60);
   const [isBundleOrder, setIsBundleOrder] = useState(false);
 
   useEffect(() => {
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    setCurrentUrl(window.location.href);
   }, []);
 
   // Đếm ngược 10 phút cho upsell banner — bắt đầu (lại) khi vào success step
@@ -412,6 +414,9 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
                   <h3 className="text-base font-semibold text-gray-800">Chọn ứng dụng ngân hàng</h3>
                   <button onClick={() => setShowBankModal(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
                 </div>
+                <p className="mb-3 text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
+                  💡 Đảm bảo đã đăng nhập sẵn vào app ngân hàng để thông tin được điền tự động
+                </p>
                 <div className="grid grid-cols-4 gap-3">
                   {([
                     { code: "vcb",  name: "Vietcombank", short: "VCB",  color: "#007B40" },
@@ -431,13 +436,12 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
                     { code: "eib",  name: "Eximbank",     short: "EIB",  color: "#003082" },
                     { code: "bvb",  name: "BaoViet",      short: "BVB",  color: "#008000" },
                   ] as const).map((bank) => (
-                    <button
+                    <a
                       key={bank.code}
+                      href={`${paymentUrl}&app=${bank.code}&ru=${encodeURIComponent(currentUrl)}`}
                       onClick={() => {
                         openingBankApp.current = true;
                         setTimeout(() => { openingBankApp.current = false; }, countdown * 1000);
-                        const ru = encodeURIComponent(window.location.href);
-                        window.location.href = `${paymentUrl}&app=${bank.code}&ru=${ru}`;
                       }}
                       className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-100 p-2 text-center text-xs text-gray-700 hover:bg-gray-50 active:scale-95 transition"
                     >
@@ -448,7 +452,7 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
                         {bank.short}
                       </div>
                       <span className="leading-tight">{bank.name}</span>
-                    </button>
+                    </a>
                   ))}
                 </div>
               </div>
