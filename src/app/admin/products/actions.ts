@@ -83,10 +83,24 @@ async function generateWithClaude(prompt: string, apiKey: string): Promise<Produ
 
 async function generateWithGemini(prompt: string, apiKey: string): Promise<ProductCopy> {
   const ai = new GoogleGenAI({ apiKey });
-  const response = await ai.models.generateContent({
-    model: "gemini-2.0-flash",
-    contents: prompt,
-  });
+  let response;
+  try {
+    response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: prompt,
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes("429") || msg.includes("RESOURCE_EXHAUSTED") || msg.includes("quota")) {
+      throw new Error(
+        "Gemini API hết quota free tier (limit = 0). Lấy API key mới tại aistudio.google.com/apikey — key từ AI Studio có 1500 req/ngày miễn phí."
+      );
+    }
+    if (msg.includes("401") || msg.includes("403") || msg.includes("API_KEY_INVALID")) {
+      throw new Error("Gemini API key không hợp lệ. Kiểm tra lại trong Admin → Cấu hình → AI.");
+    }
+    throw err;
+  }
   const raw = response.text ?? "";
   if (!raw) throw new Error("Gemini không trả về nội dung. Thử lại.");
   return parseJson(raw);
