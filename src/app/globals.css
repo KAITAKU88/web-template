@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Brand color CSS variable — overridden by root layout from DB settings */
+:root {
+  --brand: #16a34a;
+}
+
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900 antialiased;
@@ -10,12 +15,42 @@
 
 @layer components {
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-green-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-semibold text-white shadow-sm transition active:scale-95 disabled:cursor-not-allowed disabled:opacity-50;
+    background-color: var(--brand);
+  }
+  .btn-primary:hover {
+    filter: brightness(0.88);
   }
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 active:scale-95;
   }
   .card {
     @apply rounded-2xl bg-white shadow ring-1 ring-gray-200;
+  }
+}
+
+@layer utilities {
+  .bg-brand {
+    background-color: var(--brand);
+  }
+  .text-brand {
+    color: var(--brand);
+  }
+  .border-brand {
+    border-color: var(--brand);
+  }
+  .bg-brand-subtle {
+    background-color: color-mix(in srgb, var(--brand) 10%, transparent);
+  }
+  .hover\:bg-brand-dim:hover {
+    background-color: var(--brand);
+    filter: brightness(0.88);
+  }
+  .focus\:border-brand:focus {
+    border-color: var(--brand);
+  }
+  .focus\:ring-brand:focus {
+    --tw-ring-color: color-mix(in srgb, var(--brand) 25%, transparent);
+    box-shadow: 0 0 0 2px var(--tw-ring-color);
   }
 }

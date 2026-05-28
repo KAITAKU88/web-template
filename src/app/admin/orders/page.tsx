@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
+import { expireStaleOrders, EXPIRE_MINUTES } from "@/lib/expireOrders";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Tất cả" },
@@ -20,6 +21,9 @@ interface PageProps {
 }
 
 export default async function AdminOrdersPage({ searchParams }: PageProps) {
+  // Tự động hủy đơn pending quá hạn trước khi render
+  await expireStaleOrders();
+
   const params = await searchParams;
   const status = params.status ?? "";
   const emailFilter = (params.email ?? "").trim().toLowerCase();
@@ -57,7 +61,12 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
     <div className="p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Đơn hàng</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-white">Đơn hàng</h1>
+          <p className="mt-1 text-xs text-gray-500">
+            Đơn chờ thanh toán quá <span className="text-yellow-400">{EXPIRE_MINUTES} phút</span> tự động chuyển thành Đã hủy
+          </p>
+        </div>
         <span className="text-sm text-gray-400">{count ?? 0} đơn</span>
       </div>
 

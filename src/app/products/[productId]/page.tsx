@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency, calcDiscountPercent, formatCount } from "@/lib/utils";
-import { getProductCopy } from "@/lib/productContent";
+import { getProductCopy, type ProductCopy, type PainItem, type FeatureItem, type TestiItem, type IncludeItem, type FaqItem } from "@/lib/productContent";
 import type { Product } from "@/types";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -42,7 +42,7 @@ export default async function ProductPage({ params }: Props) {
   if (error || !data) notFound();
 
   const product = data as Product;
-  const copy     = getProductCopy(product.name);
+  const copy: ProductCopy = product.landing_content ?? getProductCopy(product.name);
   const typeKey  = product.type ?? "notion";
   const isBestseller = product.download_count >= 1000;
   const isHot = !isBestseller && (product.download_count >= 500 || product.rating >= 4.9);
@@ -148,7 +148,7 @@ export default async function ProductPage({ params }: Props) {
           Nghe quen không?
         </h2>
         <div className="grid gap-4 sm:grid-cols-3">
-          {copy.pains.map((p, i) => (
+          {copy.pains.map((p: PainItem, i: number) => (
             <div key={i} className="rounded-xl border border-gray-200 bg-white p-4">
               <div className="mb-2 text-2xl">{p.icon}</div>
               <div className="mb-1.5 text-sm font-bold text-gray-800">{p.title}</div>
@@ -228,7 +228,7 @@ export default async function ProductPage({ params }: Props) {
         <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-green-600">Điểm khác biệt</span>
         <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900">Tất cả những gì bạn cần</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          {copy.features.map((f, i) => (
+          {copy.features.map((f: FeatureItem, i: number) => (
             <div key={i} className="flex gap-3 rounded-xl border border-gray-100 p-4 transition-colors hover:border-green-200">
               <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-green-50 text-xl">
                 {f.icon}
@@ -249,7 +249,7 @@ export default async function ProductPage({ params }: Props) {
         <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-green-600">Đánh giá</span>
         <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900">Người dùng nói gì?</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          {copy.testimonials.map((t, i) => (
+          {copy.testimonials.map((t: TestiItem, i: number) => (
             <div key={i} className={`rounded-xl border bg-white p-5 ${i === 0 ? "border-green-200 bg-gradient-to-br from-white to-green-50" : "border-gray-200"}`}>
               {i === 0 && (
                 <span className="mb-3 inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-bold text-green-700">
@@ -284,7 +284,7 @@ export default async function ProductPage({ params }: Props) {
           <div>
             <h3 className="mb-4 font-bold text-gray-800">Bạn nhận được:</h3>
             <ul className="space-y-3">
-              {copy.includes.map((item, i) => (
+              {copy.includes.map((item: IncludeItem, i: number) => (
                 <li key={i} className="flex items-start gap-3 border-b border-gray-50 pb-3 text-sm last:border-0 last:pb-0">
                   <span className="mt-0.5 font-bold text-green-500">✓</span>
                   <div>

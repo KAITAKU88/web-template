@@ -33,14 +33,11 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
   const [paymentUrl, setPaymentUrl] = useState("");
   const [isMobile, setIsMobile] = useState(false);
   const [showBankModal, setShowBankModal] = useState(false);
-  const [currentUrl, setCurrentUrl] = useState("");
-  const openingBankApp = useRef(false);
   const [upsellCountdown, setUpsellCountdown] = useState(10 * 60);
   const [isBundleOrder, setIsBundleOrder] = useState(false);
 
   useEffect(() => {
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
-    setCurrentUrl(window.location.href);
   }, []);
 
   // Đếm ngược 10 phút cho upsell banner — bắt đầu (lại) khi vào success step
@@ -93,11 +90,9 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
   }, [step]);
 
   // F5 / đóng tab → hủy đơn qua sendBeacon
-  // Bỏ qua khi user đang mở app ngân hàng (deep link navigation)
   useEffect(() => {
     if (step !== "waiting") return;
     const handleUnload = () => {
-      if (openingBankApp.current) return;
       navigator.sendBeacon(`/api/orders/${orderIdRef.current}`);
     };
     window.addEventListener("beforeunload", handleUnload);
@@ -462,11 +457,9 @@ export default function CheckoutClient({ product, companion, bundle }: Props) {
                   ] as const).map((bank) => (
                     <a
                       key={bank.code}
-                      href={`${paymentUrl}&app=${bank.code}&ru=${encodeURIComponent(currentUrl)}`}
-                      onClick={() => {
-                        openingBankApp.current = true;
-                        setTimeout(() => { openingBankApp.current = false; }, countdown * 1000);
-                      }}
+                      href={`${paymentUrl}&app=${bank.code}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-100 p-2 text-center text-xs text-gray-700 hover:bg-gray-50 active:scale-95 transition"
                     >
                       <div

@@ -12,6 +12,8 @@ export interface Product {
   rating: number;                 // 0.0 - 5.0
   rating_count: number;           // Số lượt đánh giá
   download_count: number;         // Số lượt tải
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  landing_content: any | null;   // ProductCopy sinh bởi AI — NULL = dùng content tĩnh
   created_at: string;
 }
 
