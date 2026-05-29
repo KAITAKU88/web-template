@@ -1,6 +1,6 @@
 -- Khởi tạo admin_default_password nếu chưa có
 INSERT INTO settings (key, value, updated_at)
-VALUES ('admin_default_password', 'admin12345678', NOW())
+VALUES ('admin_default_password', '"admin12345678"', NOW())
 ON CONFLICT (key) DO NOTHING;
 
 -- Đảm bảo các key khác tồn tại (null = rỗng)
