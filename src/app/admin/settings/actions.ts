@@ -36,7 +36,6 @@ export async function saveSettings(formData: FormData) {
 }
 
 export async function changePassword(formData: FormData): Promise<{ error?: string; success?: boolean }> {
-  const currentPassword = (formData.get("current_password") as string).trim();
   const newPassword = (formData.get("new_password") as string).trim();
   const confirmPassword = (formData.get("confirm_password") as string).trim();
 
@@ -45,13 +44,6 @@ export async function changePassword(formData: FormData): Promise<{ error?: stri
   }
   if (newPassword !== confirmPassword) {
     return { error: "Xác nhận mật khẩu không khớp." };
-  }
-
-  // Kiểm tra mật khẩu hiện tại
-  const settings = await getSettings();
-  const storedPassword = settings.admin_password ?? process.env.ADMIN_PASSWORD ?? "";
-  if (currentPassword !== storedPassword) {
-    return { error: "Mật khẩu hiện tại không đúng." };
   }
 
   await updateSettings({ admin_password: newPassword });
