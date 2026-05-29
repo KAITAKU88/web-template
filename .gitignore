@@ -7,6 +7,10 @@ node_modules/
 .next/
 out/
 
+# Cloudflare / OpenNext build output
+.open-next/
+.wrangler/
+
 # Production
 build/
 
