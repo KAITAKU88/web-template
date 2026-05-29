@@ -1,8 +1,6 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  serverExternalPackages: ["@google/genai", "@anthropic-ai/sdk"],
-
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "**.supabase.co" },
