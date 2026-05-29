@@ -3,10 +3,13 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async rewrites() {
     return [
-      // Login pages dùng trang riêng, không rewrite
+      // Login pages dùng trang riêng
       { source: "/manager/login",      destination: "/admin/staff-login" },
       { source: "/collaborator/login", destination: "/admin/staff-login" },
-      // Các trang còn lại map về /admin
+      // Root path (dashboard)
+      { source: "/manager",      destination: "/admin" },
+      { source: "/collaborator", destination: "/admin" },
+      // Sub-pages
       { source: "/manager/:path*",      destination: "/admin/:path*" },
       { source: "/collaborator/:path*", destination: "/admin/:path*" },
     ];
