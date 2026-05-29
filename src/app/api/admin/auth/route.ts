@@ -1,25 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { createOwnerToken, createStaffToken } from "@/lib/admin-auth";
+import { getActivePassword, clearTempPassword } from "@/lib/admin-password";
 
 const ROLE_BASE: Record<string, string> = {
   owner:        "/admin",
   manager:      "/manager",
   collaborator: "/collaborator",
 };
-
-async function getAdminPassword(): Promise<string> {
-  try {
-    const supabase = createAdminClient();
-    const { data } = await supabase
-      .from("settings")
-      .select("value")
-      .eq("key", "admin_password")
-      .single();
-    if (data?.value) return data.value as string;
-  } catch {}
-  return process.env.ADMIN_PASSWORD ?? "admin12345678";
-}
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -49,31 +37,14 @@ export async function POST(req: NextRequest) {
     }
   } else {
     // ── Owner login ──────────────────────────────────────────────────
-    const correctPassword = await getAdminPassword();
-    let valid = password && password === correctPassword;
-
-    if (!valid) {
-      try {
-        const supabase = createAdminClient();
-        const { data } = await supabase
-          .from("settings")
-          .select("key, value")
-          .in("key", ["admin_temp_password", "admin_temp_password_expiry"]);
-        const map = Object.fromEntries(
-          (data ?? []).map((r: { key: string; value: string }) => [r.key, r.value])
-        );
-        const tempPw = map["admin_temp_password"];
-        const expiry = map["admin_temp_password_expiry"];
-        if (tempPw && password === tempPw && expiry && new Date() < new Date(expiry)) {
-          valid = true;
-          const supabase2 = createAdminClient();
-          await supabase2.from("settings").delete().in("key", ["admin_temp_password", "admin_temp_password_expiry"]);
-        }
-      } catch {}
+    const active = await getActivePassword();
+    if (!active || password !== active.password) {
+      return NextResponse.json({ error: "Sai mật khẩu." }, { status: 401 });
     }
 
-    if (!valid) {
-      return NextResponse.json({ error: "Sai mật khẩu." }, { status: 401 });
+    // Nếu đăng nhập bằng mật khẩu tạm → xóa temp sau khi đăng nhập thành công
+    if (active.type === "temp") {
+      await clearTempPassword();
     }
 
     token = await createOwnerToken();
@@ -82,7 +53,7 @@ export async function POST(req: NextRequest) {
 
   const basePath = ROLE_BASE[role] ?? "/admin";
   const res = NextResponse.json({ ok: true, basePath });
-  res.cookies.set("admin_token", token, {
+  res.cookies.set("admin_token", token!, {
     httpOnly: true,
     sameSite: "lax",
     path: "/",

@@ -1,6 +1,7 @@
 "use server";
 
-import { updateSettings, getSettings } from "@/lib/settings";
+import { updateSettings } from "@/lib/settings";
+import { setAdminPassword } from "@/lib/admin-password";
 
 const ALL_KEYS = [
   "site_name", "site_description", "brand_name", "logo_url", "brand_color", "favicon_url", "og_image_url",
@@ -46,6 +47,7 @@ export async function changePassword(formData: FormData): Promise<{ error?: stri
     return { error: "Xác nhận mật khẩu không khớp." };
   }
 
-  await updateSettings({ admin_password: newPassword });
+  // Set admin_password, tự động xóa default và temp
+  await setAdminPassword(newPassword);
   return { success: true };
 }
