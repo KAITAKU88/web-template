@@ -6,6 +6,8 @@ import Link from "next/link";
 
 export default function LoginForm({ brandName, showHint = false }: { brandName: string; showHint?: boolean }) {
   const router = useRouter();
+  const [isStaff, setIsStaff] = useState(false);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -14,10 +16,11 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
     e.preventDefault();
     setError("");
     setLoading(true);
+    const body = isStaff ? { email, password } : { password };
     const res = await fetch("/api/admin/auth", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
+      body: JSON.stringify(body),
     });
     setLoading(false);
     if (res.ok) {
@@ -38,27 +41,44 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
             </svg>
           </div>
           <h1 className="text-xl font-bold text-white">Admin — {brandName}</h1>
-          <p className="mt-1 text-sm text-gray-400">Đăng nhập để quản lý</p>
+          <p className="mt-1 text-sm text-gray-400">
+            {isStaff ? "Đăng nhập tài khoản nhân viên" : "Đăng nhập Owner"}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {isStaff && (
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-gray-300">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoFocus
+                required
+                placeholder="nhanvien@example.com"
+                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-4 py-3 text-white placeholder-gray-500 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+              />
+            </div>
+          )}
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-300">Mật khẩu</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              autoFocus
+              autoFocus={!isStaff}
               required
               placeholder="••••••••"
               className="w-full rounded-xl border border-gray-700 bg-gray-800 px-4 py-3 text-white placeholder-gray-500 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
             />
           </div>
-          {showHint && (
+
+          {!isStaff && showHint && (
             <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-300">
               <p className="font-semibold mb-0.5">Mật khẩu mặc định</p>
               <p className="font-mono tracking-wide">admin12345678</p>
-              <p className="mt-1.5 text-amber-400/70">Hint này ẩn sau khi bạn thiết lập email admin và đổi mật khẩu.</p>
+              <p className="mt-1.5 text-amber-400/70">Hint này ẩn sau khi bạn thiết lập email admin.</p>
             </div>
           )}
           {error && (
@@ -71,12 +91,21 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
           >
             {loading ? "Đang xác thực…" : "Đăng nhập"}
           </button>
-          <Link
-            href="/admin/forgot-password"
-            className="block text-center text-sm text-gray-500 hover:text-gray-300 transition"
-          >
-            Quên mật khẩu?
-          </Link>
+
+          <div className="flex items-center justify-between text-sm">
+            <button
+              type="button"
+              onClick={() => { setIsStaff(!isStaff); setError(""); setEmail(""); setPassword(""); }}
+              className="text-gray-500 hover:text-gray-300 transition"
+            >
+              {isStaff ? "← Đăng nhập Owner" : "Đăng nhập nhân viên →"}
+            </button>
+            {!isStaff && (
+              <Link href="/admin/forgot-password" className="text-gray-500 hover:text-gray-300 transition">
+                Quên mật khẩu?
+              </Link>
+            )}
+          </div>
         </form>
       </div>
     </div>
