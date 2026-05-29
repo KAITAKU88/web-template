@@ -74,15 +74,19 @@ export async function middleware(req: NextRequest) {
   const role = session.role;
   const basePath = ROLE_BASE[role] ?? "/admin";
 
-  // Nếu vào sai base path → redirect về đúng base path
+  // Nếu vào sai base path → redirect về đúng path tương đương
   if (isAdminPath && !isManagerPath && !isCollaboratorPath && role !== "owner") {
-    return NextResponse.redirect(new URL(basePath, req.url));
+    // Manager/Collaborator truy cập /admin/xxx → redirect sang /manager/xxx hoặc /collaborator/xxx
+    const equivalent = pathname.replace("/admin", basePath);
+    return NextResponse.redirect(new URL(equivalent, req.url));
   }
   if (isManagerPath && role !== "manager") {
-    return NextResponse.redirect(new URL(basePath, req.url));
+    const equivalent = pathname.replace("/manager", basePath);
+    return NextResponse.redirect(new URL(equivalent, req.url));
   }
   if (isCollaboratorPath && role !== "collaborator") {
-    return NextResponse.redirect(new URL(basePath, req.url));
+    const equivalent = pathname.replace("/collaborator", basePath);
+    return NextResponse.redirect(new URL(equivalent, req.url));
   }
 
   // Owner-only pages — check theo sub-path (bỏ prefix role)
