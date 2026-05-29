@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Sai mật khẩu." }, { status: 401 });
     }
 
-    token = await createOwnerToken(password!);
+    token = await createOwnerToken();
   }
 
   const res = NextResponse.json({ ok: true });

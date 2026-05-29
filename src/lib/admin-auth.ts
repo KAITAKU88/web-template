@@ -22,22 +22,16 @@ async function hmac(data: string, secret: string): Promise<string> {
   return btoa(String.fromCharCode(...new Uint8Array(sig)));
 }
 
-// ── Owner token (backwards compatible) ──────────────────────────────
-export async function createOwnerToken(password: string): Promise<string> {
+// ── Owner token — ký bằng "owner" cố định, không phụ thuộc password ─
+export async function createOwnerToken(): Promise<string> {
   const secret = process.env.ADMIN_SECRET ?? "";
-  return hmac(password, secret);
+  return hmac("owner", secret);
 }
 
-async function verifyOwnerToken(token: string): Promise<boolean> {
-  try {
-    const settings = await getSettings();
-    const password = settings.admin_password ?? process.env.ADMIN_PASSWORD ?? "admin12345678";
-    const secret = process.env.ADMIN_SECRET ?? "";
-    const expected = await hmac(password, secret);
-    return token === expected;
-  } catch {
-    return false;
-  }
+export async function verifyOwnerTokenValue(token: string): Promise<boolean> {
+  const secret = process.env.ADMIN_SECRET ?? "";
+  const expected = await hmac("owner", secret);
+  return token === expected;
 }
 
 // ── Staff token ──────────────────────────────────────────────────────
@@ -85,8 +79,8 @@ export async function resolveSession(token: string): Promise<AdminSession | null
     }
   }
 
-  // Owner token (backwards compatible)
-  const isOwner = await verifyOwnerToken(token);
+  // Owner token
+  const isOwner = await verifyOwnerTokenValue(token);
   if (isOwner) return { type: "owner", role: "owner", name: "Owner" };
 
   return null;

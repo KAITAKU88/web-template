@@ -31,9 +31,8 @@ async function verifyToken(token: string): Promise<{ role: string } | null> {
     return { role };
   }
 
-  // Owner token (backwards compatible: HMAC of password)
-  const password = process.env.ADMIN_PASSWORD ?? "admin12345678";
-  const expected = await hmac(password, secret);
+  // Owner token: HMAC("owner", secret)
+  const expected = await hmac("owner", secret);
   if (token === expected) return { role: "owner" };
 
   return null;
