@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function LoginForm({ brandName }: { brandName: string }) {
+export default function LoginForm({ brandName, showHint = false }: { brandName: string; showHint?: boolean }) {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -54,6 +54,13 @@ export default function LoginForm({ brandName }: { brandName: string }) {
               className="w-full rounded-xl border border-gray-700 bg-gray-800 px-4 py-3 text-white placeholder-gray-500 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
             />
           </div>
+          {showHint && (
+            <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-300">
+              <p className="font-semibold mb-0.5">Mật khẩu mặc định</p>
+              <p className="font-mono tracking-wide">admin12345678</p>
+              <p className="mt-1.5 text-amber-400/70">Hint này ẩn sau khi bạn thiết lập email admin và đổi mật khẩu.</p>
+            </div>
+          )}
           {error && (
             <p className="rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>
           )}

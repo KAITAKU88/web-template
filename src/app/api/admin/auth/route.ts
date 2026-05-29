@@ -27,7 +27,7 @@ async function getAdminPassword(): Promise<string> {
       .single();
     if (data?.value) return data.value as string;
   } catch {}
-  return process.env.ADMIN_PASSWORD ?? "";
+  return process.env.ADMIN_PASSWORD ?? "admin12345678";
 }
 
 export async function POST(req: NextRequest) {

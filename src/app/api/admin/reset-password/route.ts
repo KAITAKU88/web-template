@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (email.toLowerCase() !== adminEmail.toLowerCase()) {
-    return NextResponse.json({ error: "Email không đúng. Vui lòng kiểm tra lại." }, { status: 400 });
+    return NextResponse.json({ error: "Sai địa chỉ email admin." }, { status: 400 });
   }
 
   const tempPassword = randomPassword();
