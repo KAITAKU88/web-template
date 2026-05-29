@@ -5,7 +5,7 @@ import AdminSidebar from "./Sidebar";
 export async function generateMetadata() {
   const settings = await getSettings();
   const brandName = settings.brand_name ?? settings.site_name ?? "Admin";
-  return { title: `Admin — ${brandName}` };
+  return { title: brandName };
 }
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

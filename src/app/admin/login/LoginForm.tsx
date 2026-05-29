@@ -17,18 +17,23 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
     e.preventDefault();
     setError("");
     setLoading(true);
-    const body = isStaff ? { email, password } : { password };
-    const res = await fetch("/api/admin/auth", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    setLoading(false);
-    if (res.ok) {
-      router.replace("/admin");
-    } else {
-      const data = await res.json();
-      setError(data.error ?? "Đăng nhập thất bại.");
+    try {
+      const body = isStaff ? { email, password } : { password };
+      const res = await fetch("/api/admin/auth", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        router.replace("/admin");
+      } else {
+        const data = await res.json();
+        setError(data.error ?? "Đăng nhập thất bại.");
+      }
+    } catch {
+      setError("Không thể kết nối. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
     }
   }
 

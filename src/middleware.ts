@@ -58,10 +58,10 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/admin", req.url));
   }
 
-  // Truyền role qua header để server components đọc
-  const res = NextResponse.next();
-  res.headers.set("x-admin-role", session.role);
-  return res;
+  // Truyền role qua request header để server components đọc
+  const requestHeaders = new Headers(req.headers);
+  requestHeaders.set("x-admin-role", session.role);
+  return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {
