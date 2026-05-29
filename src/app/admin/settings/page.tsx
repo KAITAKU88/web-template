@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { getSettings } from "@/lib/settings";
 import SettingsForm from "./SettingsForm";
+import ChangePasswordForm from "./ChangePasswordForm";
 
 export const dynamic = "force-dynamic";
 
@@ -97,6 +98,8 @@ export default async function AdminSettingsPage() {
       </div>
 
       <SettingsForm settings={settings} />
+
+      <ChangePasswordForm />
 
       {/* ── Thông số khác (Env Vars) ──────────────────────────── */}
       <div className="space-y-4">

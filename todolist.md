@@ -8,8 +8,7 @@ CRON_SECRET=8833b9758bfedf38ef7898d36ded13d3c4d9fefc22a881b5
 Sau khi chạy tốt mới tính đến tối ưu, chạy nhanh chóng, code sạch 
 
 
-dựa trên toàn bộ mã nguồn của dự án, của sepay, supabase, viét 1 bản thiết kế cực kì chi tiết về tính năng, hoạt động, chi tiết đến mức mà chỉ cần cung cấp bản blueprint này cho 1 Agent thì nó có thể tự làm ra 1 hệ thống y hệt như vậy. Toàn bộ lưu thành 1 file .md huo 
-Sau đó viết 1 bản blueprint khác để thiết kế 1 web khóa học. Chỉ có thêm tính năng đăng nhập, tạo khóa học, quản lý học viên, tiến trình..sẽ phức tạp hơn .
+Dựa trên file mẫu là AGENTS_2 hãy viết bản cho chính hệ thống này 
 
 
 
@@ -30,12 +29,10 @@ Sau đó viết 1 bản blueprint khác để thiết kế 1 web khóa học. Ch
 
 
 
-Phần hướng dẫn dùng toàn tiếng việt không dấu, khó nhìn 
 
 
 
 
-Cho phép đổi mật khẩu quản trị
 Kịch bản như sau: Có người hỏi mua hệ thống này cho thương hiệu của họ, quy trình như thế nào:
 - Tạo github của họ, fork repo của tôi => Họ có source code
 - Tạo dự án supabase của họ và tạo lại toàn bộ dữ liệu hay có cách nào để clone thư mục trên supabase của tôi (mà không chứa dữ liệu) thành dự án của họ không.

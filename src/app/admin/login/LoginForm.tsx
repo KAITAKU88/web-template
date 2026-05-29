@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginForm({ brandName }: { brandName: string }) {
   const router = useRouter();
@@ -63,6 +64,12 @@ export default function LoginForm({ brandName }: { brandName: string }) {
           >
             {loading ? "Đang xác thực…" : "Đăng nhập"}
           </button>
+          <Link
+            href="/admin/forgot-password"
+            className="block text-center text-sm text-gray-500 hover:text-gray-300 transition"
+          >
+            Quên mật khẩu?
+          </Link>
         </form>
       </div>
     </div>

@@ -30,6 +30,7 @@ export async function middleware(req: NextRequest) {
 
   if (!pathname.startsWith("/admin")) return NextResponse.next();
   if (pathname === "/admin/login") return NextResponse.next();
+  if (pathname === "/admin/forgot-password") return NextResponse.next();
 
   const token = req.cookies.get("admin_token")?.value;
   if (!token || !(await verifyAdminToken(token))) {

@@ -117,6 +117,14 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
         description="Kênh liên lạc hiển thị với khách hàng"
       >
         <Field
+          label="Email Admin"
+          name="admin_email"
+          type="email"
+          defaultValue={settings.admin_email ?? ""}
+          placeholder="admin@yourdomain.com"
+          hint="Dùng để nhận mật khẩu tạm khi quên mật khẩu — không hiển thị với khách hàng"
+        />
+        <Field
           label="Link Zalo"
           name="zalo_link"
           defaultValue={settings.zalo_link ?? ""}
@@ -284,12 +292,14 @@ function Field({
   defaultValue,
   placeholder,
   hint,
+  type = "text",
 }: {
   label: string;
   name: string;
   defaultValue: string;
   placeholder?: string;
   hint?: string;
+  type?: string;
 }) {
   return (
     <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
@@ -303,7 +313,7 @@ function Field({
         <input
           id={name}
           name={name}
-          type="text"
+          type={type}
           defaultValue={defaultValue}
           placeholder={placeholder}
           className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-colors"
