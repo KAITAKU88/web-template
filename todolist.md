@@ -44,5 +44,11 @@ Kịch bản như sau: Có người hỏi mua hệ thống này cho thương hi�
 
  
 =======
+thêm tính năng phân quyền:
+- Nhân viên sale
+- Quản trị viên cấp 2: Cho phép tạo danh mục, tạo sản phẩm. và toàn bộ quyền của nhân viên
+- Quản trị viên cấp 1: Đầy đủ quyền, nhưng không được thay đổi mật khẩu, không được thay đổi email, không được xem phần Cấu hình và Hướng dẫn., có quyền xóa hoặc thêm các vai trò nhân viên sale, quản trị viên cấp 2. 
+hiênhiên
 
-
+===
+Xem lại phần Generate với AI, đang lỗi phần đó. Xem cấu trúc và flow 1 trang landing page của 1 sản phẩm. Tạo sẵn promt mặc định để dùng cho nút này.
