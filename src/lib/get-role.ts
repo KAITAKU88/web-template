@@ -16,7 +16,8 @@ async function hmac(data: string, secret: string): Promise<string> {
 export async function getAdminRole(): Promise<AdminRole> {
   try {
     const cookieStore = await cookies();
-    const token = cookieStore.get("admin_token")?.value ?? "";
+    const raw = cookieStore.get("admin_token")?.value ?? "";
+    const token = raw ? decodeURIComponent(raw) : "";
 
     if (!token) return "owner";
 
