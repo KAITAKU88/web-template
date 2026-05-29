@@ -8,6 +8,12 @@ main = ".open-next/worker.js"
 directory = ".open-next/assets"
 binding = "ASSETS"
 
+[observability]
+enabled = true
+
+[observability.logs]
+enabled = true
+
 [vars]
 # Production env vars được set trong Cloudflare Dashboard, không hardcode ở đây
 # Cloudflare Dashboard → Pages → Project → Settings → Environment variables
