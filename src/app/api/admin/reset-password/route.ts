@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
   const siteName = settings.site_name ?? "Admin";
 
   const resend = new Resend(apiKey);
-  await resend.emails.send({
+  const { error: sendError } = await resend.emails.send({
     from: `${fromName} <${fromEmail}>`,
     to: adminEmail,
     subject: `[${siteName}] Mật khẩu tạm thời`,
@@ -67,6 +67,14 @@ export async function POST(req: NextRequest) {
       </div>
     `,
   });
+
+  if (sendError) {
+    console.error("Resend error:", sendError);
+    return NextResponse.json(
+      { error: `Gửi email thất bại: ${sendError.message}` },
+      { status: 500 }
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }
