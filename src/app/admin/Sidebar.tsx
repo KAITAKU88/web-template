@@ -75,7 +75,7 @@ export default function AdminSidebar({ brandName = "Admin", role = "owner" }: { 
 
   async function handleLogout() {
     await fetch("/api/admin/auth", { method: "DELETE" });
-    router.replace("/admin/login");
+    window.location.href = "/admin/login";
   }
 
   // Chặn navigation khi đang có unsaved changes trên trang Settings

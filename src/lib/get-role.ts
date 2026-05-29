@@ -17,7 +17,8 @@ export async function getAdminRole(): Promise<AdminRole> {
   try {
     const cookieStore = await cookies();
     const raw = cookieStore.get("admin_token")?.value ?? "";
-    const token = raw ? decodeURIComponent(raw) : "";
+    let token = raw;
+    try { if (raw) token = decodeURIComponent(raw); } catch { token = raw; }
 
     if (!token) return "owner";
 

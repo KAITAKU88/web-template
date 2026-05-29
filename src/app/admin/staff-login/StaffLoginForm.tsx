@@ -48,7 +48,7 @@ export default function StaffLoginForm({ brandName }: { brandName: string }) {
       });
       if (res.ok) {
         const data = await res.json();
-        router.replace(data.basePath ?? "/manager");
+        window.location.href = data.basePath ?? "/manager";
       } else {
         const data = await res.json();
         setError(data.error ?? "Đăng nhập thất bại.");

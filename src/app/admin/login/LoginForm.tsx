@@ -45,7 +45,7 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
         body: JSON.stringify({ password }),
       });
       if (res.ok) {
-        router.replace("/admin");
+        window.location.href = "/admin";
       } else {
         const data = await res.json();
         setError(data.error ?? "Đăng nhập thất bại.");
