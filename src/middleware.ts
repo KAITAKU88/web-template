@@ -19,8 +19,6 @@ const ROLE_BASE: Record<string, string> = {
   collaborator: "/collaborator",
 };
 
-// Owner-only sub-paths (trong /admin/...)
-const OWNER_ONLY_SUBPATHS = ["/admin/settings", "/admin/setup", "/admin/staff"];
 
 async function verifyToken(token: string): Promise<{ role: string } | null> {
   const secret = process.env.ADMIN_SECRET ?? "";
@@ -87,10 +85,20 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(basePath, req.url));
   }
 
-  // Owner-only sub-paths (chỉ owner mới vào /admin/settings, /admin/setup, /admin/staff)
-  const isOwnerOnly = OWNER_ONLY_SUBPATHS.some((p) => pathname.startsWith(p));
-  if (isOwnerOnly && role !== "owner") {
-    return NextResponse.redirect(new URL("/admin", req.url));
+  // Owner-only pages — check theo sub-path (bỏ prefix role)
+  const OWNER_ONLY_PAGES = ["/settings", "/setup", "/staff"];
+  const subPath = pathname.replace(/^\/(admin|manager|collaborator)/, "");
+  if (OWNER_ONLY_PAGES.some((p) => subPath.startsWith(p)) && role !== "owner") {
+    return NextResponse.redirect(new URL(basePath, req.url));
+  }
+
+  // Collaborator chỉ được xem, không được thêm/sửa
+  const WRITE_PAGES = ["/products/new", "/products/", "/categories"];
+  if (role === "collaborator" && WRITE_PAGES.some((p) => subPath.startsWith(p))) {
+    // Cho phép xem list, chặn edit/new
+    if (subPath.includes("/new") || subPath.includes("/edit")) {
+      return NextResponse.redirect(new URL(basePath, req.url));
+    }
   }
 
   // Truyền role qua request header
