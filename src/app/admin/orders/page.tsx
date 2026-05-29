@@ -145,7 +145,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                   status: string;
                   paid_at: string | null;
                   created_at: string;
-                  products?: { name: string } | null;
+                  products?: { name: string }[] | null;
                 }) => {
                   const s = STATUS_LABEL[order.status] ?? { label: order.status, cls: "bg-gray-700 text-gray-300" };
                   const time = order.paid_at ?? order.created_at;
