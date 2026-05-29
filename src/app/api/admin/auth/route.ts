@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { createOwnerToken, createStaffToken } from "@/lib/admin-auth";
 
+const ROLE_BASE: Record<string, string> = {
+  owner:        "/admin",
+  manager:      "/manager",
+  collaborator: "/collaborator",
+};
+
 async function getAdminPassword(): Promise<string> {
   try {
     const supabase = createAdminClient();
@@ -20,8 +26,9 @@ export async function POST(req: NextRequest) {
   const { password, email } = body as { password?: string; email?: string };
 
   let token: string | null = null;
+  let role = "owner";
 
-  // ── Staff login (email + password) ──────────────────────────────
+  // ── Staff login ──────────────────────────────────────────────────
   if (email) {
     try {
       const supabase = createAdminClient();
@@ -36,15 +43,15 @@ export async function POST(req: NextRequest) {
       }
 
       token = await createStaffToken(staff.id, staff.role);
+      role = staff.role;
     } catch {
       return NextResponse.json({ error: "Lỗi hệ thống." }, { status: 500 });
     }
   } else {
-    // ── Owner login (password only) ────────────────────────────────
+    // ── Owner login ──────────────────────────────────────────────────
     const correctPassword = await getAdminPassword();
     let valid = password && password === correctPassword;
 
-    // Kiểm tra mật khẩu tạm
     if (!valid) {
       try {
         const supabase = createAdminClient();
@@ -59,7 +66,6 @@ export async function POST(req: NextRequest) {
         const expiry = map["admin_temp_password_expiry"];
         if (tempPw && password === tempPw && expiry && new Date() < new Date(expiry)) {
           valid = true;
-          // Xóa mật khẩu tạm
           const supabase2 = createAdminClient();
           await supabase2.from("settings").delete().in("key", ["admin_temp_password", "admin_temp_password_expiry"]);
         }
@@ -71,9 +77,11 @@ export async function POST(req: NextRequest) {
     }
 
     token = await createOwnerToken();
+    role = "owner";
   }
 
-  const res = NextResponse.json({ ok: true });
+  const basePath = ROLE_BASE[role] ?? "/admin";
+  const res = NextResponse.json({ ok: true, basePath });
   res.cookies.set("admin_token", token, {
     httpOnly: true,
     sameSite: "lax",

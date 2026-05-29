@@ -56,9 +56,22 @@ const navItems: NavItem[] = [
   },
 ];
 
+const ROLE_BASE: Record<AdminRole, string> = {
+  owner: "/admin",
+  manager: "/manager",
+  collaborator: "/collaborator",
+};
+
+const ROLE_LABEL: Record<AdminRole, string> = {
+  owner: "Owner",
+  manager: "Quản lý",
+  collaborator: "Cộng tác viên",
+};
+
 export default function AdminSidebar({ brandName = "Admin", role = "owner" }: { brandName?: string; role?: AdminRole }) {
   const pathname = usePathname();
   const router = useRouter();
+  const basePath = ROLE_BASE[role];
 
   async function handleLogout() {
     await fetch("/api/admin/auth", { method: "DELETE" });
@@ -67,7 +80,8 @@ export default function AdminSidebar({ brandName = "Admin", role = "owner" }: { 
 
   // Chặn navigation khi đang có unsaved changes trên trang Settings
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
-    const leavingSettings = pathname.startsWith("/admin/settings") && !href.startsWith("/admin/settings");
+    const settingsPath = `${basePath}/settings`;
+    const leavingSettings = pathname.startsWith(settingsPath) && !href.startsWith(settingsPath);
     const dirty = typeof window !== "undefined" &&
       (window as Window & { __adminSettingsDirty?: boolean }).__adminSettingsDirty;
     if (leavingSettings && dirty) {
@@ -94,15 +108,19 @@ export default function AdminSidebar({ brandName = "Admin", role = "owner" }: { 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.filter((item) => item.roles.includes(role)).map((item) => {
+          // Đổi /admin prefix → basePath của role hiện tại
+          const href = item.href === "/admin"
+            ? basePath
+            : item.href.replace("/admin", basePath);
           const active =
             item.href === "/admin"
-              ? pathname === "/admin"
-              : pathname.startsWith(item.href);
+              ? pathname === basePath
+              : pathname.startsWith(href.replace(basePath, "").length > 0 ? href : basePath + "/");
           return (
             <Link
               key={item.href}
-              href={item.href}
-              onClick={(e) => handleNavClick(e, item.href)}
+              href={href}
+              onClick={(e) => handleNavClick(e, href)}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                 active
                   ? "bg-emerald-500/10 text-emerald-400"
@@ -118,17 +136,15 @@ export default function AdminSidebar({ brandName = "Admin", role = "owner" }: { 
 
       {/* Role badge + Logout */}
       <div className="shrink-0 border-t border-gray-800 p-3 space-y-1">
-        {role !== "owner" && (
-          <div className="px-3 py-1.5">
-            <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              role === "manager"
-                ? "bg-blue-500/15 text-blue-400"
-                : "bg-gray-500/15 text-gray-400"
-            }`}>
-              {role === "manager" ? "Quản lý" : "Cộng tác viên"}
-            </span>
-          </div>
-        )}
+        <div className="px-3 py-1.5">
+          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+            role === "owner"       ? "bg-emerald-500/15 text-emerald-400" :
+            role === "manager"     ? "bg-blue-500/15 text-blue-400"       :
+                                     "bg-gray-500/15 text-gray-400"
+          }`}>
+            {ROLE_LABEL[role]}
+          </span>
+        </div>
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 transition-colors hover:bg-gray-800 hover:text-red-400"

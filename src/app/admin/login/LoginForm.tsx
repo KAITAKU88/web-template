@@ -25,7 +25,8 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
         body: JSON.stringify(body),
       });
       if (res.ok) {
-        router.replace("/admin");
+        const data = await res.json();
+        router.replace(data.basePath ?? "/admin");
       } else {
         const data = await res.json();
         setError(data.error ?? "Đăng nhập thất bại.");
