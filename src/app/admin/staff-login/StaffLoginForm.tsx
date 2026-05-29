@@ -1,11 +1,35 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
+
+const LOGIN_TABS = [
+  { label: "Owner",          href: "/admin/login"        },
+  { label: "Quản lý",        href: "/manager/login"      },
+  { label: "Cộng tác viên",  href: "/collaborator/login" },
+];
+
+function LoginTabs({ active }: { active: string }) {
+  return (
+    <div className="mb-6 flex rounded-xl border border-gray-800 bg-gray-800/50 p-1 gap-1">
+      {LOGIN_TABS.map((tab) => (
+        <Link key={tab.href} href={tab.href}
+          className={`flex-1 rounded-lg py-2 text-center text-xs font-semibold transition ${
+            active === tab.href
+              ? "bg-gray-700 text-white shadow"
+              : "text-gray-500 hover:text-gray-300"
+          }`}>
+          {tab.label}
+        </Link>
+      ))}
+    </div>
+  );
+}
 
 export default function StaffLoginForm({ brandName }: { brandName: string }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
@@ -39,14 +63,17 @@ export default function StaffLoginForm({ brandName }: { brandName: string }) {
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-gray-950">
       <div className="w-full max-w-sm rounded-2xl bg-gray-900 p-8 shadow-2xl">
-        <div className="mb-8 text-center">
+        <LoginTabs active={pathname} />
+        <div className="mb-6 text-center">
           <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500">
             <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
           <h1 className="text-xl font-bold text-white">{brandName}</h1>
-          <p className="mt-1 text-sm text-gray-400">Đăng nhập tài khoản nhân viên</p>
+          <p className="mt-1 text-sm text-gray-400">
+            {pathname === "/manager/login" ? "Đăng nhập Quản lý" : "Đăng nhập Cộng tác viên"}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -90,10 +117,6 @@ export default function StaffLoginForm({ brandName }: { brandName: string }) {
             {loading ? "Đang xác thực…" : "Đăng nhập"}
           </button>
 
-          <Link href="/admin/login"
-            className="block text-center text-sm text-gray-500 hover:text-gray-300 transition">
-            ← Trang đăng nhập Admin
-          </Link>
         </form>
       </div>
     </div>

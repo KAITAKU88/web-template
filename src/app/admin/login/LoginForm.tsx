@@ -4,6 +4,29 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+const LOGIN_TABS = [
+  { label: "Owner",          href: "/admin/login"        },
+  { label: "Quản lý",        href: "/manager/login"      },
+  { label: "Cộng tác viên",  href: "/collaborator/login" },
+];
+
+function LoginTabs({ active }: { active: string }) {
+  return (
+    <div className="mb-6 flex rounded-xl border border-gray-800 bg-gray-800/50 p-1 gap-1">
+      {LOGIN_TABS.map((tab) => (
+        <Link key={tab.href} href={tab.href}
+          className={`flex-1 rounded-lg py-2 text-center text-xs font-semibold transition ${
+            active === tab.href
+              ? "bg-gray-700 text-white shadow"
+              : "text-gray-500 hover:text-gray-300"
+          }`}>
+          {tab.label}
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export default function LoginForm({ brandName, showHint = false }: { brandName: string; showHint?: boolean }) {
   const router = useRouter();
   const [password, setPassword] = useState("");
@@ -37,7 +60,8 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
   return (
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-gray-950">
       <div className="w-full max-w-sm rounded-2xl bg-gray-900 p-8 shadow-2xl">
-        <div className="mb-8 text-center">
+        <LoginTabs active="/admin/login" />
+        <div className="mb-6 text-center">
           <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500">
             <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
@@ -46,6 +70,7 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
           <h1 className="text-xl font-bold text-white">{brandName}</h1>
           <p className="mt-1 text-sm text-gray-400">Đăng nhập Owner</p>
         </div>
+
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
