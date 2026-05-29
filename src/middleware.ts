@@ -42,7 +42,13 @@ async function verifyToken(token: string): Promise<{ role: string } | null> {
   return null;
 }
 
-const PUBLIC_PATHS = ["/admin/login", "/admin/forgot-password"];
+const PUBLIC_PATHS = [
+  "/admin/login",
+  "/admin/forgot-password",
+  "/admin/staff-login",
+  "/manager/login",
+  "/collaborator/login",
+];
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
@@ -94,5 +100,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/manager/:path*", "/collaborator/:path*"],
+  matcher: ["/admin/:path*", "/manager/:path*", "/collaborator/:path*", "/manager/login", "/collaborator/login"],
 };

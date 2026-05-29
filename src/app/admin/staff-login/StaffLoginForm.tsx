@@ -4,8 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function LoginForm({ brandName, showHint = false }: { brandName: string; showHint?: boolean }) {
+export default function StaffLoginForm({ brandName }: { brandName: string }) {
   const router = useRouter();
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState("");
@@ -19,10 +20,11 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
       const res = await fetch("/api/admin/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({ email, password }),
       });
       if (res.ok) {
-        router.replace("/admin");
+        const data = await res.json();
+        router.replace(data.basePath ?? "/manager");
       } else {
         const data = await res.json();
         setError(data.error ?? "Đăng nhập thất bại.");
@@ -38,16 +40,28 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
     <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-gray-950">
       <div className="w-full max-w-sm rounded-2xl bg-gray-900 p-8 shadow-2xl">
         <div className="mb-8 text-center">
-          <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500">
+          <div className="mb-3 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500">
             <svg className="h-7 w-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
           </div>
           <h1 className="text-xl font-bold text-white">{brandName}</h1>
-          <p className="mt-1 text-sm text-gray-400">Đăng nhập Owner</p>
+          <p className="mt-1 text-sm text-gray-400">Đăng nhập tài khoản nhân viên</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-gray-300">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoFocus
+              required
+              placeholder="email@example.com"
+              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-4 py-3 text-white placeholder-gray-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+            />
+          </div>
           <div>
             <label className="mb-1.5 block text-sm font-medium text-gray-300">Mật khẩu</label>
             <div className="relative">
@@ -55,10 +69,9 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
                 type={showPw ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                autoFocus
                 required
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-4 py-3 pr-11 text-white placeholder-gray-500 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-4 py-3 pr-11 text-white placeholder-gray-500 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
               <button type="button" onClick={() => setShowPw(!showPw)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-300 transition">
@@ -70,23 +83,16 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
             </div>
           </div>
 
-          {showHint && (
-            <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-300">
-              <p className="font-semibold mb-0.5">Mật khẩu mặc định</p>
-              <p className="font-mono tracking-wide">admin12345678</p>
-              <p className="mt-1.5 text-amber-400/70">Hint này ẩn sau khi bạn đổi mật khẩu.</p>
-            </div>
-          )}
           {error && <p className="rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>}
 
           <button type="submit" disabled={loading}
-            className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-60">
+            className="w-full rounded-xl bg-blue-500 py-3 text-sm font-semibold text-white transition hover:bg-blue-600 disabled:opacity-60">
             {loading ? "Đang xác thực…" : "Đăng nhập"}
           </button>
 
-          <Link href="/admin/forgot-password"
+          <Link href="/admin/login"
             className="block text-center text-sm text-gray-500 hover:text-gray-300 transition">
-            Quên mật khẩu?
+            ← Trang đăng nhập Admin
           </Link>
         </form>
       </div>
