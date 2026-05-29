@@ -5,15 +5,17 @@ import ProductForm from "../../ProductForm";
 import { updateProduct } from "../../actions";
 import { redirect } from "next/navigation";
 import type { Product } from "@/types";
+import { adminPath } from "@/lib/admin-redirect";
 
 interface Props { params: Promise<{ id: string }> }
 
 export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
   const supabase = createAdminClient();
-  const [{ data }, { data: catData }] = await Promise.all([
+  const [{ data }, { data: catData }, productsPath] = await Promise.all([
     supabase.from("products").select("*").eq("id", id).single(),
     supabase.from("categories").select("id, name").order("sort_order"),
+    adminPath("/products"),
   ]);
   if (!data) notFound();
 
@@ -23,13 +25,13 @@ export default async function EditProductPage({ params }: Props) {
   async function handleUpdate(formData: FormData) {
     "use server";
     await updateProduct(id, formData);
-    redirect("/admin/products");
+    redirect(await adminPath("/products"));
   }
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/admin/products" className="text-gray-500 hover:text-gray-300 transition-colors">
+        <Link href={productsPath} className="text-gray-500 hover:text-gray-300 transition-colors">
           ← Quay lại
         </Link>
         <h1 className="text-2xl font-bold text-white">Chỉnh sửa: {product.name}</h1>
