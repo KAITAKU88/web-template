@@ -2,6 +2,7 @@
 
 import { useTransition, useState, useRef } from "react";
 import { generateLandingContent } from "./actions";
+import { buildDefaultLanding } from "@/lib/landingTemplate";
 import type { ProductCopy } from "@/lib/productContent";
 import type { Product } from "@/types";
 
@@ -32,6 +33,17 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
     product?.download_count ?? Math.floor(Math.random() * 1451) + 50
   );
 
+  function handleUseTemplate() {
+    if (!formRef.current) return;
+    const fd = new FormData(formRef.current);
+    const name = (fd.get("name") as string).trim();
+    if (!name) { setGenError("Vui lòng nhập tên sản phẩm trước"); return; }
+    setGenError(null);
+    const category = (fd.get("type") as string) || "notion";
+    const description = (fd.get("description") as string) || "";
+    setLanding(buildDefaultLanding(name, category, description));
+  }
+
   function handleGenerate() {
     if (!formRef.current) return;
     const fd = new FormData(formRef.current);
@@ -49,7 +61,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
         );
         setLanding(content);
       } catch (e) {
-        setGenError(e instanceof Error ? e.message : "Lỗi khi gọi AI");
+        setGenError(e instanceof Error ? e.message : "Lỗi khi gọi AI. Thử dùng Template mặc định.");
       }
     });
   }
@@ -179,8 +191,8 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
       <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-white">Landing Page (AI)</h2>
-            <p className="mt-0.5 text-xs text-gray-500">Claude sẽ sinh tự động headline, nỗi đau, tính năng, testimonial, FAQ</p>
+            <h2 className="text-sm font-semibold text-white">Landing Page</h2>
+            <p className="mt-0.5 text-xs text-gray-500">Tạo trang bán hàng: headline → nỗi đau → giải pháp → tính năng → testimonial → FAQ → nút mua hàng</p>
           </div>
           {landing && (
             <span className="flex items-center gap-1.5 text-xs text-emerald-400">
@@ -213,8 +225,15 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
             </div>
           </div>
 
-          {/* Generate button */}
-          <div className="flex items-center gap-3">
+          {/* Generate buttons */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={handleUseTemplate}
+              className="flex items-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600 transition-colors"
+            >
+              📋 Dùng template mặc định
+            </button>
             <button
               type="button"
               onClick={handleGenerate}
@@ -224,7 +243,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
               {generating ? (
                 <>
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  Đang sinh nội dung…
+                  Đang tạo…
                 </>
               ) : (
                 <>✨ Generate với AI</>
@@ -236,10 +255,14 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
                 onClick={() => setLanding(null)}
                 className="text-xs text-gray-500 hover:text-red-400 transition-colors"
               >
-                Xóa nội dung AI
+                Xóa nội dung
               </button>
             )}
           </div>
+          <p className="text-xs text-gray-600">
+            <span className="text-emerald-500">Template mặc định</span> — hoạt động ngay, không cần API key.
+            <span className="ml-2 text-violet-400">Generate AI</span> — cần cấu hình Claude/Gemini API trong Cấu hình.
+          </p>
 
           {genError && (
             <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
