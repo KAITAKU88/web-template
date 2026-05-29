@@ -6,13 +6,14 @@ import ProductGrid from "@/components/ProductGrid";
 
 export default async function HomePage() {
   const supabase = await createClient();
-  const { data: products, error } = await supabase
-    .from("products")
-    .select("*")
-    .order("created_at", { ascending: false });
+  const [{ data: products, error }, { data: catData }] = await Promise.all([
+    supabase.from("products").select("*").order("created_at", { ascending: false }),
+    supabase.from("categories").select("id, name").order("sort_order"),
+  ]);
 
   if (error) console.error("Error fetching products:", error);
   const list = (products as Product[]) ?? [];
+  const categories = (catData ?? []) as { id: string; name: string }[];
 
   return (
     <div>
@@ -28,7 +29,7 @@ export default async function HomePage() {
 
       {/* Product grid — bọc Suspense vì ProductGrid dùng useSearchParams */}
       <Suspense fallback={<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">{Array.from({length:3}).map((_,i)=><div key={i} className="h-64 rounded-2xl bg-gray-100 animate-pulse dark:bg-gray-800"/>)}</div>}>
-        <ProductGrid products={list} />
+        <ProductGrid products={list} categories={categories} />
       </Suspense>
 
       {/* Trust signals */}

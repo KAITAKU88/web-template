@@ -7,9 +7,6 @@ import Image from "next/image";
 import { formatCurrency, calcDiscountPercent, formatCount } from "@/lib/utils";
 import type { Product } from "@/types";
 
-const TYPE_LABEL: Record<string, string> = { notion: "Notion", google_sheet: "Google Sheets" };
-const TYPE_ICON: Record<string, string>  = { notion: "📓", google_sheet: "📊" };
-
 type SortKey = "newest" | "price_asc" | "price_desc" | "popular";
 
 const PRICE_RANGES = [
@@ -20,7 +17,9 @@ const PRICE_RANGES = [
   { label: "Trên 200k",  min: 200000, max: Infinity  },
 ];
 
-export default function ProductGrid({ products }: { products: Product[] }) {
+interface Category { id: string; name: string; }
+
+export default function ProductGrid({ products, categories = [] }: { products: Product[]; categories?: Category[] }) {
   const searchParams = useSearchParams();
 
   // Đọc query từ URL (header search) và đồng bộ khi URL thay đổi
@@ -55,20 +54,43 @@ export default function ProductGrid({ products }: { products: Product[] }) {
     <div>
       {/* ── Toolbar: Filter + Sort ── */}
       <div className="mb-6 flex flex-wrap items-center gap-2">
-        {/* Type filter */}
-        {["all", "notion", "google_sheet"].map((t) => (
-          <button
-            key={t}
-            onClick={() => setTypeFilter(t)}
-            className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-              typeFilter === t
-                ? "border-green-500 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
-            }`}
-          >
-            {t === "all" ? "Tất cả" : t === "notion" ? "📓 Notion" : "📊 Google Sheets"}
-          </button>
-        ))}
+        {/* Danh mục — dropdown trên mobile, buttons trên desktop khi ≤5 danh mục */}
+        {categories.length > 0 && (
+          <>
+            {/* Mobile + nhiều danh mục: dropdown */}
+            <select
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
+              className={`rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 ${
+                categories.length <= 5 ? "sm:hidden" : ""
+              }`}
+            >
+              <option value="all">Tất cả</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
+            </select>
+
+            {/* Desktop + ≤5 danh mục: buttons */}
+            {categories.length <= 5 && (
+              <div className="hidden sm:flex flex-wrap gap-2">
+                {["all", ...categories.map((c) => c.id)].map((t) => (
+                  <button
+                    key={t}
+                    onClick={() => setTypeFilter(t)}
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                      typeFilter === t
+                        ? "border-green-500 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                        : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                    }`}
+                  >
+                    {t === "all" ? "Tất cả" : categories.find((c) => c.id === t)?.name ?? t}
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        )}
 
         <div className="ml-auto flex items-center gap-2">
           {/* Price range */}
@@ -132,7 +154,7 @@ export default function ProductGrid({ products }: { products: Product[] }) {
                   {product.image_url ? (
                     <Image src={product.image_url} alt={product.name} fill className="object-cover" />
                   ) : (
-                    <span className="text-6xl">{product.type ? TYPE_ICON[product.type] ?? "📄" : "📄"}</span>
+                    <span className="text-6xl">📄</span>
                   )}
                   {isBestseller && (
                     <span className="absolute left-2 top-2 rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-bold text-white shadow">🏆 Bestseller</span>
@@ -145,8 +167,8 @@ export default function ProductGrid({ products }: { products: Product[] }) {
                 {/* Content */}
                 <div className="flex flex-1 flex-col p-5">
                   {product.type && (
-                    <span className="mb-2 inline-flex w-fit items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                      {TYPE_ICON[product.type]} {TYPE_LABEL[product.type]}
+                    <span className="mb-2 inline-flex w-fit items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
+                      {categories.find((c) => c.id === product.type)?.name ?? product.type}
                     </span>
                   )}
                   <h2 className="mb-1 font-bold text-gray-900 leading-snug dark:text-white">{product.name}</h2>

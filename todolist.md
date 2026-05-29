@@ -1,46 +1,15 @@
+ADMIN_SECRET=a6b5f7ac6ae6a0575b8290a3fc76edde4da165675a079308de1eb2311c6b07c6
+CRON_SECRET=8833b9758bfedf38ef7898d36ded13d3c4d9fefc22a881b5
 
-miagrate hệ thống sang Cloudflare
-
-Cách deploy trên Cloudflare Pages (GitHub auto-deploy)
-
-1. Cloudflare Dashboard → Workers & Pages → Create → Pages → Connect to Git
-2. Chọn repo này, settings:
-  - Build command: npx @opennextjs/cloudflare build
-  - Build output directory: .open-next/assets
-  - Node.js version: 18
-3. Thêm 6 env vars (NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, ADMIN_PASSWORD, ADMIN_SECRET, CRON_SECRET)
-4. Save & Deploy — mỗi push lên GitHub sẽ tự động deploy
-
-Cron job
-
-Cloudflare Pages không có built-in scheduler như Netlify. Dùng cron-job.org (miễn phí) để POST đến https://your-domain.pages.dev/api/cron/expire-orders mỗi 5 phút với header x-cron-secret: <CRON_SECRET>.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-ICON và tên Brand nhỏ, cho to hơn 1 chút, chữ Lab màu xanh 
+▎ Lưu ý: Lưu lại 2 chuỗi này ở nơi an toàn (password manager). Sau khi đóng tab Cloudflare là không xem lại được.
 
 
 
 Sau khi chạy tốt mới tính đến tối ưu, chạy nhanh chóng, code sạch 
 
 
-dựa trên toàn bộ mã nguồn của dự án, của sepay, supabase, viét 1 bản thiết kế cực kì chi tiết về tính năng, hoạt động, chi tiết đến mức mà chỉ cần cung cấp bản blueprint này cho 1 Agent thì nó có thể tự làm ra 1 hệ thống y hệt như vậy. 
+dựa trên toàn bộ mã nguồn của dự án, của sepay, supabase, viét 1 bản thiết kế cực kì chi tiết về tính năng, hoạt động, chi tiết đến mức mà chỉ cần cung cấp bản blueprint này cho 1 Agent thì nó có thể tự làm ra 1 hệ thống y hệt như vậy. Toàn bộ lưu thành 1 file .md huo 
 Sau đó viết 1 bản blueprint khác để thiết kế 1 web khóa học. Chỉ có thêm tính năng đăng nhập, tạo khóa học, quản lý học viên, tiến trình..sẽ phức tạp hơn .
-
-
-
 
 
 
@@ -60,13 +29,20 @@ Sau đó viết 1 bản blueprint khác để thiết kế 1 web khóa học. Ch
 
 
 
-Thêm menu là Template trong đó có các mục con như NOtion, google sheet, .1 menu là Khóa học, rồi trong đó tạo hẳn 1 1 trang cho bài đăng khóa học Notion và AI thay vì sử dụng tally.so
+
+Phần hướng dẫn dùng toàn tiếng việt không dấu, khó nhìn 
 
 
 
 
-
-
+Cho phép đổi mật khẩu quản trị
+Kịch bản như sau: Có người hỏi mua hệ thống này cho thương hiệu của họ, quy trình như thế nào:
+- Tạo github của họ, fork repo của tôi => Họ có source code
+- Tạo dự án supabase của họ và tạo lại toàn bộ dữ liệu hay có cách nào để clone thư mục trên supabase của tôi (mà không chứa dữ liệu) thành dự án của họ không.
+- Tạo dự án Cloudflare Pages của chính họ với các thiết lập sẵn giôngs của tôi.
+- Tạo Sepay của họ và cấu hình phù hợp
+- Tạo Resend....
+- Tức là có cách nào để nhanh chóng tạo ra hệ thống của họ giống như 1 bản clone hệ thống của tôi không, việc tiếp theo sau đó chỉ vào là Dashboard để kết nối các hệ thống lại và hoạt đọng luôn
 
 
  

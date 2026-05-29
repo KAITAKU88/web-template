@@ -11,10 +11,14 @@ interface Props { params: Promise<{ id: string }> }
 export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
   const supabase = createAdminClient();
-  const { data } = await supabase.from("products").select("*").eq("id", id).single();
+  const [{ data }, { data: catData }] = await Promise.all([
+    supabase.from("products").select("*").eq("id", id).single(),
+    supabase.from("categories").select("id, name").order("sort_order"),
+  ]);
   if (!data) notFound();
 
   const product = data as Product;
+  const categories = catData ?? [{ id: "notion", name: "Notion" }, { id: "google_sheet", name: "Google Sheets" }];
 
   async function handleUpdate(formData: FormData) {
     "use server";
@@ -31,7 +35,7 @@ export default async function EditProductPage({ params }: Props) {
         <h1 className="text-2xl font-bold text-white">Chỉnh sửa: {product.name}</h1>
       </div>
 
-      <ProductForm product={product} onSubmit={handleUpdate} submitLabel="Lưu thay đổi" />
+      <ProductForm product={product} onSubmit={handleUpdate} submitLabel="Lưu thay đổi" categories={categories} />
     </div>
   );
 }

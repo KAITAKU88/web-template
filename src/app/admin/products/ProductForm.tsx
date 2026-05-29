@@ -5,13 +5,21 @@ import { generateLandingContent } from "./actions";
 import type { ProductCopy } from "@/lib/productContent";
 import type { Product } from "@/types";
 
+interface Category { id: string; name: string; }
+
 interface Props {
   product?: Product;
   onSubmit: (formData: FormData) => Promise<void>;
   submitLabel?: string;
+  categories?: Category[];
 }
 
-export default function ProductForm({ product, onSubmit, submitLabel = "Lưu sản phẩm" }: Props) {
+const DEFAULT_CATEGORIES: Category[] = [
+  { id: "notion", name: "Notion" },
+  { id: "google_sheet", name: "Google Sheets" },
+];
+
+export default function ProductForm({ product, onSubmit, submitLabel = "Lưu sản phẩm", categories = DEFAULT_CATEGORIES }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const [saving, startSave] = useTransition();
   const [generating, startGenerate] = useTransition();
@@ -78,16 +86,17 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
             />
           </div>
 
-          {/* Loại */}
+          {/* Danh mục */}
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1.5">Loại template</label>
+            <label className="block text-xs font-medium text-gray-400 mb-1.5">Danh mục</label>
             <select
               name="type"
-              defaultValue={product?.type ?? "notion"}
+              defaultValue={product?.type ?? categories[0]?.id ?? "notion"}
               className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white outline-none focus:border-emerald-500"
             >
-              <option value="notion">Notion</option>
-              <option value="google_sheet">Google Sheets</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))}
             </select>
           </div>
 

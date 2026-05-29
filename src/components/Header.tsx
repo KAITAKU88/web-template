@@ -14,24 +14,36 @@ function isImageUrl(value: string) {
   return /^https?:\/\/|^\//.test(value);
 }
 
+function splitBrandName(name: string): [string, string] {
+  if (name.includes(" ")) {
+    const idx = name.indexOf(" ");
+    return [name.slice(0, idx), name.slice(idx + 1)];
+  }
+  const match = name.match(/^([A-Z][a-z]*)([A-Z].*)$/);
+  if (match) return [match[1], match[2]];
+  return [name, ""];
+}
+
 function Logo({ brandName, logoValue }: { brandName: string; logoValue?: string }) {
   const initials = brandName.match(/[A-Z]/g)?.join("") || brandName.slice(0, 2).toUpperCase();
   const showImage = logoValue && isImageUrl(logoValue);
   const showText  = logoValue && !isImageUrl(logoValue);
+  const [first, second] = splitBrandName(brandName);
 
   return (
-    <Link href="/" className="flex items-center gap-2.5 select-none shrink-0">
+    <Link href="/" className="flex items-center gap-3 select-none shrink-0">
       {showImage ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={logoValue} alt={brandName} className="h-8 w-auto max-w-[120px] object-contain" />
+        <img src={logoValue} alt={brandName} className="h-10 w-auto max-w-[140px] object-contain" />
       ) : (
-        <span className="flex h-8 min-w-8 items-center justify-center rounded-lg bg-brand px-1.5 text-white font-black text-sm shadow-sm">
+        <span className="flex h-10 min-w-10 items-center justify-center rounded-xl bg-brand px-2 text-white font-black text-base shadow-sm">
           {showText ? logoValue : initials}
         </span>
       )}
       {!showImage && (
-        <span className="hidden sm:block font-extrabold tracking-tight text-gray-900 dark:text-white text-lg">
-          {brandName}
+        <span className="hidden sm:block font-extrabold tracking-tight text-xl">
+          <span className="text-gray-900 dark:text-white">{first}</span>
+          {second && <span className="text-brand">{second}</span>}
         </span>
       )}
     </Link>
