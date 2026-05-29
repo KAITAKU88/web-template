@@ -92,16 +92,10 @@ export async function POST(req: NextRequest) {
     }
 
     // Tăng lượt tải của sản phẩm (atomic, fire-and-forget)
-    await supabase.rpc("increment_download_count", {
-      p_product_id: order.product_id,
-    }).catch(() => {});
+    try { await supabase.rpc("increment_download_count", { p_product_id: order.product_id }); } catch { /* ignore */ }
 
     // Cập nhật/upsert bảng customers để phục vụ remarketing
-    await supabase.rpc("upsert_customer_on_order", {
-      p_email: order.customer_email,
-    }).catch(() => {
-      // Bỏ qua lỗi nếu function chưa tồn tại
-    });
+    try { await supabase.rpc("upsert_customer_on_order", { p_email: order.customer_email }); } catch { /* ignore */ }
 
     console.log(`✅ Order ${orderId} confirmed — ${payload.transferAmount}đ from ${order.customer_email}`);
 

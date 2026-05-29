@@ -109,7 +109,7 @@ export default async function AdminDashboardPage() {
                 status: string;
                 paid_at: string | null;
                 created_at: string;
-                products?: { name: string } | null;
+                products?: { name: string }[] | null;
               }) => {
                 const s = STATUS_LABEL[order.status] ?? { label: order.status, cls: "bg-gray-700 text-gray-300" };
                 return (
