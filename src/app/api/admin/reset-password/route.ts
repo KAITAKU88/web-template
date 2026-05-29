@@ -39,6 +39,13 @@ export async function POST(req: NextRequest) {
 
   // Gửi email
   const apiKey = settings.resend_api_key || process.env.RESEND_API_KEY || "";
+  if (!apiKey) {
+    return NextResponse.json(
+      { error: "Email chưa được cấu hình. Vui lòng liên hệ quản trị viên để khôi phục thủ công." },
+      { status: 400 }
+    );
+  }
+
   const fromName = settings.resend_from_name ?? settings.site_name ?? "Admin";
   const fromEmail = settings.resend_from_email ?? "onboarding@resend.dev";
   const siteName = settings.site_name ?? "Admin";
