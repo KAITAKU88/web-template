@@ -66,10 +66,16 @@ function SearchBarInner() {
   const [showDropdown, setShowDropdown] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Đồng bộ khi URL thay đổi trên homepage (ví dụ bấm back)
+  // Đồng bộ với URL khi ở homepage; clear khi rời homepage
   useEffect(() => {
-    if (isHomepage) setValue(searchParams.get("q") ?? "");
-  }, [searchParams, isHomepage]);
+    if (isHomepage) {
+      setValue(searchParams.get("q") ?? "");
+    } else {
+      setValue("");
+      setResults([]);
+      setShowDropdown(false);
+    }
+  }, [isHomepage, searchParams]);
 
   // Đóng dropdown khi click ra ngoài
   useEffect(() => {
