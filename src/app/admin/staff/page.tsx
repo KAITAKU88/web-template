@@ -13,7 +13,7 @@ export default async function StaffPage() {
   const activeCount = staffList.filter((s) => s.is_active).length;
 
   return (
-    <div className="p-6 space-y-6 max-w-3xl">
+    <div className="p-4 md:p-6 space-y-6 max-w-3xl">
       <div>
         <h1 className="text-xl font-bold text-white">Quản lý nhân viên</h1>
         <p className="mt-1 text-sm text-gray-400">

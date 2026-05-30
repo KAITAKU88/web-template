@@ -68,7 +68,17 @@ const ROLE_LABEL: Record<AdminRole, string> = {
   collaborator: "Cộng tác viên",
 };
 
-export default function AdminSidebar({ brandName = "Admin", role = "owner" }: { brandName?: string; role?: AdminRole }) {
+export default function AdminSidebar({
+  brandName = "Admin",
+  role = "owner",
+  mobileOpen = false,
+  onMobileClose,
+}: {
+  brandName?: string;
+  role?: AdminRole;
+  mobileOpen?: boolean;
+  onMobileClose?: () => void;
+}) {
   const pathname = usePathname();
   const router = useRouter();
   const basePath = ROLE_BASE[role];
@@ -94,7 +104,26 @@ export default function AdminSidebar({ brandName = "Admin", role = "owner" }: { 
   }
 
   return (
-    <aside className="flex w-56 flex-col border-r border-gray-800 bg-gray-900">
+    <aside
+      className={`
+        fixed inset-y-0 left-0 z-[9999] flex w-72 flex-col border-r border-gray-800 bg-gray-900
+        transform transition-transform duration-200 ease-in-out
+        md:static md:w-56 md:translate-x-0 md:transition-none
+        ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
+    >
+      {/* Nút đóng sidebar trên mobile */}
+      <button
+        type="button"
+        onClick={onMobileClose}
+        className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors md:hidden"
+        aria-label="Đóng menu"
+      >
+        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
       {/* Logo → mở trang chủ trong tab mới */}
       <a
         href="/"
