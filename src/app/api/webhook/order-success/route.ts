@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
     ? new Date(order.paid_at).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })
     : new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
 
+  // Gửi email xác nhận đơn hàng
   const resend = new Resend(apiKey);
   const { error } = await resend.emails.send({
     from,
@@ -89,7 +90,62 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email send failed" }, { status: 500 });
   }
 
+  // Meta CAPI — gửi Purchase event server-side (vượt qua ad blocker)
+  const metaPixelId     = settings.meta_pixel_id     || process.env.META_PIXEL_ID || "";
+  const metaAccessToken = settings.meta_access_token || process.env.META_ACCESS_TOKEN || "";
+  if (metaPixelId && metaAccessToken) {
+    sendMetaCapi({ pixelId: metaPixelId, accessToken: metaAccessToken, order }).catch(
+      (e) => console.error("Meta CAPI error:", e)
+    );
+  }
+
   return NextResponse.json({ ok: true });
+}
+
+// Hash SHA-256 theo chuẩn Meta CAPI (email phải lowercase + trim trước khi hash)
+async function sha256(value: string): Promise<string> {
+  const buf = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(value.toLowerCase().trim())
+  );
+  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+async function sendMetaCapi(params: {
+  pixelId: string;
+  accessToken: string;
+  order: { id: string; customer_email: string; amount: number; paid_at: string | null; product_id: string };
+}) {
+  const { pixelId, accessToken, order } = params;
+  const hashedEmail = await sha256(order.customer_email);
+  const eventTime = order.paid_at
+    ? Math.floor(new Date(order.paid_at).getTime() / 1000)
+    : Math.floor(Date.now() / 1000);
+
+  const body = {
+    data: [{
+      event_name: "Purchase",
+      event_time: eventTime,
+      event_id: order.id,             // deduplication với Pixel client-side
+      action_source: "website",
+      user_data: { em: [hashedEmail] },
+      custom_data: {
+        currency: "VND",
+        value: order.amount,
+        content_ids: [order.product_id],
+        content_type: "product",
+      },
+    }],
+  };
+
+  const res = await fetch(
+    `https://graph.facebook.com/v19.0/${pixelId}/events?access_token=${accessToken}`,
+    { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Meta CAPI ${res.status}: ${text}`);
+  }
 }
 
 function buildEmailHtml(params: {

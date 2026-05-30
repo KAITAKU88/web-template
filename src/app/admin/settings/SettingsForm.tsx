@@ -200,25 +200,59 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
         />
       </Section>
 
-      {/* ── Analytics & Webhook nội bộ ────────────────────────── */}
+      {/* ── Analytics & Tracking ──────────────────────────────── */}
       <Section
-        title="Analytics & Cấu hình nâng cao"
-        description="Google Analytics và webhook secret nội bộ — cần thiết khi triển khai"
+        title="Analytics & Tracking"
+        description="GTM, GA4 và các Pixel quảng cáo — lưu ID tại đây, cấu hình tag trong GTM Dashboard"
       >
         <Field
           label="GTM Container ID"
           name="gtm_id"
           defaultValue={settings.gtm_id ?? ""}
           placeholder="GTM-XXXXXXX"
-          hint="Google Tag Manager — quản lý tất cả tracking tags (GA4, Facebook Pixel, Google Ads...). Khi có GTM, GA4 ID bên dưới bị bỏ qua (cấu hình GA4 bên trong GTM)."
+          hint="Google Tag Manager — sau khi nhập ID này, cấu hình GA4, Facebook Pixel, TikTok Pixel bên trong GTM Dashboard"
         />
         <Field
           label="Google Analytics ID"
           name="ga_id"
           defaultValue={settings.ga_id ?? ""}
           placeholder="G-XXXXXXXXXX"
-          hint="Chỉ dùng khi không có GTM. Khi đã có GTM Container ID, cấu hình GA4 bên trong GTM Dashboard."
+          hint="Chỉ dùng khi không có GTM. Khi đã có GTM Container ID thì cấu hình GA4 bên trong GTM."
         />
+        <Field
+          label="Facebook Pixel ID"
+          name="meta_pixel_id"
+          defaultValue={settings.meta_pixel_id ?? ""}
+          placeholder="123456789012345"
+          hint="Lấy tại Meta Business → Events Manager → Pixel ID. Thêm vào GTM tag. Dùng kèm Meta Access Token bên dưới để bật CAPI (server-side)."
+        />
+        <SecretField
+          label="Meta Access Token (CAPI)"
+          name="meta_access_token"
+          hasValue={!!settings.meta_access_token}
+          hint="Lấy tại Meta Business → Events Manager → Pixel → Settings → Generate Access Token. Khi có token này, hệ thống tự gửi Purchase event server-side khi đơn thành công."
+        />
+        <Field
+          label="TikTok Pixel ID"
+          name="tiktok_pixel_id"
+          defaultValue={settings.tiktok_pixel_id ?? ""}
+          placeholder="CXXXXXXXXXXXXXXX"
+          hint="Lấy tại TikTok Ads Manager → Assets → Events → Web Events → Pixel ID. Thêm vào GTM tag."
+        />
+        <Field
+          label="Google Ads Conversion ID"
+          name="google_ads_id"
+          defaultValue={settings.google_ads_id ?? ""}
+          placeholder="AW-XXXXXXXXXX"
+          hint="Lấy tại Google Ads → Tools → Conversions. Thêm vào GTM tag để theo dõi conversion."
+        />
+      </Section>
+
+      {/* ── Webhook nội bộ ────────────────────────────────────── */}
+      <Section
+        title="Cấu hình nâng cao"
+        description="Webhook secret nội bộ"
+      >
         <SecretField
           label="Supabase Webhook Secret"
           name="supabase_webhook_secret"

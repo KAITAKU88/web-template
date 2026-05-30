@@ -185,6 +185,30 @@ Cả hai endpoint dùng header `x-cron-secret: <CRON_SECRET>` (env var).
 
 ---
 
+## Marketing System
+
+### Email Campaigns (`/admin/marketing`)
+- Trang danh sách campaigns + tạo mới
+- Phân khúc: tất cả, mua trong 30 ngày, mua sản phẩm X
+- Templates mẫu: blank, sản phẩm mới, re-engagement, giảm giá
+- API: `POST/PUT /api/marketing/campaigns` — lưu nháp hoặc gửi ngay qua Resend
+- Gửi batch 10 email/lần, 300ms delay giữa batch
+- DB: `email_campaigns` table (id, name, subject, html_body, segment, status, sent_count)
+
+### Meta CAPI (server-side)
+- Trong `/api/webhook/order-success`: sau khi gửi email, gửi Purchase event lên Meta CAPI
+- Hash email bằng SHA-256 (chuẩn Meta)
+- Event deduplication qua `event_id = order.id`
+- Cần: `meta_pixel_id` + `meta_access_token` trong Settings
+
+### Tracking Pixel IDs (Settings)
+| Key | Mục đích |
+|-----|----------|
+| `meta_pixel_id` | Facebook/Meta Pixel — thêm vào GTM tag |
+| `meta_access_token` | Meta CAPI server-side — auto-fire khi đơn thành công |
+| `tiktok_pixel_id` | TikTok Pixel — thêm vào GTM tag |
+| `google_ads_id` | Google Ads Conversion — thêm vào GTM tag |
+
 ## GA4 Event Tracking
 
 Tất cả events fire qua `fireEvent()` từ `src/lib/gtag.ts` — chỉ hoạt động khi GA4 đã cấu hình (`ga_id` trong Settings).

@@ -11,14 +11,14 @@ const ALL_KEYS = [
   "resend_api_key", "resend_from_email", "resend_from_name",
   "ai_provider", "claude_api_key", "gemini_api_key",
   "supabase_webhook_secret",
-  "gtm_id", "ga_id",
+  "gtm_id", "ga_id", "meta_pixel_id", "tiktok_pixel_id", "google_ads_id",
 ];
 
 // Sensitive keys: if submitted empty → keep existing (skip upsert)
 const SENSITIVE_KEYS = new Set([
   "sepay_api_key", "sepay_webhook_secret",
   "resend_api_key", "claude_api_key", "gemini_api_key",
-  "supabase_webhook_secret",
+  "supabase_webhook_secret", "meta_access_token",
 ]);
 
 export async function saveSettings(formData: FormData) {
