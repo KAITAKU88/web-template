@@ -254,9 +254,14 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           hint="Dán vào Supabase → Database → Webhooks → URL"
         />
         <WebhookUrlField
-          label="Cron Job URL"
+          label="Cron — Hủy đơn hết hạn"
           path="/api/cron/expire-orders"
-          hint="Dán vào cron-job.org, phương thức POST, chạy mỗi 5 phút"
+          hint="POST mỗi 5 phút — hủy đơn pending quá hạn"
+        />
+        <WebhookUrlField
+          label="Cron — Abandoned Cart Email"
+          path="/api/cron/abandoned-cart"
+          hint="POST mỗi 5 phút — gửi email nhắc đơn bỏ rơi sau 15 phút"
         />
       </Section>
 

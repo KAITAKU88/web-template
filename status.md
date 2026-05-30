@@ -66,17 +66,20 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 ## Ngữ cảnh phiên làm việc hiện tại
 > Cập nhật tự động — dùng để tiếp tục nếu phiên bị ngắt
 
-**Đang làm:** Abandoned Cart Email (Tác vụ 2/2 ưu tiên cao)
-**Bước tiếp theo nếu phiên ngắt:** Tạo API endpoint `/api/cron/abandoned-cart`, tạo email template, cấu hình cron
+**Đang làm:** File AGENTS (tác vụ documentation)
+**Bước tiếp theo nếu phiên ngắt:** Đọc file AGENTS_2 mẫu, viết AGENTS.md cho hệ thống này
 
 ---
 
 ## Việc cần làm tiếp
 
 ### 🔴 Ưu tiên cao
-- ❌ **Abandoned Cart Email** — gửi email sau 15 phút nếu đơn pending; chưa có code
-  - Tiêu đề: `[Kaitaku] Đơn hàng của bạn chưa hoàn tất`
-  - Nội dung: link trang thanh toán + code giảm giá 10% (hết hạn trong ngày)
+- ✅ **Abandoned Cart Email** — hoàn chỉnh
+  - Migration: cột `cart_email_sent_at` vào bảng `orders`
+  - Endpoint: `POST /api/cron/abandoned-cart` (bảo vệ bởi CRON_SECRET)
+  - Logic: đơn pending 15–120 phút, có email, chưa gửi → gửi 1 lần, đánh dấu ngay
+  - Email: link quay lại trang sản phẩm, thông tin đơn hàng, branded HTML
+  - ⚠️ **Cần bạn làm**: Thêm cron job thứ 2 trên cron-job.org — POST `/api/cron/abandoned-cart` mỗi 5 phút (cùng CRON_SECRET với cron hiện tại)
 - ✅ **GTM Event Tracking** — `src/lib/gtag.ts` + ProductDetail + CheckoutClient
   - `Click_Mua_Ngay` → nút Mua ngay + floating CTA (ProductDetail) + form submit (CheckoutClient)
   - `Generate_QR` → sau khi tạo đơn thành công, QR hiển thị
