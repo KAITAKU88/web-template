@@ -53,6 +53,11 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 - ❌ Tạo cron job trên cron-job.org: POST `/api/cron/expire-orders` mỗi 5 phút
 - ❌ Custom domain (đang dùng workers.dev — bị chặn một số ISP VN)
 
+### Tính năng đang làm (ưu tiên cao)
+- ✅ **Logo/Brand sidebar → link trang chủ** — bấm logo/tên brand trong dashboard mở trang chủ web (tab mới)
+- ✅ **Landing page editor thủ công** — edit từng section (headline, nỗi đau, giải pháp, features, testimonials, FAQ...) với giao diện có thể thêm/xóa từng item; nút Preview mở trang sản phẩm; header/footer/nút thanh toán cố định không thay đổi
+- ✅ **AI prompt cố định chi tiết** — prompt dài hardcode với yêu cầu chất lượng, tone, cấu trúc rõ ràng cho từng field
+
 ### Tính năng chưa implement trong code
 - ❌ **Abandoned Cart Email** — chưa có dòng code nào; cần gửi email sau 15 phút nếu đơn vẫn pending
 - ❌ **GTM event tracking** — GA4 script có nhưng chưa fire sự kiện: `Click_Mua_Ngay`, `Generate_QR`, `Purchase`

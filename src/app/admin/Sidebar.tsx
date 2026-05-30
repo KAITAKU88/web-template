@@ -95,15 +95,21 @@ export default function AdminSidebar({ brandName = "Admin", role = "owner" }: { 
 
   return (
     <aside className="flex w-56 flex-col border-r border-gray-800 bg-gray-900">
-      {/* Logo */}
-      <div className="flex h-16 shrink-0 items-center gap-2.5 px-5 border-b border-gray-800">
+      {/* Logo → mở trang chủ trong tab mới */}
+      <a
+        href="/"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="Xem trang chủ"
+        className="flex h-16 shrink-0 items-center gap-2.5 px-5 border-b border-gray-800 hover:bg-gray-800/50 transition-colors"
+      >
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500">
           <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
         </div>
         <span className="text-sm font-semibold text-white">{brandName}</span>
-      </div>
+      </a>
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1">

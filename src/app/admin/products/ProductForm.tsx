@@ -5,6 +5,7 @@ import { generateLandingContent } from "./actions";
 import { buildDefaultLanding } from "@/lib/landingTemplate";
 import type { ProductCopy } from "@/lib/productContent";
 import type { Product } from "@/types";
+import LandingEditor from "@/components/LandingEditor";
 
 interface Category { id: string; name: string; }
 
@@ -187,81 +188,65 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
         </div>
       </div>
 
-      {/* ── AI Landing Page ───────────────────────────────────── */}
+      {/* ── Landing Page Editor ───────────────────────────────── */}
       <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between gap-3">
+        <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between gap-3 flex-wrap">
           <div>
             <h2 className="text-sm font-semibold text-white">Landing Page</h2>
-            <p className="mt-0.5 text-xs text-gray-500">Tạo trang bán hàng: headline → nỗi đau → giải pháp → tính năng → testimonial → FAQ → nút mua hàng</p>
+            <p className="mt-0.5 text-xs text-gray-500">Tạo trang bán hàng: headline → nỗi đau → giải pháp → tính năng → testimonial → FAQ</p>
           </div>
-          {landing && (
-            <span className="flex items-center gap-1.5 text-xs text-emerald-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              Đã có nội dung AI
-            </span>
-          )}
+          {/* Gợi ý AI */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={handleUseTemplate}
+              className="flex items-center gap-2 rounded-xl bg-emerald-700 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-600 transition-colors"
+            >
+              📋 Template mặc định
+            </button>
+            <button
+              type="button"
+              onClick={handleGenerate}
+              disabled={generating}
+              className="flex items-center gap-2 rounded-xl bg-violet-600 px-3 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-50 transition-colors"
+            >
+              {generating ? (
+                <>
+                  <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                  Đang tạo…
+                </>
+              ) : "✨ Generate AI"}
+            </button>
+          </div>
         </div>
+
         <div className="p-6 space-y-4">
-          {/* Hints cho AI */}
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {/* Hints cho AI — thu gọn */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1.5">Mô tả ngắn (gợi ý cho AI)</label>
               <textarea
                 name="description"
-                rows={3}
+                rows={2}
                 defaultValue={product?.description ?? ""}
-                placeholder="Template giúp quản lý công việc cá nhân theo hệ thống PARA..."
-                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
+                placeholder="Template giúp quản lý công việc theo hệ thống PARA..."
+                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
               />
             </div>
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1.5">Đối tượng mục tiêu (gợi ý cho AI)</label>
               <textarea
                 name="audience"
-                rows={3}
-                placeholder="Người đi làm văn phòng, freelancer muốn tổ chức công việc..."
-                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
+                rows={2}
+                placeholder="Người đi làm văn phòng, freelancer..."
+                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
               />
             </div>
           </div>
 
-          {/* Generate buttons */}
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={handleUseTemplate}
-              className="flex items-center gap-2 rounded-xl bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-600 transition-colors"
-            >
-              📋 Dùng template mặc định
-            </button>
-            <button
-              type="button"
-              onClick={handleGenerate}
-              disabled={generating}
-              className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-500 disabled:opacity-50 transition-colors"
-            >
-              {generating ? (
-                <>
-                  <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                  Đang tạo…
-                </>
-              ) : (
-                <>✨ Generate với AI</>
-              )}
-            </button>
-            {landing && (
-              <button
-                type="button"
-                onClick={() => setLanding(null)}
-                className="text-xs text-gray-500 hover:text-red-400 transition-colors"
-              >
-                Xóa nội dung
-              </button>
-            )}
-          </div>
           <p className="text-xs text-gray-600">
             <span className="text-emerald-500">Template mặc định</span> — hoạt động ngay, không cần API key.
-            <span className="ml-2 text-violet-400">Generate AI</span> — cần cấu hình Claude/Gemini API trong Cấu hình.
+            <span className="ml-2 text-violet-400">Generate AI</span> — cần Claude/Gemini API trong Cấu hình.
           </p>
 
           {genError && (
@@ -270,41 +255,12 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
             </p>
           )}
 
-          {/* Preview nội dung đã generate */}
-          {landing && (
-            <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4 space-y-3">
-              <p className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">Preview nội dung AI</p>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Headline</p>
-                <p className="text-sm font-semibold text-white">{landing.headline}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1">Subheadline</p>
-                <p className="text-sm text-gray-300">{landing.subheadline}</p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1.5">Tính năng ({landing.features?.length ?? 0})</p>
-                <div className="flex flex-wrap gap-2">
-                  {landing.features?.map((f, i) => (
-                    <span key={i} className="rounded-lg bg-gray-800 px-2.5 py-1 text-xs text-gray-300">
-                      {f.icon} {f.title}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 mb-1.5">FAQ ({landing.faqs?.length ?? 0} câu hỏi)</p>
-                <div className="space-y-1">
-                  {landing.faqs?.slice(0, 2).map((f, i) => (
-                    <p key={i} className="text-xs text-gray-400 truncate">• {f.q}</p>
-                  ))}
-                  {(landing.faqs?.length ?? 0) > 2 && (
-                    <p className="text-xs text-gray-600">+{(landing.faqs?.length ?? 0) - 2} câu nữa…</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+          {/* Editor thủ công */}
+          <LandingEditor
+            value={landing}
+            onChange={setLanding}
+            productId={product?.id}
+          />
         </div>
       </div>
 
