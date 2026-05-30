@@ -206,11 +206,18 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
         description="Google Analytics và webhook secret nội bộ — cần thiết khi triển khai"
       >
         <Field
+          label="GTM Container ID"
+          name="gtm_id"
+          defaultValue={settings.gtm_id ?? ""}
+          placeholder="GTM-XXXXXXX"
+          hint="Google Tag Manager — quản lý tất cả tracking tags (GA4, Facebook Pixel, Google Ads...). Khi có GTM, GA4 ID bên dưới bị bỏ qua (cấu hình GA4 bên trong GTM)."
+        />
+        <Field
           label="Google Analytics ID"
           name="ga_id"
           defaultValue={settings.ga_id ?? ""}
           placeholder="G-XXXXXXXXXX"
-          hint="Mã GA4 để theo dõi lượt truy cập — lấy tại Google Analytics → Admin → Data Streams"
+          hint="Chỉ dùng khi không có GTM. Khi đã có GTM Container ID, cấu hình GA4 bên trong GTM Dashboard."
         />
         <SecretField
           label="Supabase Webhook Secret"

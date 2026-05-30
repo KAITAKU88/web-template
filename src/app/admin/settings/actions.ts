@@ -11,7 +11,7 @@ const ALL_KEYS = [
   "resend_api_key", "resend_from_email", "resend_from_name",
   "ai_provider", "claude_api_key", "gemini_api_key",
   "supabase_webhook_secret",
-  "ga_id",
+  "gtm_id", "ga_id",
 ];
 
 // Sensitive keys: if submitted empty → keep existing (skip upsert)

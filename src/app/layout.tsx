@@ -44,7 +44,8 @@ export default async function RootLayout({
   const brandName = settings.brand_name ?? siteName;
   const logoValue = settings.logo_url ?? undefined;
   const zaloLink = settings.zalo_link ?? null;
-  const gaId = settings.ga_id || process.env.NEXT_PUBLIC_GA_ID || null;
+  const gtmId = settings.gtm_id || null;
+  const gaId  = !gtmId ? (settings.ga_id || process.env.NEXT_PUBLIC_GA_ID || null) : null;
 
   return (
     <html
@@ -61,19 +62,31 @@ export default async function RootLayout({
           }}
         />
 
-        {/* Google Analytics 4 */}
+        {/* Google Tag Manager — ưu tiên GTM nếu có, không thì dùng GA4 trực tiếp */}
+        {gtmId && (
+          <script dangerouslySetInnerHTML={{
+            __html: `window.dataLayer=window.dataLayer||[];(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','${gtmId}');`,
+          }} />
+        )}
+
+        {/* GA4 trực tiếp — chỉ load khi không có GTM */}
         {gaId && (
           <>
             <script async src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} />
-            <script
-              dangerouslySetInnerHTML={{
-                __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}',{page_path:window.location.pathname});`,
-              }}
-            />
+            <script dangerouslySetInnerHTML={{
+              __html: `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${gaId}',{page_path:window.location.pathname});`,
+            }} />
           </>
         )}
       </head>
       <body className={`${inter.className} bg-gray-50 dark:bg-gray-950`}>
+        {/* GTM noscript — bắt buộc theo chuẩn GTM */}
+        {gtmId && (
+          <noscript>
+            <iframe src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+              height="0" width="0" style={{ display: "none", visibility: "hidden" }} />
+          </noscript>
+        )}
         <Header brandName={brandName} logoValue={logoValue} />
         <main className="mx-auto max-w-5xl px-4 py-10">{children}</main>
 

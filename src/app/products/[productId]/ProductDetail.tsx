@@ -38,6 +38,12 @@ export default function ProductDetail({ product }: { product: Product }) {
   const discount = product.original_price && product.original_price > product.price
     ? calcDiscountPercent(product.price, product.original_price) : null;
 
+  // Track product view
+  useEffect(() => {
+    trackEvent("product_view");
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Email validate khi gõ
   useEffect(() => {
     if (!email) { setEmailStatus(""); return; }
@@ -85,6 +91,7 @@ export default function ProductDetail({ product }: { product: Product }) {
           if (s === "success") {
             clearInterval(timerRef.current!);
             setStep("success");
+            trackEvent("purchase");
             fireEvent("Purchase", { product_id: product.id, product_name: product.name, value: product.price, currency: "VND" });
           } else if (s === "expired") { clearInterval(timerRef.current!); setStep("expired"); }
         })
@@ -128,6 +135,7 @@ export default function ProductDetail({ product }: { product: Product }) {
       if (!res.ok) { setError(data.error ?? "Có lỗi xảy ra."); setStep("idle"); return; }
       setOrderId(data.order_id); setQrUrl(data.qr_url);
       setCountdown(15 * 60); setStep("waiting");
+      trackEvent("qr_generate");
       fireEvent("Generate_QR", { product_id: product.id, product_name: product.name, price: product.price, order_id: data.order_id });
     } catch { setError("Không thể kết nối máy chủ."); setStep("idle"); }
   };
