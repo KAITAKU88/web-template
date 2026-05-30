@@ -24,8 +24,15 @@ export async function createCategory(formData: FormData) {
   revalidatePath("/");
 }
 
-export async function deleteCategory(id: string) {
+export async function deleteCategory(id: string): Promise<{ error: string } | void> {
   const supabase = createAdminClient();
+  const { count } = await supabase
+    .from("products")
+    .select("id", { count: "exact", head: true })
+    .eq("type", id);
+  if (count && count > 0) {
+    return { error: `Danh mục này đang chứa ${count} sản phẩm, không thể xóa.` };
+  }
   await supabase.from("categories").delete().eq("id", id);
   revalidatePath("/admin/categories");
   revalidatePath("/");
