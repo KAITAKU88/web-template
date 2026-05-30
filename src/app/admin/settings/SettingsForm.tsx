@@ -140,12 +140,6 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           defaultValue={settings.zalo_link ?? ""}
           placeholder="https://zalo.me/0xxxxxxxxx"
         />
-        <Field
-          label="Link Facebook"
-          name="facebook_link"
-          defaultValue={settings.facebook_link ?? ""}
-          placeholder="https://facebook.com/yourpage"
-        />
       </Section>
 
       {/* ── Thanh toán ────────────────────────────────────────── */}

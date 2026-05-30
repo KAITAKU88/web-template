@@ -116,8 +116,8 @@ const PHASES: Phase[] = [
       },
       {
         id: "cfg-contact",
-        title: "Link liên hệ Zalo và Facebook",
-        desc: "Link Zalo hiển thị ở footer để khách hàng bấm vào liên hệ hỗ trợ trực tiếp. Facebook là tùy chọn.",
+        title: "Link liên hệ Zalo",
+        desc: "Link Zalo hiển thị ở footer để khách hàng bấm vào liên hệ hỗ trợ trực tiếp.",
         links: [{ label: "Điền Link Zalo", href: "/admin/settings#zalo_link", variant: "primary" }],
       },
     ],

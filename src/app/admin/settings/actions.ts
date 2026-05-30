@@ -5,7 +5,7 @@ import { setAdminPassword } from "@/lib/admin-password";
 
 const ALL_KEYS = [
   "site_name", "site_description", "brand_name", "logo_url", "brand_color", "favicon_url", "og_image_url",
-  "zalo_link", "facebook_link", "admin_email",
+  "zalo_link", "admin_email",
   "bank_code", "bank_account_number", "bank_account_holder",
   "sepay_api_key", "sepay_webhook_secret",
   "resend_api_key", "resend_from_email", "resend_from_name",
