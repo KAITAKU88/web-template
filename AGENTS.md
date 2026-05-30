@@ -62,8 +62,8 @@ src/
 │       ├── orders/history/route.ts     # GET lịch sử theo email
 │       ├── webhook/sepay/route.ts      # POST từ SePay khi thanh toán thành công
 │       ├── webhook/order-success/      # POST từ Supabase DB Webhook khi đơn = success
-│       ├── cron/expire-orders/         # POST từ cron-job.org mỗi 5 phút
-│       └── cron/abandoned-cart/        # POST từ cron-job.org mỗi 5 phút
+│       ├── cron/expire-orders/         # POST — Cloudflare Cron Triggers gọi mỗi 5 phút
+│       └── cron/abandoned-cart/        # POST — Cloudflare Cron Triggers gọi mỗi 5 phút
 ├── components/
 │   ├── Header.tsx                      # Header public: Logo, Search, Settings menu
 │   ├── ProductGrid.tsx                 # Grid sản phẩm + filter mobile/desktop
