@@ -63,17 +63,25 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 
 ---
 
+## Ngữ cảnh phiên làm việc hiện tại
+> Cập nhật tự động — dùng để tiếp tục nếu phiên bị ngắt
+
+**Đang làm:** Abandoned Cart Email (Tác vụ 2/2 ưu tiên cao)
+**Bước tiếp theo nếu phiên ngắt:** Tạo API endpoint `/api/cron/abandoned-cart`, tạo email template, cấu hình cron
+
+---
+
 ## Việc cần làm tiếp
 
 ### 🔴 Ưu tiên cao
 - ❌ **Abandoned Cart Email** — gửi email sau 15 phút nếu đơn pending; chưa có code
   - Tiêu đề: `[Kaitaku] Đơn hàng của bạn chưa hoàn tất`
   - Nội dung: link trang thanh toán + code giảm giá 10% (hết hạn trong ngày)
-- ❌ **GTM Event Tracking** — fire sự kiện để chạy retargeting ads
-  - `Click_Mua_Ngay` → nút Bước 1
-  - `Generate_QR` → nút Bước 2
-  - `Purchase` → trang thành công Bước 3
-  - Retargeting: nhắm `Generate_QR`, loại trừ `Purchase`, 3 ngày liên tiếp
+- ✅ **GTM Event Tracking** — `src/lib/gtag.ts` + ProductDetail + CheckoutClient
+  - `Click_Mua_Ngay` → nút Mua ngay + floating CTA (ProductDetail) + form submit (CheckoutClient)
+  - `Generate_QR` → sau khi tạo đơn thành công, QR hiển thị
+  - `Purchase` → khi Supabase realtime báo status = success
+  - Tất cả fire qua `window.gtag()` — chỉ hoạt động khi GA4 đã cấu hình
 
 ### 🟡 Cấu hình ngoài (thủ công, không phải code)
 - ❌ Dán SePay Webhook URL vào SePay Dashboard → Dịch vụ → Webhook

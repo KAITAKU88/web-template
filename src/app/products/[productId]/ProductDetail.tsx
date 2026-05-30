@@ -6,6 +6,7 @@ import { formatCurrency, calcDiscountPercent, formatCount } from "@/lib/utils";
 import type { Product, OrderStatus } from "@/types";
 import Image from "next/image";
 import Link from "next/link";
+import { fireEvent } from "@/lib/gtag";
 
 const TYPE_LABEL: Record<string, string> = { notion: "Notion", google_sheet: "Google Sheets" };
 const TYPE_ICON: Record<string, string>  = { notion: "📓", google_sheet: "📊" };
@@ -81,8 +82,11 @@ export default function ProductDetail({ product }: { product: Product }) {
       .on("postgres_changes", { event: "UPDATE", schema: "public", table: "orders", filter: `id=eq.${orderId}` },
         (payload) => {
           const s = payload.new.status as OrderStatus;
-          if (s === "success") { clearInterval(timerRef.current!); setStep("success"); }
-          else if (s === "expired") { clearInterval(timerRef.current!); setStep("expired"); }
+          if (s === "success") {
+            clearInterval(timerRef.current!);
+            setStep("success");
+            fireEvent("Purchase", { product_id: product.id, product_name: product.name, value: product.price, currency: "VND" });
+          } else if (s === "expired") { clearInterval(timerRef.current!); setStep("expired"); }
         })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
@@ -124,6 +128,7 @@ export default function ProductDetail({ product }: { product: Product }) {
       if (!res.ok) { setError(data.error ?? "Có lỗi xảy ra."); setStep("idle"); return; }
       setOrderId(data.order_id); setQrUrl(data.qr_url);
       setCountdown(15 * 60); setStep("waiting");
+      fireEvent("Generate_QR", { product_id: product.id, product_name: product.name, price: product.price, order_id: data.order_id });
     } catch { setError("Không thể kết nối máy chủ."); setStep("idle"); }
   };
 
@@ -208,7 +213,10 @@ export default function ProductDetail({ product }: { product: Product }) {
             {isBuying && !showForm && (
               <button
                 type="button"
-                onClick={() => setShowForm(true)}
+                onClick={() => {
+                  setShowForm(true);
+                  fireEvent("Click_Mua_Ngay", { product_id: product.id, product_name: product.name, price: product.price });
+                }}
                 className="btn-primary w-full"
               >
                 🛒 Mua ngay — {formatCurrency(product.price)}
@@ -339,7 +347,10 @@ export default function ProductDetail({ product }: { product: Product }) {
       {showFloating && step !== "waiting" && step !== "success" && (
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 animate-bounce">
           <button
-            onClick={scrollToForm}
+            onClick={() => {
+              scrollToForm();
+              fireEvent("Click_Mua_Ngay", { product_id: product.id, product_name: product.name, price: product.price, source: "floating_cta" });
+            }}
             className="flex items-center gap-2 rounded-full bg-green-600 px-6 py-3 text-sm font-bold text-white shadow-2xl ring-4 ring-green-200 transition hover:bg-green-700 active:scale-95"
           >
             🛒 Mua ngay — {formatCurrency(product.price)}

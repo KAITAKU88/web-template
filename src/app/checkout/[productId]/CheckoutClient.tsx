@@ -8,6 +8,7 @@ import type { Product, OrderStatus } from "@/types";
 import type { BumpCompanion, BundleOffer } from "./page";
 import Image from "next/image";
 import Link from "next/link";
+import { fireEvent } from "@/lib/gtag";
 
 type CheckoutStep = "form" | "waiting" | "success" | "cancelled";
 
@@ -113,6 +114,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
           if (newStatus === "success") {
             clearInterval(timerRef.current!);
             setStep("success");
+            fireEvent("Purchase", { product_id: product.id, product_name: product.name, value: orderAmount, currency: "VND" });
           } else if (newStatus === "cancelled" || newStatus === "expired") {
             clearInterval(timerRef.current!);
             setStep("cancelled");
@@ -127,6 +129,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
     e.preventDefault();
     setLoading(true);
     setError("");
+    fireEvent("Click_Mua_Ngay", { product_id: product.id, product_name: product.name, price: product.price });
     try {
       const res = await fetch("/api/orders", {
         method: "POST",
@@ -150,6 +153,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
       setPaymentUrl(data.payment_url ?? "");
       setCountdown(COUNTDOWN_SEC);
       setStep("waiting");
+      fireEvent("Generate_QR", { product_id: product.id, product_name: product.name, price: data.amount, order_id: data.order_id });
     } catch {
       setError("Không thể kết nối đến máy chủ. Vui lòng thử lại.");
     } finally {
