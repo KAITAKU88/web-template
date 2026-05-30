@@ -253,16 +253,6 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           path="/api/webhook/order-success"
           hint="Dán vào Supabase → Database → Webhooks → URL"
         />
-        <WebhookUrlField
-          label="Cron — Hủy đơn hết hạn"
-          path="/api/cron/expire-orders"
-          hint="Tự động gọi bởi Cloudflare Cron Triggers mỗi 5 phút — có thể gọi thủ công để test"
-        />
-        <WebhookUrlField
-          label="Cron — Abandoned Cart Email"
-          path="/api/cron/abandoned-cart"
-          hint="Tự động gọi bởi Cloudflare Cron Triggers mỗi 5 phút — có thể gọi thủ công để test"
-        />
       </Section>
 
       {/* ── Submit ────────────────────────────────────────────── */}
