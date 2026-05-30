@@ -8,7 +8,7 @@ import { revalidatePath } from "next/cache";
 import type { ProductCopy } from "@/lib/productContent";
 
 function buildPrompt(name: string, type: string, description: string, audience: string): string {
-  const typeLabel = type === "google_sheet" ? "Google Sheets" : "Notion";
+  const typeLabel = type === "google_sheet" ? "Google Sheets" : type === "notion" ? "Notion" : type;
   return `Bạn là copywriter chuyên viết landing page cho sản phẩm template ${typeLabel} bán tại thị trường Việt Nam.
 
 Thông tin sản phẩm:
