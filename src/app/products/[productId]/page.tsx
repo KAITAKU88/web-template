@@ -262,8 +262,12 @@ export default async function ProductPage({ params }: Props) {
               <div className="mb-3 text-amber-400 text-sm">★★★★★</div>
               <p className="mb-4 text-sm italic leading-relaxed text-gray-600">&ldquo;{t.text}&rdquo;</p>
               <div className="flex items-center gap-3 border-t border-gray-100 pt-3">
-                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-xl">
-                  {t.avatar}
+                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-gray-100 text-xl overflow-hidden">
+                  {(t.avatar.startsWith("http://") || t.avatar.startsWith("https://") || t.avatar.startsWith("/")) ? (
+                    <Image src={t.avatar} alt={t.name} width={36} height={36} className="h-full w-full object-cover" unoptimized />
+                  ) : (
+                    <span>{t.avatar}</span>
+                  )}
                 </div>
                 <div>
                   <div className="text-sm font-bold text-gray-800">{t.name}</div>

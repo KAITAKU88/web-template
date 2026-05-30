@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import type { ProductCopy, PainItem, FeatureItem, TestiItem, IncludeItem, FaqItem } from "@/lib/productContent";
+import { createClient } from "@/lib/supabase/client";
+
+const MAX_TESTIMONIALS = 4;
 
 const EMPTY: ProductCopy = {
   headline: "",
@@ -20,6 +24,76 @@ interface Props {
   value: ProductCopy | null;
   onChange: (v: ProductCopy) => void;
   productId?: string;
+}
+
+function isImageUrl(s: string) {
+  return s.startsWith("http://") || s.startsWith("https://") || s.startsWith("/");
+}
+
+function AvatarInput({
+  value,
+  onChange,
+  productId,
+  uploading,
+  onUpload,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  productId?: string;
+  uploading: boolean;
+  onUpload: (file: File) => void;
+}) {
+  const isImg = isImageUrl(value);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <div className="h-10 w-10 shrink-0 rounded-full bg-gray-800 overflow-hidden flex items-center justify-center text-xl border border-gray-700">
+          {isImg ? (
+            <Image src={value} alt="avatar" width={40} height={40} className="h-full w-full object-cover" unoptimized />
+          ) : (
+            <span>{value || "👤"}</span>
+          )}
+        </div>
+        <input
+          value={isImg ? value : value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="👤  hoặc paste link https://..."
+          className={`${inputCls} flex-1 text-xs`}
+        />
+        <label
+          className={`shrink-0 cursor-pointer rounded-xl border border-gray-700 px-3 py-2 text-xs transition-colors ${
+            uploading
+              ? "text-gray-600"
+              : "text-gray-400 hover:border-emerald-500 hover:text-emerald-400"
+          }`}
+          title="Upload ảnh nhỏ (tối đa 512 KB)"
+        >
+          {uploading ? "⏳" : "📷 Upload"}
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            className="hidden"
+            disabled={uploading}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onUpload(file);
+              e.target.value = "";
+            }}
+          />
+        </label>
+      </div>
+      {isImg && (
+        <button
+          type="button"
+          onClick={() => onChange("👤")}
+          className="text-xs text-gray-600 hover:text-red-400 transition-colors"
+        >
+          ✕ Xóa ảnh, dùng emoji
+        </button>
+      )}
+    </div>
+  );
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────────
@@ -95,6 +169,7 @@ function RemoveBtn({ onClick }: { onClick: () => void }) {
 
 export default function LandingEditor({ value, onChange, productId }: Props) {
   const [open, setOpen] = useState<Record<string, boolean>>({ hero: true });
+  const [uploadingIdx, setUploadingIdx] = useState<Record<number, boolean>>({});
 
   function toggle(key: string) {
     setOpen((o) => ({ ...o, [key]: !o[key] }));
@@ -102,6 +177,27 @@ export default function LandingEditor({ value, onChange, productId }: Props) {
 
   function patch(partial: Partial<ProductCopy>) {
     onChange({ ...(value ?? EMPTY), ...partial });
+  }
+
+  async function handleAvatarUpload(idx: number, file: File) {
+    setUploadingIdx((prev) => ({ ...prev, [idx]: true }));
+    try {
+      const supabase = createClient();
+      const ext = file.name.split(".").pop() ?? "jpg";
+      const folder = productId ?? "general";
+      const path = `${folder}/${Date.now()}_${idx}.${ext}`;
+      const { error } = await supabase.storage
+        .from("avatars")
+        .upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      updateTesti(idx, "avatar", data.publicUrl);
+    } catch (err) {
+      console.error("Upload avatar thất bại:", err);
+      alert("Upload thất bại. Kiểm tra bucket 'avatars' đã được tạo chưa.");
+    } finally {
+      setUploadingIdx((prev) => ({ ...prev, [idx]: false }));
+    }
   }
 
   // Initialize with empty template if null
@@ -145,7 +241,10 @@ export default function LandingEditor({ value, onChange, productId }: Props) {
     arr[i] = { ...arr[i], [field]: val };
     patch({ testimonials: arr });
   }
-  function addTesti() { patch({ testimonials: [...lp.testimonials, { text: "", name: "", role: "", avatar: "👤" }] }); }
+  function addTesti() {
+    if (lp.testimonials.length >= MAX_TESTIMONIALS) return;
+    patch({ testimonials: [...lp.testimonials, { text: "", name: "", role: "", avatar: "👤" }] });
+  }
   function removeTesti(i: number) { patch({ testimonials: lp.testimonials.filter((_, idx) => idx !== i) }); }
 
   function updateInclude(i: number, field: keyof IncludeItem, val: string) {
@@ -293,7 +392,12 @@ export default function LandingEditor({ value, onChange, productId }: Props) {
       </SectionCard>
 
       {/* ── Đánh giá ─────────────────────────────────────────────── */}
-      <SectionCard title="Đánh giá khách hàng" badge={lp.testimonials.length} open={!!open.testimonials} onToggle={() => toggle("testimonials")}>
+      <SectionCard
+        title="Đánh giá khách hàng"
+        badge={lp.testimonials.length}
+        open={!!open.testimonials}
+        onToggle={() => toggle("testimonials")}
+      >
         {lp.testimonials.map((t, i) => (
           <div key={i} className="rounded-xl border border-gray-800 p-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -301,26 +405,48 @@ export default function LandingEditor({ value, onChange, productId }: Props) {
               <RemoveBtn onClick={() => removeTesti(i)} />
             </div>
             <Field label="Nội dung đánh giá">
-              <textarea rows={3} value={t.text} onChange={(e) => updateTesti(i, "text", e.target.value)}
-                placeholder="Template này thực sự thay đổi cách tôi làm việc..." className={textareaCls} />
+              <textarea
+                rows={3}
+                value={t.text}
+                onChange={(e) => updateTesti(i, "text", e.target.value)}
+                placeholder="Template này thực sự thay đổi cách tôi làm việc..."
+                className={textareaCls}
+              />
             </Field>
-            <div className="grid grid-cols-[60px_1fr_1fr] gap-3">
-              <Field label="Avatar">
-                <input value={t.avatar} onChange={(e) => updateTesti(i, "avatar", e.target.value)}
-                  placeholder="👤" className={inputCls} />
-              </Field>
+            <Field label="Avatar (emoji hoặc ảnh)">
+              <AvatarInput
+                value={t.avatar}
+                onChange={(v) => updateTesti(i, "avatar", v)}
+                productId={productId}
+                uploading={!!uploadingIdx[i]}
+                onUpload={(file) => handleAvatarUpload(i, file)}
+              />
+            </Field>
+            <div className="grid grid-cols-2 gap-3">
               <Field label="Tên">
-                <input value={t.name} onChange={(e) => updateTesti(i, "name", e.target.value)}
-                  placeholder="Minh Tuấn" className={inputCls} />
+                <input
+                  value={t.name}
+                  onChange={(e) => updateTesti(i, "name", e.target.value)}
+                  placeholder="Minh Tuấn"
+                  className={inputCls}
+                />
               </Field>
               <Field label="Nghề · Thành phố">
-                <input value={t.role} onChange={(e) => updateTesti(i, "role", e.target.value)}
-                  placeholder="Designer · HCM" className={inputCls} />
+                <input
+                  value={t.role}
+                  onChange={(e) => updateTesti(i, "role", e.target.value)}
+                  placeholder="Designer · HCM"
+                  className={inputCls}
+                />
               </Field>
             </div>
           </div>
         ))}
-        <AddBtn onClick={addTesti} label="Thêm đánh giá" />
+        {lp.testimonials.length < MAX_TESTIMONIALS ? (
+          <AddBtn onClick={addTesti} label="Thêm đánh giá" />
+        ) : (
+          <p className="text-center text-xs text-gray-600">Tối đa {MAX_TESTIMONIALS} đánh giá</p>
+        )}
       </SectionCard>
 
       {/* ── Bao gồm ──────────────────────────────────────────────── */}
