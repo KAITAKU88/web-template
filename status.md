@@ -66,8 +66,7 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 ## Ngữ cảnh phiên làm việc hiện tại
 > Cập nhật tự động — dùng để tiếp tục nếu phiên bị ngắt
 
-**Đang làm:** File AGENTS (tác vụ documentation)
-**Bước tiếp theo nếu phiên ngắt:** Đọc file AGENTS_2 mẫu, viết AGENTS.md cho hệ thống này
+**Trạng thái:** Tất cả tác vụ 🔴 đã hoàn thành. Các tác vụ 🟡 cần bạn thao tác thủ công.
 
 ---
 
@@ -101,7 +100,7 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
   - Tạo Cloudflare Pages + cấu hình SePay + Resend
   - Mục tiêu: chỉ cần vào Dashboard điền thông tin là chạy được
 - ❌ **Tối ưu**: code sạch, performance, tốc độ
-- ❌ **File AGENTS**: document hệ thống theo format AGENTS_2
+- ✅ **File AGENTS**: `AGENTS.md` — kiến trúc đầy đủ, tech stack, luồng mua hàng, DB, cron, webhook, gotchas
 
 ---
 
