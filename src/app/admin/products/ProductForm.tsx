@@ -261,6 +261,15 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
             onChange={setLanding}
             productId={product?.id}
           />
+          {landing && (
+            <button
+              type="button"
+              onClick={() => setLanding(null)}
+              className="text-xs text-gray-600 hover:text-red-400 transition-colors"
+            >
+              ✕ Xóa toàn bộ landing page (dùng nội dung mặc định)
+            </button>
+          )}
         </div>
       </div>
 
