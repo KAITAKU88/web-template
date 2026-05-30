@@ -256,12 +256,12 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
         <WebhookUrlField
           label="Cron — Hủy đơn hết hạn"
           path="/api/cron/expire-orders"
-          hint="POST mỗi 5 phút — hủy đơn pending quá hạn"
+          hint="Tự động gọi bởi Cloudflare Cron Triggers mỗi 5 phút — có thể gọi thủ công để test"
         />
         <WebhookUrlField
           label="Cron — Abandoned Cart Email"
           path="/api/cron/abandoned-cart"
-          hint="POST mỗi 5 phút — gửi email nhắc đơn bỏ rơi sau 15 phút"
+          hint="Tự động gọi bởi Cloudflare Cron Triggers mỗi 5 phút — có thể gọi thủ công để test"
         />
       </Section>
 

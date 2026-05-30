@@ -90,7 +90,10 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
   - URL: `https://yourdomain.com/api/webhook/sepay`
   - **Không cấu hình trong Dashboard app** — cấu hình trực tiếp trên SePay
 - ❌ Tạo Supabase Database Webhook trỏ tới `/api/webhook/order-success`
-- ❌ Tạo cron job trên cron-job.org: POST `/api/cron/expire-orders` mỗi 5 phút
+- ✅ Cron jobs — tích hợp Cloudflare Cron Triggers (mỗi 5 phút, không cần dịch vụ ngoài)
+  - `src/cf-worker.ts` — worker wrapper thêm `scheduled()` handler
+  - `wrangler.toml` — `[triggers] crons = ["*/5 * * * *"]`
+  - Gọi nội bộ: `expire-orders` + `abandoned-cart`
 - ❌ Custom domain (workers.dev bị chặn một số ISP Việt Nam)
 
 ### 🟢 Sau khi hệ thống ổn định

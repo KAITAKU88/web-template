@@ -160,7 +160,10 @@ Toàn bộ cấu hình lưu trong bảng `settings`, quản lý qua Admin → C�
 
 ---
 
-## Cron jobs (cần cấu hình trên cron-job.org)
+## Cron jobs (Cloudflare Cron Triggers — tự động, không cần dịch vụ ngoài)
+
+Cấu hình trong `wrangler.toml` (`[triggers] crons = ["*/5 * * * *"]`).
+Entry point: `src/cf-worker.ts` — wraps OpenNext handler, thêm `scheduled()` handler.
 
 Cả hai endpoint dùng header `x-cron-secret: <CRON_SECRET>` (env var).
 
@@ -168,6 +171,8 @@ Cả hai endpoint dùng header `x-cron-secret: <CRON_SECRET>` (env var).
 |-----|--------|----------|----------|
 | `/api/cron/expire-orders` | POST | 5 phút | Hủy đơn pending quá 15 phút |
 | `/api/cron/abandoned-cart` | POST | 5 phút | Email nhắc đơn bỏ rơi 15–120 phút |
+
+> Các URL trên có thể gọi thủ công để test (copy từ Admin → Cấu hình → Webhook & API URLs).
 
 ---
 

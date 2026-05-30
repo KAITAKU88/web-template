@@ -77,9 +77,16 @@ const PHASES: Phase[] = [
       {
         id: "cf-deploy",
         title: "Trigger Redeploy",
-        desc: "Cloudflare Pages → Deployments → Retry deployment hoặc push commit mới. Chờ ~3-5 phút. Truy cập domain *.workers.dev xác nhận site chạy. Thử đăng nhập /admin/login.",
+        desc: "Cloudflare Dashboard → Workers & Pages → chọn project → Deployments → Retry deployment hoặc push commit mới lên GitHub. Chờ ~3-5 phút. Truy cập domain *.workers.dev xác nhận site chạy. Thử đăng nhập /admin/login.",
         links: [{ label: "Cloudflare Dashboard", href: "https://dash.cloudflare.com/" }],
         tips: "Nếu site báo lỗi 500, kiểm tra lại Supabase keys trong Cloudflare env vars. Xem Deployment logs để thấy lỗi cụ thể.",
+      },
+      {
+        id: "cf-cron",
+        title: "Cron tự động (đã tích hợp sẵn)",
+        desc: "Cloudflare Cron Triggers đã được cấu hình trong mã nguồn — không cần dịch vụ cron ngoài.\n\nHai tác vụ chạy tự động mỗi 5 phút:\n  • Hủy đơn pending quá hạn\n  • Gửi email nhắc đơn bỏ rơi (sau 15 phút)\n\nKiểm tra: Cloudflare Dashboard → Workers → chọn project → Triggers → Cron Triggers.",
+        links: [{ label: "Cloudflare Workers Dashboard", href: "https://dash.cloudflare.com/" }],
+        tips: "Cron Triggers chỉ hoạt động sau khi deploy lên Cloudflare, không chạy khi dev local.",
       },
     ],
   },
