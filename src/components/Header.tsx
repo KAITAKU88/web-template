@@ -307,10 +307,10 @@ function SettingsMenu() {
 export default function Header({ brandName = "TemplateLab", logoValue }: { brandName?: string; logoValue?: string }) {
   return (
     <header className="sticky top-0 z-40 border-b border-gray-100 bg-white/90 backdrop-blur-sm dark:border-gray-800 dark:bg-gray-900/90">
-      <div className="mx-auto flex h-16 max-w-5xl items-center gap-3 px-4">
+      <div className="mx-auto flex h-16 max-w-5xl items-center gap-2 px-4">
         <Logo brandName={brandName} logoValue={logoValue} />
-        <div className="ml-auto flex items-center gap-3">
-          <div className="w-64 min-w-0">
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
+          <div className="min-w-0 flex-1 sm:w-64 sm:flex-none">
             <SearchBar />
           </div>
           <SettingsMenu />

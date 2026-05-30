@@ -53,27 +53,48 @@ export default function ProductGrid({ products, categories = [] }: { products: P
   return (
     <div>
       {/* ── Toolbar: Filter + Sort ── */}
-      <div className="mb-6 flex flex-wrap items-center gap-2">
-        {/* Danh mục — dropdown trên mobile, buttons trên desktop khi ≤5 danh mục */}
+
+      {/* Mobile: 3 dropdown trên cùng 1 hàng */}
+      <div className="mb-6 flex gap-1.5 sm:hidden">
+        {categories.length > 0 && (
+          <select
+            value={typeFilter}
+            onChange={(e) => setTypeFilter(e.target.value)}
+            className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-2 py-1.5 text-xs font-medium text-gray-600 shadow-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+          >
+            <option value="all">Tất cả</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        )}
+        <select
+          value={priceIdx}
+          onChange={(e) => setPriceIdx(Number(e.target.value))}
+          className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-2 py-1.5 text-xs font-medium text-gray-600 shadow-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+        >
+          {PRICE_RANGES.map((r, i) => (
+            <option key={i} value={i}>{r.label}</option>
+          ))}
+        </select>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as SortKey)}
+          className="min-w-0 flex-1 rounded-xl border border-gray-200 bg-white px-2 py-1.5 text-xs font-medium text-gray-600 shadow-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+        >
+          <option value="newest">Mới nhất</option>
+          <option value="price_asc">Giá tăng dần</option>
+          <option value="price_desc">Giá giảm dần</option>
+          <option value="popular">Phổ biến nhất</option>
+        </select>
+      </div>
+
+      {/* Desktop: category buttons/dropdown + giá + sắp xếp */}
+      <div className="mb-6 hidden sm:flex flex-wrap items-center gap-2">
         {categories.length > 0 && (
           <>
-            {/* Mobile + nhiều danh mục: dropdown */}
-            <select
-              value={typeFilter}
-              onChange={(e) => setTypeFilter(e.target.value)}
-              className={`rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 ${
-                categories.length <= 5 ? "sm:hidden" : ""
-              }`}
-            >
-              <option value="all">Tất cả</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.id}>{c.name}</option>
-              ))}
-            </select>
-
-            {/* Desktop + ≤5 danh mục: buttons */}
-            {categories.length <= 5 && (
-              <div className="hidden sm:flex flex-wrap gap-2">
+            {categories.length <= 5 ? (
+              <div className="flex flex-wrap gap-2">
                 {["all", ...categories.map((c) => c.id)].map((t) => (
                   <button
                     key={t}
@@ -88,12 +109,21 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                   </button>
                 ))}
               </div>
+            ) : (
+              <select
+                value={typeFilter}
+                onChange={(e) => setTypeFilter(e.target.value)}
+                className="rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-600 shadow-sm outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+              >
+                <option value="all">Tất cả</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </select>
             )}
           </>
         )}
-
         <div className="ml-auto flex items-center gap-2">
-          {/* Price range */}
           <select
             value={priceIdx}
             onChange={(e) => setPriceIdx(Number(e.target.value))}
@@ -103,8 +133,6 @@ export default function ProductGrid({ products, categories = [] }: { products: P
               <option key={i} value={i}>{r.label}</option>
             ))}
           </select>
-
-          {/* Sort */}
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
