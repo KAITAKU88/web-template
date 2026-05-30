@@ -1,4 +1,4 @@
-# Trạng thái làm việc — 2026-05-30
+# Trạng thái làm việc — 2026-05-30 (cập nhật cuối phiên)
 
 ## Production URL
 https://web-template-cloudflare.thankful-to-all-88.workers.dev
@@ -32,6 +32,14 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 - ✅ Migration `20260530000001_relax_product_type_constraint.sql` — cần chạy trên Supabase nếu chưa
 - ✅ Lọc đơn hàng theo thời gian: Hôm nay / 7 ngày / Tháng này / Năm này
 
+### Supabase Storage & Upload ảnh (phiên 2026-05-30 — cuối ngày)
+- ✅ Bucket `avatars` (512 KB, jpeg/png/webp/gif) — lưu avatar testimonials
+- ✅ Bucket `site-assets` (5 MB, thêm svg/ico) — lưu logo, favicon, og-image
+- ✅ **LandingEditor**: AvatarInput — upload ảnh hoặc paste link, preview real-time, max 4 testimonials
+- ✅ **SettingsForm**: ImageUploadField — logo/favicon/og-image đều có nút Upload + URL input + preview
+- ✅ Product page: render `<img>` nếu avatar là URL, emoji nếu không phải
+- ✅ Migration tự động apply qua `supabase db push` sau khi tạo file
+
 ### Landing Page Editor (hoàn thành phiên 2026-05-30)
 - ✅ **Sidebar logo/brand → link trang chủ** tab mới (`href="/" target="_blank"`)
 - ✅ **LandingEditor component** (`src/components/LandingEditor.tsx`) — editor đầy đủ 7 section:
@@ -63,16 +71,20 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 
 ## Việc cần làm tiếp
 
+### Ưu tiên cao — làm trước
+- ❌ **Mobile UI** — giao diện trên mobile chưa ổn, ảnh hưởng trực tiếp khách hàng
+- ❌ **Abandoned Cart Email** — gửi email sau 15 phút nếu đơn vẫn pending; chưa có dòng code nào
+- ❌ **GTM event tracking** — fire sự kiện: `Click_Mua_Ngay`, `Generate_QR`, `Purchase` để chạy retargeting ads
+
 ### Cấu hình ngoài (không phải code — cần làm thủ công)
 - ❌ Dán SePay Webhook URL vào SePay Dashboard → Dịch vụ → Webhook
 - ❌ Tạo Supabase Database Webhook trỏ tới `/api/webhook/order-success`
 - ❌ Tạo cron job trên cron-job.org: POST `/api/cron/expire-orders` mỗi 5 phút
-- ❌ Chạy migration `20260530000001_relax_product_type_constraint.sql` trên Supabase (nếu chưa)
 - ❌ Custom domain (đang dùng workers.dev — bị chặn một số ISP VN)
 
-### Tính năng chưa implement trong code
-- ❌ **Abandoned Cart Email** — chưa có dòng code nào; gửi email sau 15 phút nếu đơn vẫn pending
-- ❌ **GTM event tracking** — GA4 script có nhưng chưa fire sự kiện: `Click_Mua_Ngay`, `Generate_QR`, `Purchase`
+### Tính năng nâng cao — làm sau khi hệ thống ổn định
+- ❌ **White-label / clone system** — quy trình bàn giao hệ thống cho khách mua lại (fork repo + clone Supabase + Cloudflare Pages)
+- ❌ **Viết file AGENTS** — document hệ thống theo format AGENTS_2
 
 ## Lưu ý kỹ thuật quan trọng
 - **Next.js 15.5.18** (không dùng 16.x — bug prefetch RSC với OpenNext)
