@@ -238,6 +238,28 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
         />
       </Section>
 
+      {/* ── Webhook & API URLs (read-only) ────────────────────── */}
+      <Section
+        title="Webhook & API URLs"
+        description="Copy từng URL và dán vào dịch vụ tương ứng — không thể chỉnh sửa"
+      >
+        <WebhookUrlField
+          label="SePay Webhook URL"
+          path="/api/webhook/sepay"
+          hint="Dán vào SePay Dashboard → Dịch vụ → Webhook → URL"
+        />
+        <WebhookUrlField
+          label="Supabase DB Webhook URL"
+          path="/api/webhook/order-success"
+          hint="Dán vào Supabase → Database → Webhooks → URL"
+        />
+        <WebhookUrlField
+          label="Cron Job URL"
+          path="/api/cron/expire-orders"
+          hint="Dán vào cron-job.org, phương thức POST, chạy mỗi 5 phút"
+        />
+      </Section>
+
       {/* ── Submit ────────────────────────────────────────────── */}
       <div className={`sticky bottom-0 -mx-0 rounded-2xl transition-all duration-300 ${
         isDirty ? "bg-gray-950/95 backdrop-blur border border-emerald-500/30 px-6 py-4 shadow-xl shadow-emerald-900/20" : "px-0 py-2"
@@ -477,6 +499,59 @@ function BankCodeField({ defaultValue }: { defaultValue: string }) {
             <option key={b.code} value={b.code}>{b.name} ({b.code})</option>
           ))}
         </select>
+      </div>
+    </div>
+  );
+}
+
+function WebhookUrlField({
+  label,
+  path,
+  hint,
+}: {
+  label: string;
+  path: string;
+  hint: string;
+}) {
+  const [origin, setOrigin] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
+
+  const url = origin ? `${origin}${path}` : "Đang tải…";
+
+  async function copy() {
+    if (!origin) return;
+    await navigator.clipboard.writeText(`${origin}${path}`);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
+      <div>
+        <p className="block text-sm font-medium text-gray-300">{label}</p>
+        <p className="mt-0.5 text-xs text-gray-500">{hint}</p>
+      </div>
+      <div className="sm:col-span-2 flex items-center gap-2">
+        <input
+          readOnly
+          value={url}
+          className="w-full rounded-xl border border-gray-700 bg-gray-800/40 px-3.5 py-2 text-sm text-gray-400 font-mono outline-none select-all cursor-text"
+        />
+        <button
+          type="button"
+          onClick={copy}
+          className={`shrink-0 rounded-xl border px-3 py-2 text-xs font-medium transition-colors ${
+            copied
+              ? "border-emerald-500 text-emerald-400"
+              : "border-gray-700 text-gray-400 hover:border-emerald-500 hover:text-emerald-400"
+          }`}
+        >
+          {copied ? "✓ Copied" : "Copy"}
+        </button>
       </div>
     </div>
   );
