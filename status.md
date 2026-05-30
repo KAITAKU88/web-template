@@ -66,7 +66,7 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 ## Ngữ cảnh phiên làm việc hiện tại
 > Cập nhật tự động — dùng để tiếp tục nếu phiên bị ngắt
 
-**Trạng thái:** Tất cả tác vụ 🔴 đã hoàn thành. Các tác vụ 🟡 cần bạn thao tác thủ công.
+**Trạng thái:** Tất cả tác vụ code đã hoàn thành. Các tác vụ 🟡 cần bạn thao tác thủ công.
 
 ---
 
@@ -79,7 +79,7 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
   - Logic: đơn pending 15–120 phút, có email, chưa gửi → gửi 1 lần, đánh dấu ngay
   - Email: link quay lại trang sản phẩm, thông tin đơn hàng, branded HTML
   - ⚠️ **Cần bạn làm**: Thêm cron job thứ 2 trên cron-job.org — POST `/api/cron/abandoned-cart` mỗi 5 phút (cùng CRON_SECRET với cron hiện tại)
-- ✅ **GTM Event Tracking** — `src/lib/gtag.ts` + ProductDetail + CheckoutClient
+- ✅ **GTM + Analytics** — GTM Container ID trong Settings, analytics dashboard nội bộ (phễu, doanh thu 7 ngày, top sản phẩm)
   - `Click_Mua_Ngay` → nút Mua ngay + floating CTA (ProductDetail) + form submit (CheckoutClient)
   - `Generate_QR` → sau khi tạo đơn thành công, QR hiển thị
   - `Purchase` → khi Supabase realtime báo status = success
