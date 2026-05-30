@@ -1,7 +1,9 @@
-# Trạng thái làm việc — 2026-05-30 (cập nhật cuối phiên)
+# Trạng thái làm việc — 2026-05-30
 
 ## Production URL
 https://web-template-cloudflare.thankful-to-all-88.workers.dev
+
+---
 
 ## Đã hoàn thành (tích lũy)
 
@@ -22,76 +24,83 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 - ✅ Middleware chặn truy cập sai path, redirect về path tương đương
 - ✅ Collaborator: chỉ xem, không thêm/sửa/xóa (`canEdit = role !== "collaborator"`)
 - ✅ Manager tạo/sửa sản phẩm redirect đúng path (dùng `adminPath()`)
-- ✅ Nhân viên thực: tranthiluong300489@gmail.com (manager), duykhanh2012@gmail.com (collaborator)
 
 ### Tính năng sản phẩm & danh mục
 - ✅ Danh mục sản phẩm (bảng `categories` trong Supabase)
 - ✅ sort_order tính theo MAX(sort_order) + 1 — không trùng, không ngắt quãng
 - ✅ Chặn xóa danh mục đang có sản phẩm — hiển thị lỗi inline "Đang chứa X sản phẩm"
 - ✅ Bỏ CHECK constraint `type IN ('notion','google_sheet')` → danh mục tùy chỉnh lưu được
-- ✅ Migration `20260530000001_relax_product_type_constraint.sql` — cần chạy trên Supabase nếu chưa
 - ✅ Lọc đơn hàng theo thời gian: Hôm nay / 7 ngày / Tháng này / Năm này
 
-### Supabase Storage & Upload ảnh (phiên 2026-05-30 — cuối ngày)
-- ✅ Bucket `avatars` (512 KB, jpeg/png/webp/gif) — lưu avatar testimonials
-- ✅ Bucket `site-assets` (5 MB, thêm svg/ico) — lưu logo, favicon, og-image
-- ✅ **LandingEditor**: AvatarInput — upload ảnh hoặc paste link, preview real-time, max 4 testimonials
-- ✅ **SettingsForm**: ImageUploadField — logo/favicon/og-image đều có nút Upload + URL input + preview
+### Supabase Storage & Upload ảnh
+- ✅ Bucket `avatars` (512 KB) — lưu avatar testimonials
+- ✅ Bucket `site-assets` (5 MB, svg/ico) — lưu logo, favicon, og-image
+- ✅ LandingEditor: AvatarInput — upload ảnh hoặc paste link, preview, max 4 testimonials
+- ✅ SettingsForm: ImageUploadField — logo/favicon/og-image có nút Upload + URL + preview
 - ✅ Product page: render `<img>` nếu avatar là URL, emoji nếu không phải
-- ✅ Migration tự động apply qua `supabase db push` sau khi tạo file
 
-### Landing Page Editor (hoàn thành phiên 2026-05-30)
-- ✅ **Sidebar logo/brand → link trang chủ** tab mới (`href="/" target="_blank"`)
-- ✅ **LandingEditor component** (`src/components/LandingEditor.tsx`) — editor đầy đủ 7 section:
-  - Hero (headline + subheadline)
-  - Nỗi đau (array, thêm/xóa từng item)
-  - Giải pháp (title, desc, công thức A+B=Result)
-  - Tính năng (array, thêm/xóa)
-  - Đánh giá khách hàng (array, thêm/xóa)
-  - Bao gồm trong gói (array, thêm/xóa)
-  - FAQ (array, thêm/xóa)
-- ✅ Accordion UI — section expand/collapse, badge số lượng item
-- ✅ Nút **Preview** (chỉ khi edit SP đã tồn tại) → mở `/products/{id}` tab mới
-- ✅ Nút **"✕ Xóa toàn bộ landing page"** → reset về `null` (dùng nội dung mặc định)
-- ✅ Header/footer/nút thanh toán cố định trong template — không edit được
-- ✅ **AI prompt chi tiết hardcode** — yêu cầu tone, chất lượng, hướng dẫn từng field cụ thể
-- ✅ Validation: bắt buộc nhập tên SP trước khi dùng Template mặc định hoặc Generate AI
-- ✅ Verified bằng Puppeteer + Chrome 149 headless
+### Landing Page Editor
+- ✅ LandingEditor component — 7 section đầy đủ: Hero, Nỗi đau, Giải pháp, Tính năng, Đánh giá, Bao gồm, FAQ
+- ✅ Accordion UI — expand/collapse, badge số lượng
+- ✅ Nút Preview → mở `/products/{id}` tab mới
+- ✅ Nút Xóa toàn bộ landing page → reset về `null`
+- ✅ AI generate landing page (Claude / Gemini)
 
-### UX & Responsive
-- ✅ Mobile: search bar dùng `flex-1` tự co lại (bỏ `w-64` cứng)
-- ✅ Mobile: 3 dropdown lọc (danh mục / giá / sắp xếp) trên cùng 1 hàng
-- ✅ Search bar tự clear khi chuyển từ homepage sang trang sản phẩm
-- ✅ GA4 script load trong layout nếu cấu hình `ga_measurement_id` trong Settings
+### UX & Responsive (cập nhật 2026-05-30)
+- ✅ **Admin sidebar mobile**: slide-in drawer từ trái, hamburger button, backdrop overlay
+- ✅ **Mobile top bar** trong admin: hiển thị hamburger + brand name, ẩn trên desktop
+- ✅ Admin pages: padding responsive `p-4 md:p-6`
+- ✅ Admin products table: `overflow-x-auto`
+- ✅ Homepage hero: `text-2xl sm:text-4xl` (đúng tỉ lệ mobile)
+- ✅ Homepage trust signals: `grid-cols-1 sm:grid-cols-3` (không dùng flex min-w-64)
+- ✅ Search bar tự co theo màn hình
+- ✅ Filter mobile: 3 dropdown trên 1 hàng
 
 ### Backend & Webhook (code xong, chờ cấu hình ngoài)
 - ✅ SePay Webhook handler: `/api/webhook/sepay`
 - ✅ Supabase DB Webhook handler: `/api/webhook/order-success`
 - ✅ Cron endpoint: `/api/cron/expire-orders`
 
+---
+
 ## Việc cần làm tiếp
 
-### Ưu tiên cao — làm trước
-- ❌ **Mobile UI** — giao diện trên mobile chưa ổn, ảnh hưởng trực tiếp khách hàng
-- ❌ **Abandoned Cart Email** — gửi email sau 15 phút nếu đơn vẫn pending; chưa có dòng code nào
-- ❌ **GTM event tracking** — fire sự kiện: `Click_Mua_Ngay`, `Generate_QR`, `Purchase` để chạy retargeting ads
+### 🔴 Ưu tiên cao
+- ❌ **Abandoned Cart Email** — gửi email sau 15 phút nếu đơn pending; chưa có code
+  - Tiêu đề: `[Kaitaku] Đơn hàng của bạn chưa hoàn tất`
+  - Nội dung: link trang thanh toán + code giảm giá 10% (hết hạn trong ngày)
+- ❌ **GTM Event Tracking** — fire sự kiện để chạy retargeting ads
+  - `Click_Mua_Ngay` → nút Bước 1
+  - `Generate_QR` → nút Bước 2
+  - `Purchase` → trang thành công Bước 3
+  - Retargeting: nhắm `Generate_QR`, loại trừ `Purchase`, 3 ngày liên tiếp
 
-### Cấu hình ngoài (không phải code — cần làm thủ công)
+### 🟡 Cấu hình ngoài (thủ công, không phải code)
 - ❌ Dán SePay Webhook URL vào SePay Dashboard → Dịch vụ → Webhook
+  - URL: `https://yourdomain.com/api/webhook/sepay`
+  - **Không cấu hình trong Dashboard app** — cấu hình trực tiếp trên SePay
 - ❌ Tạo Supabase Database Webhook trỏ tới `/api/webhook/order-success`
 - ❌ Tạo cron job trên cron-job.org: POST `/api/cron/expire-orders` mỗi 5 phút
-- ❌ Custom domain (đang dùng workers.dev — bị chặn một số ISP VN)
+- ❌ Custom domain (workers.dev bị chặn một số ISP Việt Nam)
 
-### Tính năng nâng cao — làm sau khi hệ thống ổn định
-- ❌ **White-label / clone system** — quy trình bàn giao hệ thống cho khách mua lại (fork repo + clone Supabase + Cloudflare Pages)
-- ❌ **Viết file AGENTS** — document hệ thống theo format AGENTS_2
+### 🟢 Sau khi hệ thống ổn định
+- ❌ **White-label / Bán hệ thống cho khách**
+  - Fork repo → source code của họ
+  - Clone Supabase schema (không có data)
+  - Tạo Cloudflare Pages + cấu hình SePay + Resend
+  - Mục tiêu: chỉ cần vào Dashboard điền thông tin là chạy được
+- ❌ **Tối ưu**: code sạch, performance, tốc độ
+- ❌ **File AGENTS**: document hệ thống theo format AGENTS_2
+
+---
 
 ## Lưu ý kỹ thuật quan trọng
 - **Next.js 15.5.18** (không dùng 16.x — bug prefetch RSC với OpenNext)
 - **`createAdminClient()`** phải dùng ES import, KHÔNG dùng `require()`
 - **`NEXT_PUBLIC_*`** vars bake vào bundle lúc build — phải đúng trước khi build
-- **Role** đọc từ cookie trực tiếp trong `get-role.ts` (không qua middleware header vì bị mất khi rewrite)
+- **Role** đọc từ cookie trong `get-role.ts` (không qua middleware header vì bị mất khi rewrite)
 - **Cloudflare**: NODE_VERSION=22 trong Build Variables (không phải Environment Variables)
 - **Supabase project**: cdqhcxubloteojfiipsd
 - **Mật khẩu admin**: lưu riêng trong password manager, không ghi vào đây
 - **Test browser**: Playwright không support Ubuntu 26.04; dùng `@puppeteer/browsers` tải Chrome + extract libs từ Ubuntu debs vào `/tmp/chromelibs` (mất sau reboot WSL, cần tải lại)
+- **SePay Webhook URL** cấu hình trực tiếp trên SePay Dashboard — không phải trong Admin app
