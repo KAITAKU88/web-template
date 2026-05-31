@@ -66,24 +66,30 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 ## Ngữ cảnh phiên làm việc hiện tại
 > Cập nhật tự động — dùng để tiếp tục nếu phiên bị ngắt
 
-**Trạng thái (2026-05-31):** Phiên này đã hoàn thành 5 tasks lớn:
+**Trạng thái (2026-05-31):** Hoàn thành 6 tasks lớn:
 - ✅ URL slug thay UUID trong checkout
 - ✅ Draft/Publish sản phẩm  
 - ✅ Trang Khách hàng + nhóm khách hàng
 - ✅ Link bảo vệ tải template có thời hạn
 - ✅ Automation rules + Marketing lên lịch theo sự kiện
+- ✅ Automation triggers kết nối thực: order_success, order_cancelled, product_published
 
 ---
 
 ## Việc cần làm tiếp
 
-### ✅ Đã hoàn thành trong phiên 2026-05-31
+### ✅ Đã hoàn thành trong phiên 2026-05-31 (2 đợt)
 - ✅ URL slug thay UUID trong checkout — `/products/{slug}` và `/checkout/{slug}`
 - ✅ Draft/Publish sản phẩm — mặc định draft khi tạo mới, nút toggle trong admin
 - ✅ Trang Khách hàng (`/admin/customers`) — aggregate từ orders, tạo nhóm, lọc, sắp xếp
 - ✅ Link bảo vệ tải template — token có thời hạn + giới hạn lượt truy cập
 - ✅ Automation rules — tự động gửi email theo sự kiện (4 loại sự kiện, delay, nhóm)
 - ✅ Marketing lên lịch — gửi ngay hoặc đặt giờ, nhắm theo nhóm KH
+- ✅ Automation triggers thực — kết nối 3 sự kiện với queue + cron xử lý mỗi 5 phút
+  - `order_success` webhook → queue automation ngay sau xác nhận đơn
+  - `expireOrders` → queue `order_cancelled` cho từng đơn hết hạn
+  - `toggleProductStatus(published)` → queue `product_published`
+  - Cron `/api/cron/process-automations` thay biến `{{product_name}}` v.v. rồi gửi email
 
 ### 🔴 Ưu tiên cao
 - ✅ **Abandoned Cart Email** — hoàn chỉnh
@@ -147,3 +153,6 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 - ✅ 3. Marketing lên lịch/sự kiện
 - ✅ 4. Draft/Publish sản phẩm
 - ✅ 5. Link bảo vệ tải template có thời hạn
+
+Trang sản phẩm chưa có nút lọc, tìm kiếm, sắp xếp
+Hiện tại khi 1 sản phẩm mới được tạo ra chưa có phần khởi tạo số sao, số lượt đánh giá. Tạo 2 phần này, cho phép nhập thủ công. Hoặc tự động tạo ra số sao random trong khoảng 4.4 đến 4.9 và số lượt đánh giá random trong khoảng từ 1/10 đến 1/3 số lượt tải 
