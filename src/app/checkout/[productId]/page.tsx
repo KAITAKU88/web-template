@@ -25,10 +25,11 @@ export default async function CheckoutPage({ params }: Props) {
   const { productId } = await params;
   const supabase = await createClient();
 
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId);
   const { data: product, error } = await supabase
     .from("products")
     .select("*")
-    .eq("id", productId)
+    .eq(isUuid ? "id" : "slug", productId)
     .single();
 
   if (error || !product) notFound();
@@ -37,7 +38,7 @@ export default async function CheckoutPage({ params }: Props) {
   let companionQuery = supabase
     .from("products")
     .select("id, name, price")
-    .neq("id", productId)
+    .neq("id", product.id)
     .order("download_count", { ascending: false })
     .limit(1);
 
@@ -58,7 +59,7 @@ export default async function CheckoutPage({ params }: Props) {
   const { data: bundleRaw } = await supabase
     .from("products")
     .select("id, name, price")
-    .neq("id", productId)
+    .neq("id", product.id)
     .order("download_count", { ascending: false })
     .limit(3);
 

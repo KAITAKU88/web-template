@@ -133,7 +133,7 @@ export default async function ProductPage({ params }: Props) {
                 </div>
               )}
             </div>
-            <Link href={`/checkout/${product.id}`} className="btn-primary">
+            <Link href={`/checkout/${product.slug ?? product.id}`} className="btn-primary">
               Mua ngay →
             </Link>
           </div>
@@ -321,7 +321,7 @@ export default async function ProductPage({ params }: Props) {
               ✓ Nhận link qua email trong vài phút<br />
               ✓ Dùng vĩnh viễn, tự do chỉnh sửa
             </div>
-            <Link href={`/checkout/${product.id}`} className="btn-primary w-full text-center">
+            <Link href={`/checkout/${product.slug ?? product.id}`} className="btn-primary w-full text-center">
               Mua ngay →
             </Link>
             <p className="mt-2 text-center text-xs text-gray-400">Thanh toán an toàn qua VietQR</p>
@@ -373,7 +373,7 @@ export default async function ProductPage({ params }: Props) {
         <div className="mb-1 text-3xl font-extrabold">{formatCurrency(product.price)}</div>
         <p className="mb-5 text-sm text-green-100">Thanh toán 1 lần — dùng vĩnh viễn</p>
         <Link
-          href={`/checkout/${product.id}`}
+          href={`/checkout/${product.slug ?? product.id}`}
           className="inline-block rounded-xl bg-white px-8 py-3.5 text-base font-extrabold text-green-700 shadow-lg transition hover:bg-green-50 active:scale-95"
         >
           Mua ngay — nhận link tức thì →
