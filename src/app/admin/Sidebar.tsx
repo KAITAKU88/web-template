@@ -106,34 +106,15 @@ export default function AdminSidebar({
     window.location.href = "/admin/login";
   }
 
-  // Chặn navigation khi đang có unsaved changes
+  // Chặn navigation khi đang có unsaved changes (bất kỳ form nào)
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
-    type DirtyWindow = Window & {
-      __adminSettingsDirty?: boolean;
-      __adminProductDirty?: boolean;
-    };
-    const w = typeof window !== "undefined" ? window as DirtyWindow : null;
-    if (!w) return;
-
-    const settingsPath = `${basePath}/settings`;
-    const productsPath = `${basePath}/products`;
-
-    const leavingSettings = pathname.startsWith(settingsPath) && !href.startsWith(settingsPath);
-    const leavingProduct  = pathname.startsWith(productsPath) && !href.startsWith(productsPath);
-
-    if (leavingSettings && w.__adminSettingsDirty) {
+    if (href === pathname) return;
+    const dirty = typeof window !== "undefined" &&
+      (window as Window & { __adminFormDirty?: boolean }).__adminFormDirty;
+    if (dirty) {
       e.preventDefault();
-      if (window.confirm("Bạn có thay đổi chưa được lưu.\nRời khỏi trang Cấu hình không?")) {
-        w.__adminSettingsDirty = false;
-        router.push(href);
-      }
-      return;
-    }
-
-    if (leavingProduct && w.__adminProductDirty) {
-      e.preventDefault();
-      if (window.confirm("Bạn có thay đổi chưa được lưu.\nRời khỏi trang Sản phẩm không?")) {
-        w.__adminProductDirty = false;
+      if (window.confirm("Bạn có thay đổi chưa được lưu.\nRời khỏi trang này không?")) {
+        (window as Window & { __adminFormDirty?: boolean }).__adminFormDirty = false;
         router.push(href);
       }
     }

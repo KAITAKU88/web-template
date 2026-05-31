@@ -2,11 +2,15 @@
 
 import { useState, useTransition, useRef } from "react";
 import { createStaff } from "./actions";
+import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 
 export default function StaffCreateForm() {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState("");
+  const [isDirty, setIsDirty] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
+
+  useUnsavedChanges(isDirty);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -16,6 +20,7 @@ export default function StaffCreateForm() {
       const result = await createStaff(fd);
       if (result.error) { setError(result.error); return; }
       formRef.current?.reset();
+      setIsDirty(false);
     });
   }
 
@@ -24,7 +29,7 @@ export default function StaffCreateForm() {
       <div className="px-6 py-4 border-b border-gray-800">
         <h2 className="text-sm font-semibold text-white">Thêm nhân viên mới</h2>
       </div>
-      <form ref={formRef} onSubmit={handleSubmit} className="p-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <form ref={formRef} onSubmit={handleSubmit} onChange={() => setIsDirty(true)} className="p-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label className="block text-xs font-medium text-gray-400 mb-1.5">Họ tên <span className="text-red-400">*</span></label>
           <input name="name" required placeholder="Nguyễn Văn A"

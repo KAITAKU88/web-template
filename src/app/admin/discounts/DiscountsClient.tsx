@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { formatCurrency } from "@/lib/utils";
+import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 
 interface DiscountCode {
   id: string; code: string; type: "percent" | "flat"; value: number;
@@ -19,6 +20,9 @@ export default function DiscountsClient({ codes: init, products }: { codes: Disc
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState("");
+
+  const formHasContent = showForm && Object.values(form).some((v) => v !== "" && v !== "percent");
+  useUnsavedChanges(formHasContent);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();

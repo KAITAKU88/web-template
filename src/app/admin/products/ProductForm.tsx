@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState, useRef, useEffect } from "react";
+import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 import { generateLandingContent } from "./actions";
 import { buildDefaultLanding } from "@/lib/landingTemplate";
 import type { ProductCopy } from "@/lib/productContent";
@@ -40,20 +41,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
   const setGalleryImages: typeof setGalleryImagesRaw = (v) => { setIsDirty(true); setGalleryImagesRaw(v); };
   const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
 
-  // Cảnh báo khi đóng/refresh tab mà chưa lưu
-  useEffect(() => {
-    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
-    if (isDirty) window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  }, [isDirty]);
-
-  // Expose dirty state để Sidebar có thể chặn navigation
-  useEffect(() => {
-    (window as Window & { __adminProductDirty?: boolean }).__adminProductDirty = isDirty;
-    return () => {
-      (window as Window & { __adminProductDirty?: boolean }).__adminProductDirty = false;
-    };
-  }, [isDirty]);
+  useUnsavedChanges(isDirty);
 
   function handleUseTemplate() {
     if (!formRef.current) return;

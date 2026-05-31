@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 
 interface Product { id: string; name: string; }
 interface Campaign {
@@ -82,6 +83,11 @@ export default function CampaignForm({
 
   const isDraft = !campaign || campaign.status === "draft";
   const recipientCount = recipientPreview[segment] ?? 0;
+
+  const isDirty = name !== (campaign?.name ?? "") ||
+    subject !== (campaign?.subject ?? "") ||
+    body !== (campaign?.html_body ?? TEMPLATES[0].body);
+  useUnsavedChanges(isDirty && isDraft);
 
   function applyTemplate(tpl: typeof TEMPLATES[0]) {
     if (tpl.subject) setSubject(tpl.subject);

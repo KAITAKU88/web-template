@@ -4,6 +4,7 @@ import { useTransition, useState, useRef, useEffect } from "react";
 import { saveSettings } from "./actions";
 import type { SettingsMap } from "@/lib/settings";
 import SharedImageUploadField from "@/components/ImageUploadField";
+import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 
 export default function SettingsForm({ settings }: { settings: SettingsMap }) {
   const [pending, startTransition] = useTransition();
@@ -29,20 +30,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
     return () => { clearTimeout(t); window.removeEventListener("hashchange", focusFromHash); };
   }, []);
 
-  // Cảnh báo khi đóng/refresh tab mà chưa lưu
-  useEffect(() => {
-    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
-    if (isDirty) window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  }, [isDirty]);
-
-  // Expose dirty state để Sidebar có thể chặn navigation
-  useEffect(() => {
-    (window as Window & { __adminSettingsDirty?: boolean }).__adminSettingsDirty = isDirty;
-    return () => {
-      (window as Window & { __adminSettingsDirty?: boolean }).__adminSettingsDirty = false;
-    };
-  }, [isDirty]);
+  useUnsavedChanges(isDirty);
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
