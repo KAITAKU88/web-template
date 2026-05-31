@@ -64,6 +64,34 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Product not found" }, { status: 500 });
   }
 
+  // Tạo download tokens nếu tính năng được bật
+  const expiryHours = Number(settings.download_link_expiry_hours ?? 0);
+  const maxAccesses = Number(settings.download_link_max_accesses ?? 0);
+  const useTokens = expiryHours > 0 || maxAccesses > 0;
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://web-template-cloudflare.thankful-to-all-88.workers.dev";
+
+  async function createToken(product: ProductRow): Promise<string> {
+    if (!useTokens) return product.template_link;
+    const expiresAt = expiryHours > 0
+      ? new Date(Date.now() + expiryHours * 60 * 60 * 1000).toISOString()
+      : null;
+    const { data: tok } = await supabase.from("download_tokens").insert({
+      order_id: order.id,
+      product_id: product.id,
+      customer_email: order.customer_email,
+      template_link: product.template_link,
+      expires_at: expiresAt,
+      max_accesses: maxAccesses,
+    }).select("token").single();
+    if (!tok) return product.template_link;
+    return `${baseUrl}/api/download/${tok.token}`;
+  }
+
+  const [mainLink, bumpLink] = await Promise.all([
+    createToken(mainProduct),
+    bumpProduct ? createToken(bumpProduct) : Promise.resolve(null),
+  ]);
+
   // settings đã được đọc ở đầu hàm (dùng chung)
   const siteName   = settings.site_name   ?? "TemplateLab";
   const brandColor = settings.brand_color ?? "#16a34a";
@@ -85,7 +113,11 @@ export async function POST(req: NextRequest) {
     to: order.customer_email,
     replyTo: adminEmail,
     subject: `✅ Đơn hàng ${order.id} đã được xác nhận – ${siteName}`,
-    html: buildEmailHtml({ order, mainProduct, bumpProduct, paidAt, siteName, brandColor, adminEmail, zaloLink }),
+    html: buildEmailHtml({
+      order, mainProduct, bumpProduct, paidAt, siteName, brandColor, adminEmail, zaloLink,
+      mainLink, bumpLink,
+      expiryHours, maxAccesses,
+    }),
   });
 
   if (error) {
@@ -160,11 +192,23 @@ function buildEmailHtml(params: {
   brandColor: string;
   adminEmail?: string;
   zaloLink?: string;
+  mainLink: string;
+  bumpLink: string | null;
+  expiryHours: number;
+  maxAccesses: number;
 }) {
-  const { order, mainProduct, bumpProduct, paidAt, siteName, brandColor, adminEmail, zaloLink } = params;
+  const { order, mainProduct, bumpProduct, paidAt, siteName, brandColor, adminEmail, zaloLink,
+          mainLink, bumpLink, expiryHours, maxAccesses } = params;
 
   const typeLabel = (type: string | null) =>
     type === "google_sheet" ? "Google Sheets" : "Notion";
+
+  const expiryNotice = expiryHours > 0
+    ? `<p style="margin:8px 0 0;font-size:12px;color:#f59e0b;">⏰ Link này có hiệu lực trong <strong>${expiryHours < 24 ? `${expiryHours} giờ` : `${expiryHours / 24} ngày`}</strong> kể từ khi nhận email. Hãy truy cập sớm!</p>`
+    : "";
+  const accessNotice = maxAccesses > 0
+    ? `<p style="margin:6px 0 0;font-size:12px;color:#9ca3af;">🔒 Link giới hạn ${maxAccesses} lượt truy cập.</p>`
+    : "";
 
   const templateButton = (name: string, link: string, type: string | null) => `
     <div style="margin-bottom:12px;">
@@ -208,8 +252,9 @@ function buildEmailHtml(params: {
         <p style="margin:0 0 14px;font-size:13px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:.5px;">
           Template của bạn
         </p>
-        ${templateButton(mainProduct.name, mainProduct.template_link, mainProduct.type)}
-        ${bumpProduct ? templateButton(bumpProduct.name, bumpProduct.template_link, bumpProduct.type) : ""}
+        ${templateButton(mainProduct.name, mainLink, mainProduct.type)}
+        ${bumpProduct && bumpLink ? templateButton(bumpProduct.name, bumpLink, bumpProduct.type) : ""}
+        ${expiryNotice}${accessNotice}
       </div>
 
       <!-- Order info -->

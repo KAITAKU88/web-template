@@ -276,6 +276,53 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
         />
       </Section>
 
+      {/* ── Link bảo vệ tải template ─────────────────────────── */}
+      <Section
+        title="Link bảo vệ tải template"
+        description="Bọc link gốc trong link riêng có thời hạn — chống share link tràn lan"
+      >
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-gray-300">
+            Thời hạn link (giờ)
+          </label>
+          <select
+            name="download_link_expiry_hours"
+            defaultValue={settings.download_link_expiry_hours ?? "0"}
+            className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-white outline-none focus:border-emerald-500"
+          >
+            <option value="0">Không giới hạn (link vĩnh cửu)</option>
+            <option value="24">24 giờ</option>
+            <option value="48">48 giờ</option>
+            <option value="72">72 giờ (3 ngày)</option>
+            <option value="168">168 giờ (7 ngày)</option>
+            <option value="720">720 giờ (30 ngày)</option>
+          </select>
+          <p className="mt-1.5 text-xs text-gray-500">
+            Khi đặt &gt; 0: email giao hàng sẽ có link /api/download/... thay vì link Notion/GSheet gốc.
+            Khách mở link sau thời hạn sẽ thấy thông báo hết hạn.
+          </p>
+        </div>
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-gray-300">
+            Giới hạn lượt truy cập
+          </label>
+          <select
+            name="download_link_max_accesses"
+            defaultValue={settings.download_link_max_accesses ?? "0"}
+            className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-white outline-none focus:border-emerald-500"
+          >
+            <option value="0">Không giới hạn</option>
+            <option value="1">1 lần</option>
+            <option value="3">3 lần</option>
+            <option value="5">5 lần</option>
+            <option value="10">10 lần</option>
+          </select>
+          <p className="mt-1.5 text-xs text-gray-500">
+            Sau khi vượt giới hạn, link hiện thông báo hết lượt truy cập.
+          </p>
+        </div>
+      </Section>
+
       {/* ── Webhook & API URLs (read-only) ────────────────────── */}
       <Section
         title="Webhook & API URLs"
