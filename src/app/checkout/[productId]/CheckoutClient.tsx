@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, productUrl } from "@/lib/utils";
 import type { Product, OrderStatus } from "@/types";
 import type { BumpCompanion, BundleOffer } from "./page";
 import Image from "next/image";
@@ -170,7 +170,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
   const handleConfirmCancel = () => {
     clearInterval(timerRef.current!);
     cancelOrder(orderIdRef.current);
-    router.push(`/products/${product.id}`);
+    router.push(productUrl(product));
   };
 
   const handleBundleOrder = async () => {
@@ -234,7 +234,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
       <div className="mb-6 flex items-center gap-2 text-sm text-gray-400">
         <Link href="/" className="hover:text-gray-600">Trang chủ</Link>
         <span>/</span>
-        <Link href={`/products/${product.id}`} className="hover:text-gray-600 truncate max-w-[140px]">
+        <Link href={productUrl(product)} className="hover:text-gray-600 truncate max-w-[140px]">
           {product.name}
         </Link>
         <span>/</span>
@@ -398,7 +398,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
             </button>
 
             <Link
-              href={`/products/${product.id}`}
+              href={productUrl(product)}
               className="block text-center text-sm text-gray-400 hover:text-gray-600 transition"
             >
               ← Đổi ý, quay lại trang sản phẩm
@@ -686,7 +686,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
           <p className="mb-6 text-gray-500">
             Mã QR thanh toán đã không còn hiệu lực.
           </p>
-          <Link href={`/products/${product.id}`} className="btn-primary">
+          <Link href={productUrl(product)} className="btn-primary">
             ← Quay lại trang sản phẩm
           </Link>
         </div>

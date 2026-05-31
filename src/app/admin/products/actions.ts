@@ -155,6 +155,7 @@ export async function createProduct(formData: FormData) {
 
   const { error } = await supabase.from("products").insert({
     name: formData.get("name") as string,
+    slug: (formData.get("slug") as string) || null,
     type: (formData.get("type") as string) || null,
     price: Number(formData.get("price")),
     original_price: formData.get("original_price") ? Number(formData.get("original_price")) : null,
@@ -178,8 +179,10 @@ export async function updateProduct(id: string, formData: FormData) {
   const landingRaw = formData.get("landing_content") as string | null;
   const landing = landingRaw ? JSON.parse(landingRaw) : null;
 
+  const slugVal = (formData.get("slug") as string) || null;
   const { error } = await supabase.from("products").update({
     name: formData.get("name") as string,
+    slug: slugVal,
     type: (formData.get("type") as string) || null,
     price: Number(formData.get("price")),
     original_price: formData.get("original_price") ? Number(formData.get("original_price")) : null,
@@ -195,6 +198,7 @@ export async function updateProduct(id: string, formData: FormData) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin/products");
   revalidatePath(`/products/${id}`);
+  if (slugVal) revalidatePath(`/products/${slugVal}`);
 }
 
 export async function deleteProduct(id: string) {

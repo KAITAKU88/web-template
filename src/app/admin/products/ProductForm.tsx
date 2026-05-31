@@ -1,11 +1,12 @@
 "use client";
 
-import { useTransition, useState, useRef, useEffect } from "react";
+import { useTransition, useState, useRef, useEffect, useCallback } from "react";
 import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 import { generateLandingContent } from "./actions";
 import { buildDefaultLanding } from "@/lib/landingTemplate";
 import type { ProductCopy } from "@/lib/productContent";
 import type { Product } from "@/types";
+import { slugify } from "@/lib/utils";
 import LandingEditor from "@/components/LandingEditor";
 import ImageUploadField from "@/components/ImageUploadField";
 import MediaPicker from "@/components/MediaPicker";
@@ -37,6 +38,15 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
     product?.download_count ?? Math.floor(Math.random() * 1451) + 50
   );
   const [isDirty, setIsDirty] = useState(false);
+  const [productName, setProductName] = useState(product?.name ?? "");
+  const [slug, setSlug] = useState(product?.slug ?? "");
+  const [slugLocked, setSlugLocked] = useState(!!(product?.slug));
+
+  const handleSlugChange = useCallback((val: string) => {
+    setSlug(val);
+    setIsDirty(true);
+    setSlugLocked(val !== "");
+  }, []);
   const [galleryImages, setGalleryImagesRaw] = useState<string[]>(product?.gallery_images ?? []);
   const setGalleryImages: typeof setGalleryImagesRaw = (v) => { setIsDirty(true); setGalleryImagesRaw(v); };
   const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
@@ -106,10 +116,49 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
             <input
               name="name"
               required
-              defaultValue={product?.name ?? ""}
+              value={productName}
+              onChange={(e) => {
+                setProductName(e.target.value);
+                setIsDirty(true);
+                if (!slugLocked) setSlug(slugify(e.target.value));
+              }}
               placeholder="Ví dụ: Notion Second Brain"
               className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
             />
+          </div>
+
+          {/* URL Slug */}
+          <div className="sm:col-span-2">
+            <div className="flex items-center gap-2 mb-1.5">
+              <label className="text-xs font-medium text-gray-400">URL sản phẩm</label>
+              {!slugLocked
+                ? <span className="text-xs text-emerald-500/80 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block" />Tự động theo tên</span>
+                : <span className="text-xs text-gray-600 flex items-center gap-1"><span className="h-1.5 w-1.5 rounded-full bg-gray-600 inline-block" />Thủ công</span>
+              }
+            </div>
+            <div className={`flex items-center rounded-xl border bg-gray-800 overflow-hidden transition-colors ${slug ? "focus-within:border-emerald-500 border-gray-700" : "border-gray-700 focus-within:border-emerald-500"}`}>
+              <span className="px-3 py-2.5 text-xs text-gray-500 border-r border-gray-700 shrink-0 select-none">/products/</span>
+              <input
+                name="slug"
+                value={slug}
+                onChange={(e) => handleSlugChange(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/--+/g, "-"))}
+                placeholder="url-san-pham"
+                className="flex-1 bg-transparent px-3 py-2.5 text-sm text-white outline-none placeholder-gray-600 min-w-0"
+              />
+              {slug && (
+                <button type="button" onClick={() => { setSlug(""); setSlugLocked(false); setIsDirty(true); }}
+                  title="Xóa để auto-generate lại từ tên sản phẩm"
+                  className="px-3 text-gray-500 hover:text-white transition-colors shrink-0">
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              )}
+            </div>
+            {slug && (
+              <p className="mt-1 text-xs text-gray-600">Link: <span className="text-gray-500">/products/{slug}</span></p>
+            )}
+            {!slug && !slugLocked && (
+              <p className="mt-1 text-xs text-gray-600">Nhập tên sản phẩm để tự tạo URL</p>
+            )}
           </div>
 
           {/* Danh mục */}

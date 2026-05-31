@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { formatCurrency, calcDiscountPercent, formatCount } from "@/lib/utils";
+import { formatCurrency, calcDiscountPercent, formatCount, productUrl } from "@/lib/utils";
 import type { Product } from "@/types";
 
 type SortKey = "newest" | "price_asc" | "price_desc" | "popular";
@@ -235,7 +235,7 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                         </div>
                       )}
                     </div>
-                    <Link href={`/products/${product.id}`} className="btn-secondary flex-shrink-0 px-4 py-2 text-xs">
+                    <Link href={productUrl(product)} className="btn-secondary flex-shrink-0 px-4 py-2 text-xs">
                       Xem thêm →
                     </Link>
                   </div>

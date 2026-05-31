@@ -16,6 +16,7 @@ export interface Product {
   landing_content: any | null;   // ProductCopy sinh bởi AI — NULL = dùng content tĩnh
   label: string | null;          // Badge thủ công: "🔥 Hot", "⭐ Bestseller", v.v.
   gallery_images: string[];      // Ảnh thực tế — carousel ở trang sản phẩm
+  slug: string | null;           // SEO URL: /products/[slug]
   created_at: string;
 }
 

@@ -9,17 +9,24 @@ const VIET_MAP: Record<string, string> = {
   ỳ:'y',ý:'y',ỷ:'y',ỹ:'y',ỵ:'y',đ:'d',
 };
 
-export function slugifyFilename(filename: string): string {
-  const lastDot = filename.lastIndexOf(".");
-  const base = lastDot >= 0 ? filename.slice(0, lastDot) : filename;
-  const ext = lastDot >= 0 ? filename.slice(lastDot).toLowerCase() : "";
-  const slug = base
+export function slugify(text: string): string {
+  return text
     .toLowerCase()
     .split("").map((c) => VIET_MAP[c] ?? c).join("")
     .normalize("NFD").replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
-  return (slug || "file") + ext;
+}
+
+export function slugifyFilename(filename: string): string {
+  const lastDot = filename.lastIndexOf(".");
+  const base = lastDot >= 0 ? filename.slice(0, lastDot) : filename;
+  const ext = lastDot >= 0 ? filename.slice(lastDot).toLowerCase() : "";
+  return (slugify(base) || "file") + ext;
+}
+
+export function productUrl(product: { id: string; slug?: string | null }): string {
+  return `/products/${product.slug ?? product.id}`;
 }
 
 /**

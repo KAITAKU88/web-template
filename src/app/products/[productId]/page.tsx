@@ -22,7 +22,9 @@ interface Props { params: Promise<{ productId: string }> }
 export async function generateMetadata({ params }: Props) {
   const { productId } = await params;
   const [supabase, settings] = await Promise.all([createClient(), getSettings()]);
-  const { data } = await supabase.from("products").select("name,description,price,image_url").eq("id", productId).single();
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId);
+  const { data } = await supabase.from("products").select("name,description,price,image_url")
+    .eq(isUuid ? "id" : "slug", productId).single();
   if (!data) return {};
   const { formatCurrency } = await import("@/lib/utils");
   const siteName = settings.site_name ?? "TemplateLab";
@@ -42,7 +44,9 @@ export default async function ProductPage({ params }: Props) {
   const { productId } = await params;
   const supabase = await createClient();
 
-  const { data, error } = await supabase.from("products").select("*").eq("id", productId).single();
+  const isUuid2 = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId);
+  const { data, error } = await supabase.from("products").select("*")
+    .eq(isUuid2 ? "id" : "slug", productId).single();
   if (error || !data) notFound();
 
   const product = data as Product;
