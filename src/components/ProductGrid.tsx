@@ -172,8 +172,9 @@ export default function ProductGrid({ products, categories = [] }: { products: P
           {filtered.map((product) => {
             const discount = product.original_price && product.original_price > product.price
               ? calcDiscountPercent(product.price, product.original_price) : null;
-            const isBestseller = product.download_count >= 1000;
-            const isHot = !isBestseller && (product.download_count >= 500 || product.rating >= 4.9);
+            const customLabel = product.label || null;
+            const isBestseller = !customLabel && product.download_count >= 1000;
+            const isHot = !customLabel && !isBestseller && (product.download_count >= 500 || product.rating >= 4.9);
 
             return (
               <div key={product.id} className="card flex flex-col overflow-hidden transition hover:shadow-md dark:bg-gray-800">
@@ -183,6 +184,9 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                     <Image src={product.image_url} alt={product.name} fill className="object-cover" />
                   ) : (
                     <span className="text-6xl">📄</span>
+                  )}
+                  {customLabel && (
+                    <span className="absolute left-2 top-2 rounded-full bg-violet-600 px-2.5 py-0.5 text-xs font-bold text-white shadow">{customLabel}</span>
                   )}
                   {isBestseller && (
                     <span className="absolute left-2 top-2 rounded-full bg-amber-400 px-2.5 py-0.5 text-xs font-bold text-white shadow">🏆 Bestseller</span>

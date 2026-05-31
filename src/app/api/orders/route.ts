@@ -7,7 +7,7 @@ import type { CreateOrderRequest } from "@/types";
 export async function POST(req: NextRequest) {
   try {
     const body: CreateOrderRequest = await req.json();
-    const { product_id, customer_email, customer_phone, bump_product_id } = body;
+    const { product_id, customer_email, customer_phone, bump_product_id, discount_code } = body as typeof body & { discount_code?: string };
 
     if (!product_id || !customer_email) {
       return NextResponse.json(
@@ -52,7 +52,31 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const totalAmount = product.price + (bump_amount ?? 0);
+    const subtotal = product.price + (bump_amount ?? 0);
+
+    // Áp dụng mã giảm giá nếu có
+    let discountCodeId: string | null = null;
+    let discountAmount = 0;
+    if (discount_code) {
+      const { data: dc } = await supabase
+        .from("discount_codes")
+        .select("id, type, value, product_id, min_amount, max_uses, used_count, expires_at, is_active")
+        .eq("code", discount_code.trim().toUpperCase())
+        .single();
+
+      if (dc && dc.is_active &&
+          !(dc.expires_at && new Date(dc.expires_at) < new Date()) &&
+          !(dc.max_uses !== null && dc.used_count >= dc.max_uses) &&
+          !(dc.product_id && dc.product_id !== product_id) &&
+          subtotal >= (dc.min_amount ?? 0)) {
+        discountCodeId = dc.id;
+        discountAmount = dc.type === "percent"
+          ? Math.min(Math.round(subtotal * (dc.value / 100) / 1000) * 1000, subtotal)
+          : Math.min(dc.value as number, subtotal);
+      }
+    }
+
+    const totalAmount = Math.max(subtotal - discountAmount, 1000);
 
     // Tạo đơn hàng
     const order_id = generateOrderId();
@@ -62,10 +86,18 @@ export async function POST(req: NextRequest) {
       customer_phone: customer_phone?.trim() || null,
       product_id,
       amount: totalAmount,
+      original_amount: discountAmount > 0 ? subtotal : null,
+      discount_amount: discountAmount,
+      discount_code_id: discountCodeId,
       status: "pending",
       bump_product_id: resolvedBumpId,
       bump_amount,
     });
+
+    // Cộng used_count khi tạo đơn thành công (fire-and-forget)
+    if (!insertError && discountCodeId) {
+      void supabase.rpc("increment_discount_used", { p_id: discountCodeId });
+    }
 
     if (insertError) {
       console.error("Insert order error:", insertError);

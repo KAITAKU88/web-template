@@ -163,6 +163,7 @@ export async function createProduct(formData: FormData) {
     image_url: (formData.get("image_url") as string) || null,
     download_count: Number(formData.get("download_count") ?? 0),
     landing_content: landing,
+    label: (formData.get("label") as string) || null,
   });
 
   if (error) throw new Error(error.message);
@@ -186,6 +187,7 @@ export async function updateProduct(id: string, formData: FormData) {
     image_url: (formData.get("image_url") as string) || null,
     download_count: Number(formData.get("download_count") ?? 0),
     landing_content: landing,
+    label: (formData.get("label") as string) || null,
   }).eq("id", id);
 
   if (error) throw new Error(error.message);

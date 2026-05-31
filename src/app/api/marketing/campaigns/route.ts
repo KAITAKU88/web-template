@@ -72,6 +72,7 @@ async function sendCampaign(campaignId: string, req: NextRequest) {
   const apiKey    = settings.resend_api_key  || process.env.RESEND_API_KEY || "";
   const fromName  = settings.resend_from_name  ?? settings.site_name ?? "TemplateLab";
   const fromEmail = settings.resend_from_email || process.env.RESEND_FROM?.match(/<(.+)>/)?.[1] || "";
+  const adminEmail = settings.admin_email || undefined;
   const siteUrl   = new URL(req.url).origin;
 
   if (!apiKey || !fromEmail) {
@@ -113,7 +114,7 @@ async function sendCampaign(campaignId: string, req: NextRequest) {
     const batch = uniqueEmails.slice(i, i + 10);
     await Promise.all(
       batch.map((email) =>
-        resend.emails.send({ from, to: email, subject: campaign.subject, html })
+        resend.emails.send({ from, to: email, replyTo: adminEmail, subject: campaign.subject, html })
           .then(() => { sent++; })
           .catch((e) => console.error("Campaign send error:", email, e))
       )

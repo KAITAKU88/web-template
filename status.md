@@ -118,3 +118,15 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 - **Mật khẩu admin**: lưu riêng trong password manager, không ghi vào đây
 - **Test browser**: Playwright không support Ubuntu 26.04; dùng `@puppeteer/browsers` tải Chrome + extract libs từ Ubuntu debs vào `/tmp/chromelibs` (mất sau reboot WSL, cần tải lại)
 - **SePay Webhook URL** cấu hình trực tiếp trên SePay Dashboard — không phải trong Admin app
+
+
+
+1. Phần tiêu đề website, hiện tại chưa cho phép tùy chỉnh, hiện tại ngoài tên Brand như TemplateStores thì phần Template Notion & Google Sheets 
+2. Hiện tại làm cách nào để tùy chỉnh nội dung email, gửi nhiều kịch bản email khác nhau:
+- Khi khách mua thành công => Gửi email xác nhận đơn hàng và thanh toán thành công, gửi link tải, gửi link zalo nhóm (cần hỏi gì vào nhóm hỏi)
+- Khi khách bấm mua nhưng không thanh toán thành công => Gửi email thông báo, nhắc nhở
+...
+3. Hiện tại khi khách mua combo (tích chọn vào upsell) khi thanh toán thì gửi link như thế nào, nút tải template gồm mấy nút, phần đơn hàng trong bảng dashboard thì ghi tách riêng ra chứ, ví dụ khách mua Template A, kèm theo template B (được giảm 50% khi upsell) thì sẽ cần 2 dòng khác nhau trong bảng đơn hàng, có mã đơn hàng giống nhau.
+4. Cũng chưa có tính năng tạo mã giảm giá cho từng sản phẩm.
+5. Trường hợp khách mua mà gửi email bị lỗi (hệ thống không gửi được email) thì xử lý như thế nào . Resend sẽ tự kích hoạt 1 email gửi lại 3 lần, rồi nếu vẫn không được thì sẽ gửi 1 email báo cáo đến email cá nhân hay là thế nào. Trường hợp này có cách nào để Quản trị viên vào trong dashboard chọn 1 hoặc nhiều sản phẩm (lúc này sẽ xuất hiện nút Send to Email) và gửi đến email, cho phép chọn trong danh sách email của khách hàng và gửi, sẽ gửi dưới danh nghĩa là email tùy chỉnh theo tên miền như support@templatestores.com
+6. Hiện tại chưa cho phép chủ động gắn Label như "Hot", "Bestseller" kèm theo icon, có cách nào để khi tạo sản phẩm có thêm 1 trường dữ liệu là label, có 1 loạt các label tạo sẵn kèm icon đẹp mắt, có thể cho  phép tạo thêm label nếu muốn.

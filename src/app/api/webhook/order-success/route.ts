@@ -71,6 +71,8 @@ export async function POST(req: NextRequest) {
   const fromName   = settings.resend_from_name  ?? siteName;
   const fromEmail  = settings.resend_from_email || process.env.RESEND_FROM?.match(/<(.+)>/)?.[1] || "no-reply@example.com";
   const from       = `${fromName} <${fromEmail}>`;
+  const adminEmail = settings.admin_email || undefined;
+  const zaloLink   = settings.zalo_link   || undefined;
 
   const paidAt = order.paid_at
     ? new Date(order.paid_at).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })
@@ -81,8 +83,9 @@ export async function POST(req: NextRequest) {
   const { error } = await resend.emails.send({
     from,
     to: order.customer_email,
+    replyTo: adminEmail,
     subject: `✅ Đơn hàng ${order.id} đã được xác nhận – ${siteName}`,
-    html: buildEmailHtml({ order, mainProduct, bumpProduct, paidAt, siteName, brandColor }),
+    html: buildEmailHtml({ order, mainProduct, bumpProduct, paidAt, siteName, brandColor, adminEmail, zaloLink }),
   });
 
   if (error) {
@@ -155,8 +158,10 @@ function buildEmailHtml(params: {
   paidAt: string;
   siteName: string;
   brandColor: string;
+  adminEmail?: string;
+  zaloLink?: string;
 }) {
-  const { order, mainProduct, bumpProduct, paidAt, siteName, brandColor } = params;
+  const { order, mainProduct, bumpProduct, paidAt, siteName, brandColor, adminEmail, zaloLink } = params;
 
   const typeLabel = (type: string | null) =>
     type === "google_sheet" ? "Google Sheets" : "Notion";
@@ -233,15 +238,28 @@ function buildEmailHtml(params: {
       </table>
 
       <p style="margin:24px 0 0;font-size:13px;color:#9ca3af;line-height:1.6;">
-        Link template dùng được vĩnh viễn — chỉ cần Duplicate 1 lần vào tài khoản của bạn.<br>
-        Nếu cần hỗ trợ, hãy liên hệ qua trang web.
+        Link template dùng được vĩnh viễn — chỉ cần Duplicate 1 lần vào tài khoản của bạn.
       </p>
+
+      ${(adminEmail || zaloLink) ? `
+      <!-- Liên hệ hỗ trợ -->
+      <div style="margin-top:20px;padding:16px 20px;background:#f9fafb;border-radius:12px;">
+        <p style="margin:0 0 12px;font-size:13px;font-weight:600;color:#374151;">Cần hỗ trợ?</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          ${adminEmail ? `<a href="mailto:${adminEmail}" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px 14px;font-size:13px;color:#374151;text-decoration:none;">
+            <span>✉️</span> ${adminEmail}
+          </a>` : ""}
+          ${zaloLink ? `<a href="${zaloLink}" style="display:inline-flex;align-items:center;gap:6px;background:#0068ff;border-radius:8px;padding:8px 14px;font-size:13px;color:#fff;text-decoration:none;font-weight:600;">
+            <span>💬</span> Nhắn Zalo
+          </a>` : ""}
+        </div>
+      </div>` : ""}
     </div>
 
     <!-- Footer -->
     <div style="padding:16px 32px;background:#f9fafb;border-top:1px solid #f3f4f6;">
       <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
-        © ${siteName} · Email này được gửi tự động, vui lòng không reply trực tiếp.
+        © ${siteName} · Cần hỗ trợ? Reply email này${adminEmail ? ` hoặc gửi đến ${adminEmail}` : ""}.
       </p>
     </div>
   </div>

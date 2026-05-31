@@ -20,6 +20,8 @@ export async function POST(req: NextRequest) {
   const fromEmail = settings.resend_from_email || process.env.RESEND_FROM?.match(/<(.+)>/)?.[1] || "";
   const siteName  = settings.site_name   ?? "TemplateLab";
   const brandColor = settings.brand_color ?? "#16a34a";
+  const adminEmail = settings.admin_email || undefined;
+  const zaloLink   = settings.zalo_link   || undefined;
   const siteUrl   = new URL(req.url).origin;
 
   if (!apiKey || !fromEmail) {
@@ -75,6 +77,7 @@ export async function POST(req: NextRequest) {
     const { error: emailError } = await resend.emails.send({
       from,
       to: order.customer_email,
+      replyTo: adminEmail,
       subject: `Đơn hàng của bạn chưa hoàn tất — ${product.name}`,
       html: buildAbandonedCartHtml({
         orderId: order.id,
@@ -83,6 +86,8 @@ export async function POST(req: NextRequest) {
         productUrl,
         siteName,
         brandColor,
+        adminEmail,
+        zaloLink,
       }),
     });
 
@@ -111,6 +116,8 @@ function buildAbandonedCartHtml(p: {
   productUrl: string;
   siteName: string;
   brandColor: string;
+  adminEmail?: string;
+  zaloLink?: string;
 }) {
   return `<!DOCTYPE html>
 <html lang="vi">
@@ -157,16 +164,26 @@ function buildAbandonedCartHtml(p: {
         </table>
       </div>
 
-      <p style="margin:0;font-size:13px;color:#9ca3af;line-height:1.6;">
-        Nếu bạn gặp vấn đề trong quá trình thanh toán, hãy liên hệ với chúng tôi để được hỗ trợ.<br>
+      <p style="margin:0 0 16px;font-size:13px;color:#9ca3af;line-height:1.6;">
+        Nếu bạn gặp vấn đề trong quá trình thanh toán, liên hệ chúng tôi để được hỗ trợ.<br>
         Nếu bạn đã đổi ý, không cần làm gì thêm.
       </p>
+
+      ${(p.adminEmail || p.zaloLink) ? `
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        ${p.adminEmail ? `<a href="mailto:${p.adminEmail}" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:8px 14px;font-size:13px;color:#374151;text-decoration:none;">
+          <span>✉️</span> ${p.adminEmail}
+        </a>` : ""}
+        ${p.zaloLink ? `<a href="${p.zaloLink}" style="display:inline-flex;align-items:center;gap:6px;background:#0068ff;border-radius:8px;padding:8px 14px;font-size:13px;color:#fff;text-decoration:none;font-weight:600;">
+          <span>💬</span> Nhắn Zalo
+        </a>` : ""}
+      </div>` : ""}
     </div>
 
     <!-- Footer -->
     <div style="padding:16px 32px;background:#f9fafb;border-top:1px solid #f3f4f6;">
       <p style="margin:0;font-size:12px;color:#9ca3af;text-align:center;">
-        © ${p.siteName} · Email này được gửi tự động, vui lòng không reply trực tiếp.
+        © ${p.siteName} · Cần hỗ trợ? Reply email này${p.adminEmail ? ` hoặc gửi đến ${p.adminEmail}` : ""}.
       </p>
     </div>
   </div>

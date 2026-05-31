@@ -14,6 +14,7 @@ export interface Product {
   download_count: number;         // Số lượt tải
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   landing_content: any | null;   // ProductCopy sinh bởi AI — NULL = dùng content tĩnh
+  label: string | null;          // Badge thủ công: "🔥 Hot", "⭐ Bestseller", v.v.
   created_at: string;
 }
 

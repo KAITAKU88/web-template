@@ -37,6 +37,11 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
   const [showBankModal, setShowBankModal] = useState(false);
   const [upsellCountdown, setUpsellCountdown] = useState(10 * 60);
   const [isBundleOrder, setIsBundleOrder] = useState(false);
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountInput, setDiscountInput] = useState("");
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountError, setDiscountError] = useState("");
+  const [discountApplying, setDiscountApplying] = useState(false);
 
   useEffect(() => {
     setIsMobile(/iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
@@ -139,6 +144,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
           customer_email: email,
           customer_phone: phone || undefined,
           bump_product_id: bumpChecked && companion ? companion.id : undefined,
+          discount_code: discountCode || undefined,
         }),
       });
       const data = await res.json();
@@ -200,6 +206,27 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
 
   const formatTime = (s: number) =>
     `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+
+  const handleApplyDiscount = async () => {
+    if (!discountInput.trim()) return;
+    setDiscountApplying(true); setDiscountError("");
+    const bumpPrice = bumpChecked && companion ? companion.bumpPrice : 0;
+    const subtotal = product.price + bumpPrice;
+    const res = await fetch("/api/discounts/validate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: discountInput, product_id: product.id, amount: subtotal }),
+    });
+    const data = await res.json();
+    setDiscountApplying(false);
+    if (!res.ok) { setDiscountError(data.error ?? "Mã không hợp lệ"); return; }
+    setDiscountCode(data.code);
+    setDiscountAmount(data.discount_amount);
+  };
+
+  const handleRemoveDiscount = () => {
+    setDiscountCode(""); setDiscountInput(""); setDiscountAmount(0); setDiscountError("");
+  };
 
   return (
     <div className="mx-auto max-w-lg">
@@ -272,6 +299,34 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
               <p className="mt-1.5 text-xs text-gray-400">
                 Không bắt buộc — cung cấp số điện thoại để được hỗ trợ nhanh hơn nếu có sự cố.
               </p>
+            </div>
+
+            {/* ── Mã giảm giá ── */}
+            <div>
+              {!discountCode ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    value={discountInput}
+                    onChange={(e) => { setDiscountInput(e.target.value.toUpperCase()); setDiscountError(""); }}
+                    placeholder="Mã giảm giá (nếu có)"
+                    className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100 uppercase"
+                  />
+                  <button type="button" onClick={handleApplyDiscount} disabled={discountApplying || !discountInput.trim()}
+                    className="shrink-0 rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 transition-colors">
+                    {discountApplying ? "…" : "Áp dụng"}
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between rounded-xl bg-green-50 border border-green-200 px-4 py-2.5">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-green-600">✓</span>
+                    <span className="font-mono font-bold text-green-700">{discountCode}</span>
+                    <span className="text-green-600">— giảm {formatCurrency(discountAmount)}</span>
+                  </div>
+                  <button type="button" onClick={handleRemoveDiscount} className="text-xs text-gray-400 hover:text-red-500">Xóa</button>
+                </div>
+              )}
+              {discountError && <p className="mt-1 text-xs text-red-500">{discountError}</p>}
             </div>
 
             {error && (

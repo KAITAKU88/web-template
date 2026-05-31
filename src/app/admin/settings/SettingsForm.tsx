@@ -72,6 +72,13 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           hint="Hiển thị trên tab trình duyệt và footer"
         />
         <Field
+          label="Tagline"
+          name="site_tagline"
+          defaultValue={settings.site_tagline ?? ""}
+          placeholder="Template Notion & Google Sheets"
+          hint="Phần phụ đề sau tên site trên tab trình duyệt — ví dụ: Bộ công cụ quản lý cá nhân"
+        />
+        <Field
           label="Mô tả site"
           name="site_description"
           defaultValue={settings.site_description ?? ""}
@@ -124,21 +131,30 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
       {/* ── Liên hệ ───────────────────────────────────────────── */}
       <Section
         title="Liên hệ"
-        description="Kênh liên lạc hiển thị với khách hàng"
+        description="Kênh liên lạc hiển thị với khách hàng trong email và trang web"
       >
         <Field
-          label="Email Admin"
+          label="Email hỗ trợ"
           name="admin_email"
           type="email"
           defaultValue={settings.admin_email ?? ""}
           placeholder="admin@yourdomain.com"
-          hint="Dùng để nhận mật khẩu tạm khi quên mật khẩu — không hiển thị với khách hàng"
+          hint="Hiển thị trong email gửi khách & dùng làm Reply-To. Khuyến nghị: admin@domain.com rồi dùng Cloudflare Email Routing chuyển tiếp về Gmail cá nhân."
+        />
+        <Field
+          label="Email cá nhân (ẩn)"
+          name="personal_email"
+          type="email"
+          defaultValue={settings.personal_email ?? ""}
+          placeholder="gmail@gmail.com"
+          hint="Gmail nhận thư khi khách reply vào Email hỗ trợ (qua Cloudflare Email Routing). Chỉ lưu để bạn tham khảo — không hiển thị với khách hàng."
         />
         <Field
           label="Link Zalo"
           name="zalo_link"
           defaultValue={settings.zalo_link ?? ""}
-          placeholder="https://zalo.me/0xxxxxxxxx"
+          placeholder="https://zalo.me/g/xxxxxx"
+          hint="Link Zalo cá nhân hoặc Zalo Group — hiển thị trong email gửi khách để họ liên hệ nhanh"
         />
       </Section>
 

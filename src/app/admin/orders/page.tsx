@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { expireStaleOrders, EXPIRE_MINUTES } from "@/lib/expireOrders";
+import ResendEmailButton from "./ResendEmailButton";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Tất cả" },
@@ -72,7 +73,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
 
   let query = supabase
     .from("orders")
-    .select("id, customer_email, customer_phone, amount, status, paid_at, created_at, products!orders_product_id_fkey(name)", { count: "exact" })
+    .select("id, customer_email, customer_phone, amount, status, paid_at, created_at, product_id, bump_product_id, main_product:products!orders_product_id_fkey(name), bump_product:products!orders_bump_product_id_fkey(name)", { count: "exact" })
     .order("created_at", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
 
@@ -180,6 +181,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                 <th className="px-4 py-3 text-right">Số tiền</th>
                 <th className="px-4 py-3 text-center">Trạng thái</th>
                 <th className="px-4 py-3 text-left">Thời gian</th>
+                <th className="px-4 py-3 text-center">Email</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800">
@@ -190,19 +192,23 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                   </td>
                 </tr>
               ) : (
-                (orders ?? []).map((order: {
-                  id: string; customer_email: string; amount: number;
-                  status: string; paid_at: string | null; created_at: string;
-                  products?: { name: string }[] | null;
-                }) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (orders ?? []).map((order: any) => {
                   const s = STATUS_LABEL[order.status] ?? { label: order.status, cls: "bg-gray-700 text-gray-300" };
                   const time = order.paid_at ?? order.created_at;
+                  const mainRaw = order.main_product;
+                  const bumpRaw = order.bump_product;
+                  const mainName = (Array.isArray(mainRaw) ? mainRaw[0] : mainRaw)?.name ?? "—";
+                  const bumpName = (Array.isArray(bumpRaw) ? bumpRaw[0] : bumpRaw)?.name;
                   return (
                     <tr key={order.id} className="hover:bg-gray-800/50 transition-colors">
                       <td className="px-4 py-3 font-mono text-xs text-gray-400">{order.id.slice(0, 8)}…</td>
                       <td className="px-4 py-3 text-gray-300 max-w-[180px] truncate">{order.customer_email}</td>
-                      <td className="px-4 py-3 text-gray-300 max-w-[160px] truncate">
-                        {(order.products as { name: string } | null)?.name ?? "—"}
+                      <td className="px-4 py-3 text-gray-300 max-w-[200px]">
+                        <span className="block truncate">{mainName}</span>
+                        {bumpName && (
+                          <span className="block truncate text-xs text-amber-400">+ {bumpName}</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-right font-semibold text-emerald-400">{formatCurrency(order.amount)}</td>
                       <td className="px-4 py-3 text-center">
@@ -210,6 +216,11 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                       </td>
                       <td className="px-4 py-3 text-xs text-gray-500">
                         {new Date(time).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {order.status === "success" && (
+                          <ResendEmailButton orderId={order.id} />
+                        )}
                       </td>
                     </tr>
                   );

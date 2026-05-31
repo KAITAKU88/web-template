@@ -185,6 +185,33 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
             />
             <p className="mt-1 text-xs text-gray-600">Hệ thống tự cộng thêm mỗi khi có đơn thành công</p>
           </div>
+
+          {/* Label badge */}
+          <div className="sm:col-span-2">
+            <label className="block text-xs font-medium text-gray-400 mb-1.5">Label / Badge</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                { value: "", text: "Không có" },
+                { value: "🔥 Hot", text: "🔥 Hot" },
+                { value: "⭐ Bestseller", text: "⭐ Bestseller" },
+                { value: "✨ Mới", text: "✨ Mới" },
+                { value: "🏷️ Sale", text: "🏷️ Sale" },
+                { value: "👑 Premium", text: "👑 Premium" },
+                { value: "💎 Exclusive", text: "💎 Exclusive" },
+              ].map((opt) => {
+                const checked = (product?.label ?? "") === opt.value;
+                return (
+                  <label key={opt.value} className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-1.5 text-sm transition-colors ${
+                    checked ? "border-emerald-500 bg-emerald-500/10 text-emerald-300" : "border-gray-700 text-gray-400 hover:border-gray-500"
+                  }`}>
+                    <input type="radio" name="label" value={opt.value} defaultChecked={checked} className="sr-only" />
+                    {opt.text}
+                  </label>
+                );
+              })}
+            </div>
+            <p className="mt-1.5 text-xs text-gray-600">Hiển thị badge góc trên ảnh sản phẩm — ưu tiên hơn badge tự động (Hot/Bestseller theo lượt tải)</p>
+          </div>
         </div>
       </div>
 
