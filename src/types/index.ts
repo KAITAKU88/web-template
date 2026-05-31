@@ -17,6 +17,7 @@ export interface Product {
   label: string | null;          // Badge thủ công: "🔥 Hot", "⭐ Bestseller", v.v.
   gallery_images: string[];      // Ảnh thực tế — carousel ở trang sản phẩm
   slug: string | null;           // SEO URL: /products/[slug]
+  status: "published" | "draft"; // 'published' = hiển thị, 'draft' = bản nháp
   created_at: string;
 }
 

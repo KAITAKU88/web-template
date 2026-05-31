@@ -7,7 +7,7 @@ import ProductGrid from "@/components/ProductGrid";
 export default async function HomePage() {
   const supabase = await createClient();
   const [{ data: products, error }, { data: catData }] = await Promise.all([
-    supabase.from("products").select("*").order("created_at", { ascending: false }),
+    supabase.from("products").select("*").eq("status", "published").order("created_at", { ascending: false }),
     supabase.from("categories").select("id, name").order("sort_order"),
   ]);
 

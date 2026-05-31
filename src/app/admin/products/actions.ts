@@ -166,6 +166,7 @@ export async function createProduct(formData: FormData) {
     landing_content: landing,
     label: (formData.get("label") as string) || null,
     gallery_images: JSON.parse((formData.get("gallery_images") as string) || "[]"),
+    status: "draft",
   });
 
   if (error) throw new Error(error.message);
@@ -204,6 +205,14 @@ export async function updateProduct(id: string, formData: FormData) {
 export async function deleteProduct(id: string) {
   const supabase = createAdminClient();
   const { error } = await supabase.from("products").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/products");
+  revalidatePath("/");
+}
+
+export async function toggleProductStatus(id: string, newStatus: "published" | "draft") {
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("products").update({ status: newStatus }).eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin/products");
   revalidatePath("/");

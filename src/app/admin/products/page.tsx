@@ -3,11 +3,13 @@ import { getAdminRole } from "@/lib/get-role";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { DeleteButton } from "./DeleteButton";
+import { PublishButton } from "./PublishButton";
 
 interface ProductRow {
   id: string; name: string; type: string | null; price: number;
   original_price: number | null; image_url: string | null;
   landing_content: unknown; download_count: number; created_at: string;
+  status: string; slug: string | null;
 }
 
 export const dynamic = "force-dynamic";
@@ -18,7 +20,7 @@ export default async function AdminProductsPage() {
     getAdminRole(),
     supabase
       .from("products")
-      .select("id, name, type, price, original_price, image_url, landing_content, download_count, created_at")
+      .select("id, name, type, price, original_price, image_url, landing_content, download_count, created_at, status, slug")
       .order("created_at", { ascending: false }),
   ]);
 
@@ -63,6 +65,7 @@ export default async function AdminProductsPage() {
                 <th className="px-5 py-3 text-right">Giá</th>
                 <th className="px-5 py-3 text-center">AI</th>
                 <th className="px-5 py-3 text-right">Lượt tải</th>
+                {canEdit && <th className="px-5 py-3 text-center">Trạng thái</th>}
                 {canEdit && <th className="px-5 py-3 text-right">Thao tác</th>}
               </tr>
             </thead>
@@ -92,6 +95,11 @@ export default async function AdminProductsPage() {
                   <td className="px-5 py-4 text-right text-gray-400">
                     {p.download_count ?? 0}
                   </td>
+                  {canEdit && (
+                    <td className="px-5 py-4 text-center">
+                      <PublishButton id={p.id} status={p.status ?? "published"} />
+                    </td>
+                  )}
                   {canEdit && (
                     <td className="px-5 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">

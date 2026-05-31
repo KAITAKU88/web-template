@@ -50,6 +50,7 @@ export default async function ProductPage({ params }: Props) {
   if (error || !data) notFound();
 
   const product = data as Product;
+  if (product.status === "draft") notFound();
   const copy: ProductCopy = product.landing_content ?? getProductCopy(product.name);
   const typeKey  = product.type ?? "notion";
   const isBestseller = product.download_count >= 1000;
