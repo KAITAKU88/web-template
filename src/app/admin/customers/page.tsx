@@ -8,7 +8,6 @@ interface OrderRow {
   customer_phone: string | null;
   amount: number;
   paid_at: string | null;
-  bump_amount: number | null;
 }
 
 export default async function CustomersPage() {
@@ -17,7 +16,7 @@ export default async function CustomersPage() {
   const [{ data: orders }, { data: groupMembers }, { data: groups }] = await Promise.all([
     supabase
       .from("orders")
-      .select("customer_email, customer_phone, amount, paid_at, bump_amount")
+      .select("customer_email, customer_phone, amount, paid_at")
       .eq("status", "success")
       .order("paid_at", { ascending: false }),
     supabase
@@ -41,7 +40,8 @@ export default async function CustomersPage() {
 
   for (const o of (orders as OrderRow[]) ?? []) {
     const existing = customerMap.get(o.customer_email);
-    const revenue = (o.amount ?? 0) + (o.bump_amount ?? 0);
+    // orders.amount đã bao gồm bump_amount → không cộng thêm để tránh double-count
+    const revenue = o.amount ?? 0;
     if (existing) {
       existing.total_orders += 1;
       existing.total_revenue += revenue;

@@ -156,3 +156,4 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 
 Trang sản phẩm chưa có nút lọc, tìm kiếm, sắp xếp
 Hiện tại khi 1 sản phẩm mới được tạo ra chưa có phần khởi tạo số sao, số lượt đánh giá. Tạo 2 phần này, cho phép nhập thủ công. Hoặc tự động tạo ra số sao random trong khoảng 4.4 đến 4.9 và số lượt đánh giá random trong khoảng từ 1/10 đến 1/3 số lượt tải 
+Trang khách hàng, phần doanh thu đang tính sai, không phải doanh thu thực tế mà là giá bán 
