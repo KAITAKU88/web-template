@@ -1,31 +1,22 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { getAdminRole } from "@/lib/get-role";
-import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
-import { DeleteButton } from "./DeleteButton";
-import { PublishButton } from "./PublishButton";
-
-interface ProductRow {
-  id: string; name: string; type: string | null; price: number;
-  original_price: number | null; image_url: string | null;
-  landing_content: unknown; download_count: number; created_at: string;
-  status: string; slug: string | null;
-}
+import AdminProductsClient from "./AdminProductsClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
   const supabase = createAdminClient();
-  const [role, { data: products }] = await Promise.all([
+  const [role, { data: products }, { data: categories }] = await Promise.all([
     getAdminRole(),
     supabase
       .from("products")
-      .select("id, name, type, price, original_price, image_url, landing_content, download_count, created_at, status, slug")
+      .select("id, name, type, price, original_price, image_url, landing_content, download_count, created_at, status, slug, rating, rating_count")
       .order("created_at", { ascending: false }),
+    supabase.from("categories").select("id, name").order("sort_order"),
   ]);
 
   const canEdit = role !== "collaborator";
-  const TYPE_LABEL: Record<string, string> = { notion: "Notion", google_sheet: "Google Sheets" };
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -44,82 +35,23 @@ export default async function AdminProductsPage() {
         )}
       </div>
 
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
-        <div className="overflow-x-auto">
-        {!products?.length ? (
-          <div className="px-6 py-16 text-center">
-            <p className="text-4xl mb-3">📦</p>
-            <p className="text-gray-400 text-sm">Chưa có sản phẩm nào.</p>
-            {canEdit && (
-              <Link href="/admin/products/new" className="mt-4 inline-block text-sm text-emerald-400 hover:text-emerald-300">
-                Thêm sản phẩm đầu tiên →
-              </Link>
-            )}
-          </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-800 text-xs font-medium text-gray-500 uppercase">
-                <th className="px-5 py-3 text-left">Sản phẩm</th>
-                <th className="px-5 py-3 text-left">Loại</th>
-                <th className="px-5 py-3 text-right">Giá</th>
-                <th className="px-5 py-3 text-center">AI</th>
-                <th className="px-5 py-3 text-right">Lượt tải</th>
-                {canEdit && <th className="px-5 py-3 text-center">Trạng thái</th>}
-                {canEdit && <th className="px-5 py-3 text-right">Thao tác</th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800">
-              {(products as ProductRow[]).map((p) => (
-                <tr key={p.id} className="hover:bg-gray-800/40 transition-colors">
-                  <td className="px-5 py-4">
-                    <p className="font-medium text-white truncate max-w-[240px]">{p.name}</p>
-                    <p className="text-xs text-gray-500 font-mono mt-0.5">{p.id.slice(0, 8)}…</p>
-                  </td>
-                  <td className="px-5 py-4 text-gray-400">
-                    {TYPE_LABEL[p.type ?? ""] ?? p.type ?? "—"}
-                  </td>
-                  <td className="px-5 py-4 text-right">
-                    <p className="font-semibold text-emerald-400">{formatCurrency(p.price)}</p>
-                    {p.original_price && (
-                      <p className="text-xs text-gray-500 line-through">{formatCurrency(p.original_price)}</p>
-                    )}
-                  </td>
-                  <td className="px-5 py-4 text-center">
-                    {p.landing_content ? (
-                      <span title="Đã có landing page AI" className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-violet-500/20 text-xs text-violet-400">✨</span>
-                    ) : (
-                      <span className="text-gray-700">—</span>
-                    )}
-                  </td>
-                  <td className="px-5 py-4 text-right text-gray-400">
-                    {p.download_count ?? 0}
-                  </td>
-                  {canEdit && (
-                    <td className="px-5 py-4 text-center">
-                      <PublishButton id={p.id} status={p.status ?? "published"} />
-                    </td>
-                  )}
-                  {canEdit && (
-                    <td className="px-5 py-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Link
-                          href={`/admin/products/${p.id}/edit`}
-                          className="rounded-lg bg-gray-800 px-3 py-1.5 text-xs text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
-                        >
-                          Sửa
-                        </Link>
-                        <DeleteButton id={p.id} name={p.name} />
-                      </div>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      {!products?.length ? (
+        <div className="rounded-2xl border border-gray-800 bg-gray-900 px-6 py-16 text-center">
+          <p className="text-4xl mb-3">📦</p>
+          <p className="text-gray-400 text-sm">Chưa có sản phẩm nào.</p>
+          {canEdit && (
+            <Link href="/admin/products/new" className="mt-4 inline-block text-sm text-emerald-400 hover:text-emerald-300">
+              Thêm sản phẩm đầu tiên →
+            </Link>
+          )}
         </div>
-      </div>
+      ) : (
+        <AdminProductsClient
+          products={products as Parameters<typeof AdminProductsClient>[0]["products"]}
+          canEdit={canEdit}
+          categories={categories ?? []}
+        />
+      )}
     </div>
   );
 }

@@ -37,6 +37,12 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
   const [downloadCount, setDownloadCount] = useState<number>(
     product?.download_count ?? Math.floor(Math.random() * 1451) + 50
   );
+  const [rating, setRating] = useState<number>(
+    product?.rating ?? parseFloat((4.4 + Math.random() * 0.5).toFixed(1))
+  );
+  const [ratingCount, setRatingCount] = useState<number>(
+    product?.rating_count ?? 0
+  );
   const [isDirty, setIsDirty] = useState(false);
   const [productName, setProductName] = useState(product?.name ?? "");
   const [slug, setSlug] = useState(product?.slug ?? "");
@@ -248,6 +254,49 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
               className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500"
             />
             <p className="mt-1 text-xs text-gray-600">Hệ thống tự cộng thêm mỗi khi có đơn thành công</p>
+          </div>
+
+          {/* Rating */}
+          <div>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="text-xs font-medium text-gray-400">
+                Điểm đánh giá (★)
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  const r = parseFloat((4.4 + Math.random() * 0.5).toFixed(1));
+                  const rc = Math.floor(downloadCount * (0.1 + Math.random() * 0.23));
+                  setRating(r); setRatingCount(rc); setIsDirty(true);
+                }}
+                className="rounded-lg bg-violet-500/10 px-2.5 py-1 text-xs text-violet-400 hover:bg-violet-500/20 transition-colors"
+              >
+                ✨ Auto-fill
+              </button>
+            </div>
+            <input
+              name="rating"
+              type="number"
+              min={0} max={5} step={0.1}
+              value={rating}
+              onChange={(e) => { setRating(Number(e.target.value)); setIsDirty(true); }}
+              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500"
+            />
+            <p className="mt-1 text-xs text-gray-600">0 = không hiển thị sao. Nhấn Auto-fill để random 4.4–4.9</p>
+          </div>
+
+          {/* Rating count */}
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1.5">Số lượt đánh giá</label>
+            <input
+              name="rating_count"
+              type="number"
+              min={0}
+              value={ratingCount}
+              onChange={(e) => { setRatingCount(Number(e.target.value)); setIsDirty(true); }}
+              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500"
+            />
+            <p className="mt-1 text-xs text-gray-600">Auto-fill tự tính = 10–33% lượt tải</p>
           </div>
 
           {/* Label badge */}
