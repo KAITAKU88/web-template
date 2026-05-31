@@ -73,7 +73,7 @@ export default async function ProductPage({ params }: Props) {
       ══════════════════════════════════════════ */}
       <section className="card mb-2 overflow-hidden">
         {/* Ảnh bìa */}
-        <div className="relative flex h-60 items-center justify-center overflow-hidden bg-gradient-to-br from-green-50 to-emerald-100">
+        <div className="relative aspect-video w-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-green-50 to-emerald-100">
           {product.image_url ? (
             <Image src={product.image_url} alt={product.name} fill className="object-cover" />
           ) : (

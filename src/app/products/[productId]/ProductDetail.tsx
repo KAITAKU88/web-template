@@ -162,10 +162,10 @@ export default function ProductDetail({ product }: { product: Product }) {
         {/* Cột trái — ảnh + trust */}
         <div>
           <div className="card overflow-hidden dark:bg-gray-800">
-            <div className="relative flex h-72 items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900">
+            <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900">
               {product.image_url
                 ? <Image src={product.image_url} alt={product.name} fill className="object-cover" />
-                : <span className="text-8xl">{product.type ? TYPE_ICON[product.type] ?? "📄" : "📄"}</span>
+                : <div className="absolute inset-0 flex items-center justify-center"><span className="text-8xl">{product.type ? TYPE_ICON[product.type] ?? "📄" : "📄"}</span></div>
               }
             </div>
           </div>
