@@ -286,7 +286,7 @@ export default function StorageBrowser() {
   return (
     <div className="space-y-4">
       {/* Storage usage bar */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 px-4 py-3">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
         <div className="flex items-center gap-3">
           <span className="text-xs text-gray-500 shrink-0 font-medium">Dung lượng</span>
           {statsLoading ? (
@@ -294,10 +294,10 @@ export default function StorageBrowser() {
           ) : statsTotal !== null ? (
             <>
               <span className="text-xs whitespace-nowrap shrink-0">
-                <span className="text-white font-medium">{formatSize(statsTotal)}</span>
+                <span className="text-gray-900 dark:text-white font-medium">{formatSize(statsTotal)}</span>
                 <span className="text-gray-600"> / 1 GB</span>
               </span>
-              <div className="flex-1 h-1.5 rounded-full bg-gray-800 overflow-hidden min-w-0">
+              <div className="flex-1 h-1.5 rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden min-w-0">
                 <div
                   className={`h-full rounded-full transition-all duration-700 ${statsPct > 80 ? "bg-red-500" : statsPct > 50 ? "bg-amber-500" : "bg-emerald-500"}`}
                   style={{ width: `${Math.max(statsPct, 0.5)}%` }}
@@ -314,7 +314,7 @@ export default function StorageBrowser() {
         {BUCKETS.map((b) => (
           <button type="button" key={b.id} onClick={() => { setBucket(b.id); setFolder(""); setSearch(""); }}
             className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
-              bucket === b.id ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-gray-800 text-gray-400 hover:text-white border border-transparent"
+              bucket === b.id ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:text-gray-900 dark:hover:text-white border border-transparent"
             }`}>
             <span>{b.icon}</span>{b.label}
           </button>
@@ -322,16 +322,16 @@ export default function StorageBrowser() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-2 flex-wrap rounded-2xl border border-gray-800 bg-gray-900 px-4 py-3">
+      <div className="flex items-center gap-2 flex-wrap rounded-2xl border border-gray-200 dark:border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
         {/* Breadcrumb */}
         <div className="flex items-center gap-1 flex-1 text-sm min-w-0">
-          <button type="button" onClick={() => { setFolder(""); setSearch(""); }} className="text-gray-400 hover:text-white transition-colors shrink-0">
+          <button type="button" onClick={() => { setFolder(""); setSearch(""); }} className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors shrink-0">
             {BUCKETS.find((b) => b.id === bucket)?.label}
           </button>
           {breadcrumbs.map((part, i) => (
             <span key={i} className="flex items-center gap-1">
               <span className="text-gray-600">/</span>
-              <button type="button" onClick={() => navigateTo(i)} className="text-gray-400 hover:text-white transition-colors">{part}</button>
+              <button type="button" onClick={() => navigateTo(i)} className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">{part}</button>
             </span>
           ))}
         </div>
@@ -342,7 +342,7 @@ export default function StorageBrowser() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
           </svg>
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tìm theo tên..."
-            className="w-40 rounded-xl border border-gray-700 bg-gray-800 pl-8 pr-3 py-1.5 text-xs text-white outline-none focus:border-emerald-500 placeholder:text-gray-600" />
+            className="w-40 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 pl-8 pr-3 py-1.5 text-xs text-gray-900 dark:text-white outline-none focus:border-emerald-500 placeholder:text-gray-600" />
         </div>
 
         {/* Static actions */}
@@ -359,7 +359,7 @@ export default function StorageBrowser() {
           </label>
 
           <button type="button" onClick={() => setView(view === "grid" ? "list" : "grid")}
-            className="rounded-xl border border-gray-700 p-1.5 text-gray-400 hover:text-white transition-colors">
+            className="rounded-xl border border-gray-300 dark:border-gray-700 p-1.5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
             {view === "grid"
               ? <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg>
               : <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zm10 0a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" /></svg>
@@ -370,14 +370,14 @@ export default function StorageBrowser() {
 
       {/* Contextual action bar — hiện khi có item được chọn */}
       {selected.size > 0 && (
-        <div className="flex items-center gap-2 flex-wrap rounded-2xl border border-gray-700 bg-gray-800/60 px-4 py-2.5">
+        <div className="flex items-center gap-2 flex-wrap rounded-2xl border border-gray-300 dark:border-gray-700 bg-gray-800/60 px-4 py-2.5">
           <span className="text-xs text-gray-400 shrink-0">
-            Đã chọn <span className="font-semibold text-white">{selected.size}</span> mục
+            Đã chọn <span className="font-semibold text-gray-900 dark:text-white">{selected.size}</span> mục
           </span>
           <div className="flex-1" />
           {canRename && (
             <button type="button" onClick={startRename}
-              className="flex items-center gap-1.5 rounded-xl border border-gray-600 px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:border-gray-400 transition-colors">
+              className="flex items-center gap-1.5 rounded-xl border border-gray-600 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 transition-colors">
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
               Đổi tên
             </button>
@@ -387,7 +387,7 @@ export default function StorageBrowser() {
               className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium transition-all ${
                 copied
                   ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
-                  : "border-gray-600 text-gray-300 hover:text-white hover:border-gray-400"
+                  : "border-gray-600 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:border-gray-400"
               }`}>
               {copied ? (
                 <>
@@ -404,7 +404,7 @@ export default function StorageBrowser() {
           )}
           {canMove && (
             <button type="button" onClick={openMoveModal}
-              className="flex items-center gap-1.5 rounded-xl border border-gray-600 px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:border-gray-400 transition-colors">
+              className="flex items-center gap-1.5 rounded-xl border border-gray-600 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 transition-colors">
               <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" /></svg>
               Di chuyển{selectedFiles.length > 1 ? ` (${selectedFiles.length})` : ""}
             </button>
@@ -422,7 +422,7 @@ export default function StorageBrowser() {
         onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
         onDragLeave={() => setDragOver(false)}
         onDrop={(e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) handleUpload(e.dataTransfer.files); }}
-        className={`rounded-2xl border-2 transition-colors min-h-[300px] ${dragOver ? "border-emerald-400 bg-emerald-500/5" : "border-gray-800 bg-gray-900"}`}
+        className={`rounded-2xl border-2 transition-colors min-h-[300px] ${dragOver ? "border-emerald-400 bg-emerald-500/5" : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"}`}
       >
         {loading ? (
           <div className="flex items-center justify-center py-20">
@@ -440,13 +440,13 @@ export default function StorageBrowser() {
           </div>
         ) : visible.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-3 py-20">
-            <p className="text-sm text-gray-500">Không tìm thấy ảnh nào với từ khóa <span className="text-gray-300">&quot;{search}&quot;</span></p>
+            <p className="text-sm text-gray-500">Không tìm thấy ảnh nào với từ khóa <span className="text-gray-600 dark:text-gray-300">&quot;{search}&quot;</span></p>
             <button type="button" onClick={() => setSearch("")} className="text-xs text-emerald-400 hover:text-emerald-300">Xóa tìm kiếm</button>
           </div>
         ) : view === "grid" ? (
           <div className="p-4">
             <div className="mb-3 flex items-center gap-2">
-              <button type="button" onClick={toggleAll} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">
+              <button type="button" onClick={toggleAll} className="text-xs text-gray-500 hover:text-gray-600 dark:text-gray-300 transition-colors">
                 {selected.size === files.length ? "Bỏ chọn tất cả" : `Chọn tất cả (${visible.length})`}
               </button>
               {search && <span className="text-xs text-gray-600">— {visible.length} kết quả</span>}
@@ -457,7 +457,7 @@ export default function StorageBrowser() {
                   {file.isFolder ? (
                     <>
                       {renamingItem?.name === file.name && renamingItem.isFolder ? (
-                        <div className="w-full aspect-square rounded-xl border-2 border-emerald-500 bg-gray-800 flex flex-col items-center justify-center gap-2 p-2">
+                        <div className="w-full aspect-square rounded-xl border-2 border-emerald-500 bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center gap-2 p-2">
                           <svg className="h-7 w-7 text-amber-400 shrink-0" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M10 4H4c-1.11 0-2 .89-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8c0-1.11-.89-2-2-2h-8l-2-2z" />
                           </svg>
@@ -468,16 +468,16 @@ export default function StorageBrowser() {
                             onClick={(e) => e.stopPropagation()} />
                           <div className="flex gap-2">
                             <button type="button" onClick={() => handleRenameFolder(file.name, renamingItem.draft)} className="text-emerald-400 text-xs hover:text-emerald-300">✓</button>
-                            <button type="button" onClick={() => setRenamingItem(null)} className="text-gray-500 text-xs hover:text-white">✗</button>
+                            <button type="button" onClick={() => setRenamingItem(null)} className="text-gray-500 text-xs hover:text-gray-900 dark:hover:text-white">✗</button>
                           </div>
                         </div>
                       ) : (
                         <button type="button" onClick={() => openFolder(file.name)}
-                          className={`w-full aspect-square rounded-xl border-2 bg-gray-800 flex flex-col items-center justify-center gap-2 hover:border-gray-500 transition-colors ${selected.has(file.name) ? "border-emerald-500 ring-2 ring-emerald-500/30" : "border-gray-700"}`}>
+                          className={`w-full aspect-square rounded-xl border-2 bg-gray-100 dark:bg-gray-800 flex flex-col items-center justify-center gap-2 hover:border-gray-500 transition-colors ${selected.has(file.name) ? "border-emerald-500 ring-2 ring-emerald-500/30" : "border-gray-300 dark:border-gray-700"}`}>
                           <svg className="h-8 w-8 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M10 4H4c-1.11 0-2 .89-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8c0-1.11-.89-2-2-2h-8l-2-2z" />
                           </svg>
-                          <span className="text-xs text-gray-300 truncate w-full text-center px-1">{file.name}</span>
+                          <span className="text-xs text-gray-600 dark:text-gray-300 truncate w-full text-center px-1">{file.name}</span>
                         </button>
                       )}
                       {/* Folder checkbox */}
@@ -491,7 +491,7 @@ export default function StorageBrowser() {
                     <>
                       <button type="button" onClick={() => toggleSelect(file.name)}
                         className={`relative w-full aspect-square rounded-xl overflow-hidden border-2 transition-all ${
-                          selected.has(file.name) ? "border-emerald-500 ring-2 ring-emerald-500/30" : "border-gray-700 hover:border-gray-500"
+                          selected.has(file.name) ? "border-emerald-500 ring-2 ring-emerald-500/30" : "border-gray-300 dark:border-gray-700 hover:border-gray-500"
                         }`}>
                         <Image src={file.url} alt={file.name} fill className="object-cover" unoptimized />
                         {selected.has(file.name) && (
@@ -508,10 +508,10 @@ export default function StorageBrowser() {
                           <input value={renamingItem.draft}
                             onChange={(e) => setRenamingItem({ ...renamingItem, draft: e.target.value })}
                             onKeyDown={(e) => { if (e.key === "Enter") handleRenameFile(file.name, renamingItem.draft); if (e.key === "Escape") setRenamingItem(null); }}
-                            autoFocus className="flex-1 text-xs bg-gray-800 border border-emerald-500 rounded px-1.5 py-0.5 text-white outline-none min-w-0"
+                            autoFocus className="flex-1 text-xs bg-gray-100 dark:bg-gray-800 border border-emerald-500 rounded px-1.5 py-0.5 text-white outline-none min-w-0"
                             onClick={(e) => e.stopPropagation()} />
                           <button type="button" onClick={() => handleRenameFile(file.name, renamingItem.draft)} className="text-emerald-400 hover:text-emerald-300 text-xs shrink-0">✓</button>
-                          <button type="button" onClick={() => setRenamingItem(null)} className="text-gray-500 hover:text-white text-xs shrink-0">✗</button>
+                          <button type="button" onClick={() => setRenamingItem(null)} className="text-gray-500 hover:text-gray-900 dark:hover:text-white text-xs shrink-0">✗</button>
                         </div>
                       ) : (
                         <p className="mt-1 text-xs text-gray-600 truncate px-0.5">{file.name}</p>
@@ -526,7 +526,7 @@ export default function StorageBrowser() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-800 text-xs text-gray-500">
+              <tr className="border-b border-gray-200 dark:border-gray-200 dark:border-gray-800 text-xs text-gray-500">
                 <th className="px-4 py-2 text-left w-8">
                   <input type="checkbox" checked={selected.size === files.length && files.length > 0} onChange={toggleAll}
                     className="rounded accent-emerald-500" title="Chọn tất cả" />
@@ -536,7 +536,7 @@ export default function StorageBrowser() {
                 <th className="px-4 py-2 text-right">Cập nhật</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800/60">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-800/60">
               {visible.map((file) => (
                 <tr key={file.name}
                   onClick={() => file.isFolder ? openFolder(file.name) : toggleSelect(file.name)}
@@ -554,10 +554,10 @@ export default function StorageBrowser() {
                             if (e.key === "Enter") renamingItem.isFolder ? handleRenameFolder(file.name, renamingItem.draft) : handleRenameFile(file.name, renamingItem.draft);
                             if (e.key === "Escape") setRenamingItem(null);
                           }}
-                          autoFocus className="flex-1 text-xs bg-gray-800 border border-emerald-500 rounded px-2 py-1 text-white outline-none" />
+                          autoFocus className="flex-1 text-xs bg-gray-100 dark:bg-gray-800 border border-emerald-500 rounded px-2 py-1 text-white outline-none" />
                         <button type="button" onClick={() => renamingItem.isFolder ? handleRenameFolder(file.name, renamingItem.draft) : handleRenameFile(file.name, renamingItem.draft)}
                           className="text-emerald-400 hover:text-emerald-300 text-xs px-1">✓</button>
-                        <button type="button" onClick={() => setRenamingItem(null)} className="text-gray-500 hover:text-white text-xs px-1">✗</button>
+                        <button type="button" onClick={() => setRenamingItem(null)} className="text-gray-500 hover:text-gray-900 dark:hover:text-white text-xs px-1">✗</button>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2">
@@ -566,11 +566,11 @@ export default function StorageBrowser() {
                             <path d="M10 4H4c-1.11 0-2 .89-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8c0-1.11-.89-2-2-2h-8l-2-2z" />
                           </svg>
                         ) : (
-                          <div className="h-8 w-8 shrink-0 overflow-hidden rounded bg-gray-800">
+                          <div className="h-8 w-8 shrink-0 overflow-hidden rounded bg-gray-100 dark:bg-gray-800">
                             <Image src={file.url} alt="" width={32} height={32} className="h-full w-full object-cover" unoptimized />
                           </div>
                         )}
-                        <span className={`text-xs truncate max-w-[240px] ${file.isFolder ? "text-gray-300" : "text-gray-400"}`}>
+                        <span className={`text-xs truncate max-w-[240px] ${file.isFolder ? "text-gray-600 dark:text-gray-300" : "text-gray-400"}`}>
                           {file.name}{file.isFolder ? "/" : ""}
                         </span>
                       </div>
@@ -591,7 +591,7 @@ export default function StorageBrowser() {
       {showMoveModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowMoveModal(false)} />
-          <div className="relative z-10 w-full max-w-sm rounded-2xl border border-gray-700 bg-gray-900 p-6 shadow-2xl">
+          <div className="relative z-10 w-full max-w-sm rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-2xl">
             <h3 className="text-sm font-semibold text-white mb-1">Di chuyển file</h3>
             <p className="text-xs text-gray-500 mb-4">
               {selectedFiles.length === 1 ? selectedFiles[0].name : `${selectedFiles.length} file được chọn`}
@@ -618,7 +618,7 @@ export default function StorageBrowser() {
             </div>
             <div className="flex gap-2">
               <button type="button" onClick={() => setShowMoveModal(false)}
-                className="flex-1 rounded-xl border border-gray-700 py-2 text-xs text-gray-400 hover:text-white transition-colors">Hủy</button>
+                className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 py-2 text-xs text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">Hủy</button>
               <button type="button" onClick={handleMoveFiles} disabled={folder === moveTarget}
                 className="flex-1 rounded-xl bg-emerald-500 py-2 text-xs font-semibold text-white hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                 Di chuyển đến đây
@@ -630,7 +630,7 @@ export default function StorageBrowser() {
 
       {dragOver && (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-emerald-500/10 backdrop-blur-sm pointer-events-none">
-          <div className="rounded-2xl border-2 border-emerald-500 bg-gray-900 px-10 py-8 text-center">
+          <div className="rounded-2xl border-2 border-emerald-500 bg-white dark:bg-gray-900 px-10 py-8 text-center">
             <div className="text-4xl mb-3">⬆️</div>
             <p className="text-lg font-semibold text-emerald-400">Thả ảnh để upload</p>
           </div>

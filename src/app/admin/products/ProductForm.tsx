@@ -111,9 +111,9 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
     <form ref={formRef} onSubmit={handleSubmit} onChange={() => setIsDirty(true)} className="space-y-6">
 
       {/* ── Thông tin cơ bản ─────────────────────────────────── */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-800">
-          <h2 className="text-sm font-semibold text-white">Thông tin sản phẩm</h2>
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Thông tin sản phẩm</h2>
         </div>
         <div className="p-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
           {/* Tên */}
@@ -129,7 +129,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
                 if (!slugLocked) setSlug(slugify(e.target.value));
               }}
               placeholder="Ví dụ: Notion Second Brain"
-              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
             />
           </div>
 
@@ -149,12 +149,12 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
                 value={slug}
                 onChange={(e) => handleSlugChange(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/--+/g, "-"))}
                 placeholder="url-san-pham"
-                className="flex-1 bg-transparent px-3 py-2.5 text-sm text-white outline-none placeholder-gray-600 min-w-0"
+                className="flex-1 bg-transparent px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none placeholder-gray-400 dark:placeholder-gray-600 min-w-0"
               />
               {slug && (
                 <button type="button" onClick={() => { setSlug(""); setSlugLocked(false); setIsDirty(true); }}
                   title="Xóa để auto-generate lại từ tên sản phẩm"
-                  className="px-3 text-gray-500 hover:text-white transition-colors shrink-0">
+                  className="px-3 text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors shrink-0">
                   <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
               )}
@@ -173,7 +173,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
             <select
               name="type"
               defaultValue={product?.type ?? categories[0]?.id ?? "notion"}
-              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white outline-none focus:border-emerald-500"
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
             >
               {categories.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -191,7 +191,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
               min={0}
               defaultValue={product?.price ?? ""}
               placeholder="99000"
-              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500"
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500"
             />
           </div>
 
@@ -204,7 +204,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
               min={0}
               defaultValue={product?.original_price ?? ""}
               placeholder="149000"
-              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500"
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500"
             />
           </div>
 
@@ -217,7 +217,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
               required
               defaultValue={product?.template_link ?? ""}
               placeholder="https://notion.so/..."
-              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500"
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500"
             />
           </div>
 
@@ -251,7 +251,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
               min={0}
               value={downloadCount}
               onChange={(e) => setDownloadCount(Number(e.target.value))}
-              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500"
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500"
             />
             <p className="mt-1 text-xs text-gray-600">Hệ thống tự cộng thêm mỗi khi có đơn thành công</p>
           </div>
@@ -280,7 +280,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
               min={0} max={5} step={0.1}
               value={rating}
               onChange={(e) => { setRating(Number(e.target.value)); setIsDirty(true); }}
-              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500"
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500"
             />
             <p className="mt-1 text-xs text-gray-600">0 = không hiển thị sao. Nhấn Auto-fill để random 4.4–4.9</p>
           </div>
@@ -294,7 +294,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
               min={0}
               value={ratingCount}
               onChange={(e) => { setRatingCount(Number(e.target.value)); setIsDirty(true); }}
-              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500"
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500"
             />
             <p className="mt-1 text-xs text-gray-600">Auto-fill tự tính = 10–33% lượt tải</p>
           </div>
@@ -329,10 +329,10 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
       </div>
 
       {/* ── Thư viện ảnh thực tế ─────────────────────────────── */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between gap-3">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-sm font-semibold text-white">Giao diện thực tế</h2>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Giao diện thực tế</h2>
             <p className="mt-0.5 text-xs text-gray-500">Ảnh hiển thị dạng slideshow trên trang sản phẩm — khách bấm để xem toàn màn hình</p>
           </div>
           <button type="button" onClick={() => setGalleryPickerOpen(true)}
@@ -397,10 +397,10 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
       )}
 
       {/* ── Landing Page Editor ───────────────────────────────── */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between gap-3 flex-wrap">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 flex items-center justify-between gap-3 flex-wrap">
           <div>
-            <h2 className="text-sm font-semibold text-white">Landing Page</h2>
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Landing Page</h2>
             <p className="mt-0.5 text-xs text-gray-500">Tạo trang bán hàng: headline → nỗi đau → giải pháp → tính năng → testimonial → FAQ</p>
           </div>
           {/* Gợi ý AI */}
@@ -438,7 +438,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
                 rows={2}
                 defaultValue={product?.description ?? ""}
                 placeholder="Template giúp quản lý công việc theo hệ thống PARA..."
-                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
               />
             </div>
             <div>
@@ -447,7 +447,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
                 name="audience"
                 rows={2}
                 placeholder="Người đi làm văn phòng, freelancer..."
-                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
               />
             </div>
           </div>

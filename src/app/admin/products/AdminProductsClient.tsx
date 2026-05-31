@@ -61,7 +61,7 @@ export default function AdminProductsClient({
       {/* Stats badges */}
       <div className="flex flex-wrap gap-2">
         {[
-          { label: "Tất cả", value: "all",       count: products.length,  color: "bg-gray-800 text-gray-300" },
+          { label: "Tất cả", value: "all",       count: products.length,  color: "bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300" },
           { label: "Published", value: "published", count: publishedCount, color: "bg-emerald-500/10 text-emerald-400" },
           { label: "Draft",     value: "draft",     count: draftCount,     color: "bg-gray-700 text-gray-400" },
         ].map((item) => (
@@ -71,7 +71,7 @@ export default function AdminProductsClient({
             className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-colors ${
               statusFilter === item.value
                 ? item.color + " ring-1 ring-white/10"
-                : "bg-gray-800/50 text-gray-500 hover:bg-gray-800"
+                : "bg-gray-100 dark:bg-gray-800/50 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-800"
             }`}
           >
             {item.label} <span className="ml-1 opacity-70">{item.count}</span>
@@ -85,13 +85,13 @@ export default function AdminProductsClient({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Tìm tên sản phẩm..."
-          className="flex-1 min-w-[180px] rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-emerald-500"
+          className="flex-1 min-w-[180px] rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none focus:border-emerald-500"
         />
         {categories.length > 0 && (
           <select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+            className="rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
           >
             <option value="all">Tất cả loại</option>
             {categories.map((c) => (
@@ -102,7 +102,7 @@ export default function AdminProductsClient({
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value as SortKey)}
-          className="rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+          className="rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
         >
           <option value="newest">Mới nhất</option>
           <option value="price">Giá cao nhất</option>
@@ -119,7 +119,7 @@ export default function AdminProductsClient({
       )}
 
       {/* Table */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
         <div className="overflow-x-auto">
           {filtered.length === 0 ? (
             <div className="px-6 py-16 text-center">
@@ -127,7 +127,7 @@ export default function AdminProductsClient({
               <p className="text-gray-400 text-sm">Không tìm thấy sản phẩm phù hợp.</p>
               <button
                 onClick={() => { setSearch(""); setStatusFilter("all"); setTypeFilter("all"); }}
-                className="mt-3 text-sm text-emerald-400 hover:text-emerald-300"
+                className="mt-3 text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300"
               >
                 Xóa bộ lọc
               </button>
@@ -135,7 +135,7 @@ export default function AdminProductsClient({
           ) : (
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-gray-800 text-xs font-medium text-gray-500 uppercase">
+                <tr className="border-b border-gray-200 dark:border-gray-800 text-xs font-medium text-gray-500 uppercase">
                   <th className="px-5 py-3 text-left">Sản phẩm</th>
                   <th className="px-5 py-3 text-left">Loại</th>
                   <th className="px-5 py-3 text-right">Giá</th>
@@ -146,11 +146,11 @@ export default function AdminProductsClient({
                   {canEdit && <th className="px-5 py-3 text-right">Thao tác</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800">
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
                 {filtered.map((p) => (
-                  <tr key={p.id} className="hover:bg-gray-800/40 transition-colors">
+                  <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
                     <td className="px-5 py-4">
-                      <p className="font-medium text-white truncate max-w-[220px]">{p.name}</p>
+                      <p className="font-medium text-gray-900 dark:text-white truncate max-w-[220px]">{p.name}</p>
                       <p className="text-xs text-gray-600 font-mono mt-0.5">
                         {p.slug ? `/${p.slug}` : p.id.slice(0, 8) + "…"}
                       </p>
@@ -196,7 +196,7 @@ export default function AdminProductsClient({
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/admin/products/${p.id}/edit`}
-                            className="rounded-lg bg-gray-800 px-3 py-1.5 text-xs text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                            className="rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
                           >
                             Sửa
                           </Link>

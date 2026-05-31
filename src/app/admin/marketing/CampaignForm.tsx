@@ -58,7 +58,7 @@ const TEMPLATES = [
   },
 ];
 
-const inputCls = "w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-colors";
+const inputCls = "w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-colors";
 const textareaCls = `${inputCls} resize-none`;
 
 export default function CampaignForm({
@@ -146,17 +146,17 @@ export default function CampaignForm({
         <button
           type="button"
           onClick={() => startTransition(() => router.push("/admin/marketing"))}
-          className="text-gray-400 hover:text-white transition-colors"
+          className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
         >
           ← Quay lại
         </button>
-        <h1 className="text-xl font-bold text-white">
+        <h1 className="text-xl font-bold text-gray-900 dark:text-white">
           {campaign?.id ? "Chỉnh sửa campaign" : "Tạo campaign mới"}
         </h1>
       </div>
 
       {/* Template picker */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5">
         <p className="text-xs font-medium text-gray-400 mb-3">Template mẫu</p>
         <div className="flex flex-wrap gap-2">
           {TEMPLATES.map((tpl) => (
@@ -164,7 +164,7 @@ export default function CampaignForm({
               key={tpl.id}
               type="button"
               onClick={() => applyTemplate(tpl)}
-              className="rounded-xl border border-gray-700 px-3 py-1.5 text-xs text-gray-400 hover:border-emerald-500 hover:text-emerald-400 transition-colors"
+              className="rounded-xl border border-gray-300 dark:border-gray-700 px-3 py-1.5 text-xs text-gray-400 hover:border-emerald-500 hover:text-emerald-400 transition-colors"
             >
               {tpl.label}
             </button>
@@ -173,7 +173,7 @@ export default function CampaignForm({
       </div>
 
       {/* Form */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 p-5 space-y-4">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-5 space-y-4">
 
         <div className="space-y-1.5">
           <label className="text-xs font-medium text-gray-400">Tên campaign (nội bộ)</label>
@@ -186,11 +186,11 @@ export default function CampaignForm({
           {groups && groups.length > 0 && (
             <div className="flex gap-2 mb-2">
               <button type="button" onClick={() => setGroupId("")}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${!groupId ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${!groupId ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
                 Theo segment
               </button>
               <button type="button" onClick={() => setGroupId(groups[0]?.id ?? "")}
-                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${groupId ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${groupId ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
                 Theo nhóm khách hàng
               </button>
             </div>
@@ -245,7 +245,7 @@ export default function CampaignForm({
               {(["now", "schedule"] as const).map((mode) => (
                 <button key={mode} type="button" onClick={() => setSendMode(mode)}
                   className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-colors ${
-                    sendMode === mode ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                    sendMode === mode ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-gray-700"
                   }`}>
                   {mode === "now" ? "⚡ Gửi ngay" : "📅 Lên lịch"}
                 </button>
@@ -269,7 +269,7 @@ export default function CampaignForm({
                 type="button"
                 onClick={() => handleSave(false)}
                 disabled={saving || sending || !!success}
-                className="flex-1 rounded-xl border border-gray-700 py-2.5 text-sm font-medium text-gray-300 hover:border-gray-600 hover:text-white transition-colors disabled:opacity-50"
+                className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 py-2.5 text-sm font-medium text-gray-600 dark:text-gray-300 hover:border-gray-600 hover:text-gray-900 dark:hover:text-white transition-colors disabled:opacity-50"
               >
                 {saving ? "Đang lưu..." : "Lưu nháp"}
               </button>

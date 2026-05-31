@@ -288,7 +288,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           <select
             name="download_link_expiry_hours"
             defaultValue={settings.download_link_expiry_hours ?? "0"}
-            className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-white outline-none focus:border-emerald-500"
+            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
           >
             <option value="0">Không giới hạn (link vĩnh cửu)</option>
             <option value="24">24 giờ</option>
@@ -309,7 +309,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           <select
             name="download_link_max_accesses"
             defaultValue={settings.download_link_max_accesses ?? "0"}
-            className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2.5 text-sm text-white outline-none focus:border-emerald-500"
+            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
           >
             <option value="0">Không giới hạn</option>
             <option value="1">1 lần</option>
@@ -388,12 +388,12 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-800">
-        <h2 className="text-sm font-semibold text-white">{title}</h2>
+    <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-white">{title}</h2>
         <p className="mt-0.5 text-xs text-gray-500">{description}</p>
       </div>
-      <div className="divide-y divide-gray-800/60">{children}</div>
+      <div className="divide-y divide-gray-200/60 dark:divide-gray-800/60">{children}</div>
     </div>
   );
 }
@@ -416,7 +416,7 @@ function Field({
   return (
     <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
       <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-300">
+        <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
         </label>
         {hint && <p className="mt-0.5 text-xs text-gray-500">{hint}</p>}
@@ -428,7 +428,7 @@ function Field({
           type={type}
           defaultValue={defaultValue}
           placeholder={placeholder}
-          className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-colors"
+          className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-colors"
         />
       </div>
     </div>
@@ -449,7 +449,7 @@ function ColorField({
   return (
     <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
       <div>
-        <label htmlFor={`${name}_text`} className="block text-sm font-medium text-gray-300">
+        <label htmlFor={`${name}_text`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
         </label>
         <p className="mt-0.5 text-xs text-gray-500">Mã màu HEX</p>
@@ -459,7 +459,7 @@ function ColorField({
           type="color"
           value={hex}
           onChange={(e) => setHex(e.target.value)}
-          className="h-10 w-14 cursor-pointer rounded-lg border border-gray-700 bg-gray-800 p-1"
+          className="h-10 w-14 cursor-pointer rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-1"
         />
         <input
           id={`${name}_text`}
@@ -468,10 +468,10 @@ function ColorField({
           value={hex}
           onChange={(e) => setHex(e.target.value)}
           placeholder="#10b981"
-          className="w-36 rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-colors font-mono"
+          className="w-36 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-colors font-mono"
         />
         <div
-          className="h-8 w-8 rounded-lg border border-gray-700"
+          className="h-8 w-8 rounded-lg border border-gray-300 dark:border-gray-700"
           style={{ backgroundColor: hex }}
         />
       </div>
@@ -495,7 +495,7 @@ function SecretField({
   return (
     <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
       <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-300">
+        <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
         </label>
         {hint && <div className="mt-0.5 text-xs text-gray-500">{hint}</div>}
@@ -503,14 +503,14 @@ function SecretField({
       <div className="sm:col-span-2">
         {!editing && hasValue ? (
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm">
+            <div className="flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2 text-sm">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              <span className="text-gray-400 font-mono tracking-widest">••••••••••••</span>
+              <span className="text-gray-500 dark:text-gray-400 font-mono tracking-widest">••••••••••••</span>
             </div>
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-xs text-gray-400 hover:text-white hover:border-gray-600 transition-colors"
+              className="rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-gray-600 transition-colors"
             >
               Thay đổi
             </button>
@@ -524,7 +524,7 @@ function SecretField({
               type="text"
               autoFocus={editing}
               placeholder={hasValue ? "Nhập key mới để thay đổi" : "Nhập API key…"}
-              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-colors font-mono"
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-colors font-mono"
             />
             {editing && (
               <button
@@ -564,7 +564,7 @@ function BankCodeField({ defaultValue }: { defaultValue: string }) {
   return (
     <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
       <div>
-        <label htmlFor="bank_code" className="block text-sm font-medium text-gray-300">Ngân hàng</label>
+        <label htmlFor="bank_code" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Ngân hàng</label>
         <p className="mt-0.5 text-xs text-gray-500">Dùng để tạo mã QR VietQR</p>
       </div>
       <div className="sm:col-span-2">
@@ -572,7 +572,7 @@ function BankCodeField({ defaultValue }: { defaultValue: string }) {
           id="bank_code"
           name="bank_code"
           defaultValue={defaultValue}
-          className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
+          className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
         >
           <option value="">-- Chọn ngân hàng --</option>
           {BANKS.map((b) => (
@@ -612,14 +612,14 @@ function WebhookUrlField({
   return (
     <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
       <div>
-        <p className="block text-sm font-medium text-gray-300">{label}</p>
+        <p className="block text-sm font-medium text-gray-700 dark:text-gray-300">{label}</p>
         <p className="mt-0.5 text-xs text-gray-500">{hint}</p>
       </div>
       <div className="sm:col-span-2 flex items-center gap-2">
         <input
           readOnly
           value={url}
-          className="w-full rounded-xl border border-gray-700 bg-gray-800/40 px-3.5 py-2 text-sm text-gray-400 font-mono outline-none select-all cursor-text"
+          className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/40 px-3.5 py-2 text-sm text-gray-500 dark:text-gray-400 font-mono outline-none select-all cursor-text"
         />
         <button
           type="button"
@@ -627,7 +627,7 @@ function WebhookUrlField({
           className={`shrink-0 rounded-xl border px-3 py-2 text-xs font-medium transition-colors ${
             copied
               ? "border-emerald-500 text-emerald-400"
-              : "border-gray-700 text-gray-400 hover:border-emerald-500 hover:text-emerald-400"
+              : "border-gray-300 dark:border-gray-700 text-gray-500 dark:text-gray-400 hover:border-emerald-500 hover:text-emerald-400"
           }`}
         >
           {copied ? "✓ Copied" : "Copy"}
@@ -661,7 +661,7 @@ function ImageUploadField({
   return (
     <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
       <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-300">{label}</label>
+        <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">{label}</label>
         {hint && <p className="mt-0.5 text-xs text-gray-500">{hint}</p>}
       </div>
       <div className="sm:col-span-2">
@@ -696,7 +696,7 @@ function ProviderField({
       {/* Provider selector */}
       <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
         <div>
-          <p className="block text-sm font-medium text-gray-300">AI Provider</p>
+          <p className="block text-sm font-medium text-gray-700 dark:text-gray-300">AI Provider</p>
           <p className="mt-0.5 text-xs text-gray-500">Mặc định dùng Claude</p>
         </div>
         <div className="sm:col-span-2 flex gap-3">
@@ -709,7 +709,7 @@ function ProviderField({
               className={`flex flex-1 cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-colors ${
                 provider === opt.value
                   ? "border-emerald-500/50 bg-emerald-500/5"
-                  : "border-gray-700 hover:border-gray-600"
+                  : "border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
               }`}
             >
               <input
@@ -721,7 +721,7 @@ function ProviderField({
                 className="accent-emerald-500"
               />
               <div className="min-w-0">
-                <p className="text-sm font-medium text-white">{opt.label}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-white">{opt.label}</p>
                 <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${opt.badgeCls}`}>
                   {opt.badge}
                 </span>

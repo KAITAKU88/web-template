@@ -102,7 +102,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Đơn hàng</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Đơn hàng</h1>
           <p className="mt-1 text-xs text-gray-500">
             Đơn chờ quá <span className="text-yellow-400">{EXPIRE_MINUTES} phút</span> tự động hủy
           </p>
@@ -121,7 +121,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                 className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-colors ${
                   period === opt.value
                     ? "bg-blue-500 text-white"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                 }`}>
                 {opt.label}
               </Link>
@@ -138,7 +138,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                 className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-colors ${
                   status === opt.value
                     ? "bg-emerald-500 text-white"
-                    : "bg-gray-800 text-gray-400 hover:bg-gray-700 hover:text-white"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white"
                 }`}>
                 {opt.label}
               </Link>
@@ -154,14 +154,14 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
             {period && <input type="hidden" name="period" value={period} />}
             <input type="text" name="email" defaultValue={emailFilter}
               placeholder="Tìm theo email…"
-              className="rounded-xl border border-gray-700 bg-gray-800 px-3 py-1.5 text-xs text-white placeholder-gray-500 outline-none focus:border-emerald-500" />
+              className="rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none focus:border-emerald-500" />
             <button type="submit"
-              className="rounded-xl bg-gray-700 px-3 py-1.5 text-xs text-white hover:bg-gray-600">
+              className="rounded-xl bg-gray-200 dark:bg-gray-700 px-3 py-1.5 text-xs text-gray-700 dark:text-white hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
               Tìm
             </button>
             {emailFilter && (
               <Link href={buildUrl({ email: "", page: "1" })}
-                className="rounded-xl bg-gray-800 px-3 py-1.5 text-xs text-gray-400 hover:text-white">
+                className="rounded-xl bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
                 Xóa
               </Link>
             )}
@@ -170,11 +170,11 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-800 text-xs font-medium text-gray-500 uppercase">
+              <tr className="border-b border-gray-200 dark:border-gray-800 text-xs font-medium text-gray-500 uppercase">
                 <th className="px-4 py-3 text-left">Mã đơn</th>
                 <th className="px-4 py-3 text-left">Email</th>
                 <th className="px-4 py-3 text-left">Sản phẩm</th>
@@ -184,7 +184,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
                 <th className="px-4 py-3 text-center">Email</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
               {(orders ?? []).length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-10 text-center text-gray-500">
@@ -194,17 +194,17 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
               ) : (
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 (orders ?? []).map((order: any) => {
-                  const s = STATUS_LABEL[order.status] ?? { label: order.status, cls: "bg-gray-700 text-gray-300" };
+                  const s = STATUS_LABEL[order.status] ?? { label: order.status, cls: "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300" };
                   const time = order.paid_at ?? order.created_at;
                   const mainRaw = order.main_product;
                   const bumpRaw = order.bump_product;
                   const mainName = (Array.isArray(mainRaw) ? mainRaw[0] : mainRaw)?.name ?? "—";
                   const bumpName = (Array.isArray(bumpRaw) ? bumpRaw[0] : bumpRaw)?.name;
                   return (
-                    <tr key={order.id} className="hover:bg-gray-800/50 transition-colors">
-                      <td className="px-4 py-3 font-mono text-xs text-gray-400">{order.id.slice(0, 8)}…</td>
-                      <td className="px-4 py-3 text-gray-300 max-w-[180px] truncate">{order.customer_email}</td>
-                      <td className="px-4 py-3 text-gray-300 max-w-[200px]">
+                    <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                      <td className="px-4 py-3 font-mono text-xs text-gray-500 dark:text-gray-400">{order.id.slice(0, 8)}…</td>
+                      <td className="px-4 py-3 text-gray-700 dark:text-gray-300 max-w-[180px] truncate">{order.customer_email}</td>
+                      <td className="px-4 py-3 text-gray-700 dark:text-gray-300 max-w-[200px]">
                         <span className="block truncate">{mainName}</span>
                         {bumpName && (
                           <span className="block truncate text-xs text-amber-400">+ {bumpName}</span>

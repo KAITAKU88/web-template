@@ -91,7 +91,7 @@ export default async function AdminSettingsPage() {
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Cấu hình hệ thống</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Cấu hình hệ thống</h1>
         <p className="mt-1 text-sm text-gray-400">
           Thay đổi giao diện, tích hợp thanh toán và email — không cần sửa code
         </p>
@@ -104,7 +104,7 @@ export default async function AdminSettingsPage() {
       {/* ── Thông số khác (Env Vars) ──────────────────────────── */}
       <div className="space-y-4">
         <div className="flex items-center gap-3">
-          <h2 className="text-lg font-semibold text-white">Thông số khác</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Thông số khác</h2>
           {missingCount > 0 ? (
             <span className="rounded-full bg-red-500/20 px-2.5 py-0.5 text-xs font-medium text-red-400">
               {missingCount} chưa cấu hình
@@ -123,7 +123,7 @@ export default async function AdminSettingsPage() {
         {/* Webhook URLs — read-only info */}
         <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-800">
-            <h3 className="text-sm font-semibold text-white">Webhook URLs</h3>
+            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Webhook URLs</h3>
             <p className="mt-0.5 text-xs text-gray-500">
               Dán các URL này vào cấu hình SePay và Supabase
             </p>
@@ -152,14 +152,14 @@ export default async function AdminSettingsPage() {
           >
             <div className="flex items-start justify-between px-6 py-4 border-b border-gray-800">
               <div>
-                <h3 className="text-sm font-semibold text-white">{group.group}</h3>
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{group.group}</h3>
                 <p className="mt-0.5 text-xs text-gray-500">{group.note}</p>
               </div>
               <a
                 href={group.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="ml-4 shrink-0 flex items-center gap-1.5 rounded-lg border border-gray-700 bg-gray-800 px-3 py-1.5 text-xs text-gray-300 transition hover:border-gray-600 hover:text-white"
+                className="ml-4 shrink-0 flex items-center gap-1.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 transition hover:border-gray-600 hover:text-gray-900 dark:hover:text-white"
               >
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -205,7 +205,7 @@ function EnvVarRow({
         <p className="mt-0.5 text-xs text-gray-500">{desc}</p>
       </div>
       <div className="sm:col-span-2 flex items-center gap-3">
-        <code className="rounded-lg border border-gray-700 bg-gray-800 px-3 py-1.5 text-xs font-mono text-gray-300">
+        <code className="rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs font-mono text-gray-300">
           {envKey}
         </code>
         {isSet ? (
@@ -242,14 +242,14 @@ function WebhookUrlRow({
         <p className="mt-0.5 text-xs text-gray-500">{hint}</p>
       </div>
       <div className="sm:col-span-2 flex items-center gap-2 flex-wrap">
-        <code className="flex-1 min-w-0 rounded-lg border border-gray-700 bg-gray-800 px-3 py-1.5 text-xs font-mono text-emerald-300 truncate">
+        <code className="flex-1 min-w-0 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs font-mono text-emerald-300 truncate">
           {url}
         </code>
         <a
           href={href}
           target="_blank"
           rel="noopener noreferrer"
-          className="shrink-0 flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-800 px-2.5 py-1.5 text-xs text-gray-400 transition hover:border-gray-600 hover:text-white"
+          className="shrink-0 flex items-center gap-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-2.5 py-1.5 text-xs text-gray-500 dark:text-gray-400 transition hover:border-gray-400 dark:hover:border-gray-600 hover:text-gray-900 dark:hover:text-white"
         >
           <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />

@@ -128,14 +128,14 @@ export default function CustomersClient({
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Khách hàng</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Khách hàng</h1>
           <p className="mt-1 text-sm text-gray-400">
             {customers.length} khách hàng · {formatCurrency(totalRevenue)} tổng doanh thu
           </p>
         </div>
         <button
           onClick={() => setShowGroupModal(true)}
-          className="flex items-center gap-2 rounded-xl bg-gray-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-700 transition-colors"
+          className="flex items-center gap-2 rounded-xl bg-gray-100 dark:bg-gray-800 px-4 py-2.5 text-sm font-semibold text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
         >
           + Tạo nhóm
         </button>
@@ -149,22 +149,22 @@ export default function CustomersClient({
           { label: "Doanh thu TB", value: formatCurrency(customers.length ? Math.round(totalRevenue / customers.length) : 0) },
           { label: "Nhóm khách", value: groups.length },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-2xl border border-gray-800 bg-gray-900 p-4">
+          <div key={stat.label} className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
             <p className="text-xs text-gray-500">{stat.label}</p>
-            <p className="mt-2 text-xl font-bold text-white">{stat.value}</p>
+            <p className="mt-2 text-xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Groups */}
       {groups.length > 0 && (
-        <div className="rounded-2xl border border-gray-800 bg-gray-900 p-4">
+        <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-4">
           <h2 className="mb-3 text-sm font-semibold text-gray-300">Nhóm khách hàng</h2>
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setFilterGroup("all")}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                filterGroup === "all" ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                filterGroup === "all" ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-gray-700"
               }`}
             >
               Tất cả ({customers.length})
@@ -202,16 +202,16 @@ export default function CustomersClient({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Tìm email..."
-          className="rounded-xl border border-gray-700 bg-gray-800 px-4 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-emerald-500"
+          className="rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-4 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none focus:border-emerald-500"
         />
       </div>
 
       {/* Table */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-800 text-xs font-medium text-gray-500 uppercase">
+              <tr className="border-b border-gray-200 dark:border-gray-800 text-xs font-medium text-gray-500 uppercase">
                 <th className="px-5 py-3 text-left">#</th>
                 <th className="px-5 py-3 text-left cursor-pointer hover:text-gray-300" onClick={() => toggleSort("email")}>
                   Email <SortIcon k="email" />
@@ -230,16 +230,16 @@ export default function CustomersClient({
                 <th className="px-5 py-3 text-right">Thao tác</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
               {filtered.map((c, i) => (
                 <tr key={c.email} className="hover:bg-gray-800/40 transition-colors">
                   <td className="px-5 py-4 text-gray-600 text-xs">{i + 1}</td>
                   <td className="px-5 py-4">
-                    <p className="font-medium text-white">{c.email}</p>
+                    <p className="font-medium text-gray-900 dark:text-white">{c.email}</p>
                   </td>
                   <td className="px-5 py-4 text-gray-400 text-xs">{c.phone ?? "—"}</td>
                   <td className="px-5 py-4 text-right">
-                    <span className="font-semibold text-white">{c.total_orders}</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">{c.total_orders}</span>
                     <span className="text-gray-500 text-xs ml-1">đơn</span>
                   </td>
                   <td className="px-5 py-4 text-right">
@@ -274,7 +274,7 @@ export default function CustomersClient({
                           autoFocus
                           onBlur={() => setAddGroupTarget(null)}
                           onChange={(e) => { if (e.target.value) handleAddToGroup(c.email, e.target.value); }}
-                          className="rounded-lg border border-gray-700 bg-gray-800 px-2 py-0.5 text-xs text-white"
+                          className="rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-xs text-gray-900 dark:text-white"
                         >
                           <option value="">Chọn nhóm...</option>
                           {groups.filter((g) => !c.groups.includes(g.id)).map((g) => (
@@ -285,7 +285,7 @@ export default function CustomersClient({
                         groups.length > 0 && c.groups.length < groups.length && (
                           <button
                             onClick={() => setAddGroupTarget(c.email)}
-                            className="rounded-full border border-gray-700 px-2 py-0.5 text-xs text-gray-500 hover:border-emerald-500 hover:text-emerald-400 transition-colors"
+                            className="rounded-full border border-gray-300 dark:border-gray-700 px-2 py-0.5 text-xs text-gray-500 hover:border-emerald-500 hover:text-emerald-400 transition-colors"
                           >
                             + nhóm
                           </button>
@@ -318,20 +318,20 @@ export default function CustomersClient({
       {/* Delete confirm modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-md rounded-2xl border border-red-500/30 bg-gray-900 p-6">
+          <div className="w-full max-w-md rounded-2xl border border-red-500/30 bg-white dark:bg-gray-900 p-6">
             <div className="mb-4 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-red-500/10">
                 <span className="text-xl">⚠️</span>
               </div>
               <div>
-                <h3 className="font-bold text-white">Xóa khách hàng</h3>
+                <h3 className="font-bold text-gray-900 dark:text-white">Xóa khách hàng</h3>
                 <p className="text-xs text-gray-400">Hành động này không thể hoàn tác</p>
               </div>
             </div>
             <p className="mb-2 text-sm text-gray-300">
               Bạn sắp xóa toàn bộ đơn hàng của:
             </p>
-            <p className="mb-4 rounded-lg bg-gray-800 px-3 py-2 font-mono text-sm text-white">
+            <p className="mb-4 rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-2 font-mono text-sm text-gray-900 dark:text-white">
               {deleteConfirm}
             </p>
             <p className="mb-6 text-sm text-red-400">
@@ -340,7 +340,7 @@ export default function CustomersClient({
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 rounded-xl border border-gray-700 py-2.5 text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+                className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
                 Hủy
               </button>
@@ -359,8 +359,8 @@ export default function CustomersClient({
       {/* Create group modal */}
       {showGroupModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="w-full max-w-sm rounded-2xl border border-gray-700 bg-gray-900 p-6">
-            <h3 className="mb-4 font-bold text-white">Tạo nhóm khách hàng</h3>
+          <div className="w-full max-w-sm rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 p-6">
+            <h3 className="mb-4 font-bold text-gray-900 dark:text-white">Tạo nhóm khách hàng</h3>
             <div className="space-y-3">
               <div>
                 <label className="mb-1 block text-xs text-gray-400">Tên nhóm *</label>
@@ -368,7 +368,7 @@ export default function CustomersClient({
                   value={newGroupName}
                   onChange={(e) => setNewGroupName(e.target.value)}
                   placeholder="VD: Khách VIP, Mua nhiều lần..."
-                  className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-emerald-500"
+                  className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none focus:border-emerald-500"
                 />
                 {groupErr && <p className="mt-1 text-xs text-red-400">{groupErr}</p>}
               </div>
@@ -391,14 +391,14 @@ export default function CustomersClient({
                   value={newGroupDesc}
                   onChange={(e) => setNewGroupDesc(e.target.value)}
                   placeholder="Mô tả ngắn về nhóm..."
-                  className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-emerald-500"
+                  className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none focus:border-emerald-500"
                 />
               </div>
             </div>
             <div className="mt-4 flex gap-3">
               <button
                 onClick={() => { setShowGroupModal(false); setGroupErr(""); }}
-                className="flex-1 rounded-xl border border-gray-700 py-2.5 text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+                className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
               >
                 Hủy
               </button>

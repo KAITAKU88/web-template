@@ -259,18 +259,18 @@ export default function SetupGuide() {
   return (
     <div className="space-y-6">
       {/* Progress header */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 p-6">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <h2 className="text-lg font-bold text-white">Tiến trình triển khai</h2>
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">Tiến trình triển khai</h2>
               {doneCount === TOTAL_STEPS ? (
                 <span className="rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">Hoàn thành!</span>
               ) : (
                 <span className="text-sm text-gray-400">{doneCount}/{TOTAL_STEPS} bước</span>
               )}
             </div>
-            <div className="mt-3 h-2 w-full rounded-full bg-gray-800 overflow-hidden">
+            <div className="mt-3 h-2 w-full rounded-full bg-gray-100 dark:bg-gray-800 overflow-hidden">
               <div className="h-full rounded-full bg-emerald-500 transition-all duration-500" style={{ width: `${pct}%` }} />
             </div>
             <p className="mt-1.5 text-xs text-gray-500">
@@ -278,7 +278,7 @@ export default function SetupGuide() {
             </p>
           </div>
           {doneCount > 0 && (
-            <button onClick={reset} className="shrink-0 rounded-xl border border-gray-700 bg-gray-800 px-3 py-1.5 text-xs text-gray-400 transition hover:border-gray-600 hover:text-white">
+            <button onClick={reset} className="shrink-0 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-400 transition hover:border-gray-600 hover:text-gray-900 dark:hover:text-white">
               Bắt đầu lại
             </button>
           )}
@@ -290,8 +290,8 @@ export default function SetupGuide() {
         const phaseDone = phase.steps.filter((s) => checked.has(s.id)).length;
         const phaseComplete = phaseDone === phase.steps.length;
         return (
-          <div key={phase.id} className={`rounded-2xl border bg-gray-900 overflow-hidden transition-opacity ${phaseComplete ? "border-gray-800 opacity-60" : "border-gray-700"}`}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+          <div key={phase.id} className={`rounded-2xl border bg-white dark:bg-gray-900 overflow-hidden transition-opacity ${phaseComplete ? "border-gray-200 dark:border-gray-800 opacity-60" : "border-gray-300 dark:border-gray-700"}`}>
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-200 dark:border-gray-800">
               <div className="flex items-center gap-3">
                 {phaseComplete ? (
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500">
@@ -300,7 +300,7 @@ export default function SetupGuide() {
                     </svg>
                   </div>
                 ) : (
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-600 bg-gray-800">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full border border-gray-600 bg-gray-100 dark:bg-gray-800">
                     <span className="text-xs font-bold text-gray-400">{phaseDone}/{phase.steps.length}</span>
                   </div>
                 )}
@@ -309,7 +309,7 @@ export default function SetupGuide() {
               {phaseComplete && <span className="text-xs text-emerald-400">Xong</span>}
             </div>
 
-            <div className="divide-y divide-gray-800/60">
+            <div className="divide-y divide-gray-200 dark:divide-gray-800/60">
               {phase.steps.map((step, idx) => {
                 const isDone = checked.has(step.id);
                 return (
@@ -334,7 +334,7 @@ export default function SetupGuide() {
                         <span className={`shrink-0 mt-0.5 text-xs font-mono font-bold ${isDone ? "text-gray-600" : "text-gray-500"}`}>
                           {String(idx + 1).padStart(2, "0")}
                         </span>
-                        <h3 className={`text-sm font-semibold leading-snug ${isDone ? "text-gray-500 line-through decoration-gray-600" : "text-white"}`}>
+                        <h3 className={`text-sm font-semibold leading-snug ${isDone ? "text-gray-500 line-through decoration-gray-600" : "text-gray-900 dark:text-white"}`}>
                           {step.title}
                         </h3>
                       </div>
@@ -356,7 +356,7 @@ export default function SetupGuide() {
                             const isInternal = link.href.startsWith("/");
                             const cls = link.variant === "primary"
                               ? "inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white transition"
-                              : "inline-flex items-center gap-1 rounded-lg border border-gray-700 bg-gray-800 px-2.5 py-1 text-xs text-gray-300 transition hover:border-gray-600 hover:text-white";
+                              : "inline-flex items-center gap-1 rounded-lg border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-2.5 py-1 text-xs text-gray-600 dark:text-gray-300 transition hover:border-gray-600 hover:text-gray-900 dark:hover:text-white";
                             return isInternal ? (
                               <Link key={link.href} href={link.href} className={cls}>
                                 <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

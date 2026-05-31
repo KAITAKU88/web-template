@@ -1,8 +1,45 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { AdminRole } from "@/lib/admin-auth";
+
+type Theme = "light" | "dark" | "system";
+
+function applyTheme(t: Theme) {
+  const root = document.documentElement;
+  if (t === "dark") root.classList.add("dark");
+  else if (t === "light") root.classList.remove("dark");
+  else root.classList.toggle("dark", window.matchMedia("(prefers-color-scheme: dark)").matches);
+}
+
+function ThemeToggle() {
+  const [theme, setTheme] = useState<Theme>("system");
+  useEffect(() => {
+    const stored = (localStorage.getItem("theme") as Theme) || "system";
+    setTheme(stored);
+  }, []);
+  function cycleTheme() {
+    const next: Record<Theme, Theme> = { system: "light", light: "dark", dark: "system" };
+    const t = next[theme];
+    setTheme(t);
+    localStorage.setItem("theme", t);
+    applyTheme(t);
+  }
+  const icons: Record<Theme, string> = { light: "☀️", dark: "🌙", system: "💻" };
+  const labels: Record<Theme, string> = { light: "Sáng", dark: "Tối", system: "Tự động" };
+  return (
+    <button
+      onClick={cycleTheme}
+      title={`Giao diện: ${labels[theme]} — nhấn để đổi`}
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+    >
+      <span className="text-base">{icons[theme]}</span>
+      <span>Giao diện: {labels[theme]}</span>
+    </button>
+  );
+}
 
 type NavItem = {
   href: string;
@@ -135,7 +172,7 @@ export default function AdminSidebar({
   return (
     <aside
       className={`
-        fixed inset-y-0 left-0 z-[9999] flex w-72 flex-col border-r border-gray-800 bg-gray-900
+        fixed inset-y-0 left-0 z-[9999] flex w-72 flex-col border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900
         transform transition-transform duration-200 ease-in-out
         md:static md:w-56 md:translate-x-0 md:transition-none
         ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
@@ -145,7 +182,7 @@ export default function AdminSidebar({
       <button
         type="button"
         onClick={onMobileClose}
-        className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors md:hidden"
+        className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors md:hidden"
         aria-label="Đóng menu"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -159,18 +196,18 @@ export default function AdminSidebar({
         target="_blank"
         rel="noopener noreferrer"
         title="Xem trang chủ"
-        className="flex h-16 shrink-0 items-center gap-2.5 px-5 border-b border-gray-800 hover:bg-gray-800/50 transition-colors"
+        className="flex h-16 shrink-0 items-center gap-2.5 px-5 border-b border-gray-200 dark:border-gray-800 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors"
       >
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500">
           <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
           </svg>
         </div>
-        <span className="text-sm font-semibold text-white">{brandName}</span>
+        <span className="text-sm font-semibold text-gray-900 dark:text-white">{brandName}</span>
       </a>
 
       {/* Nav */}
-      <nav className="flex-1 px-3 py-4 space-y-1">
+      <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
         {navItems.filter((item) => item.roles.includes(role)).map((item) => {
           // Đổi /admin prefix → basePath của role hiện tại
           const href = item.href === "/admin"
@@ -187,8 +224,8 @@ export default function AdminSidebar({
               onClick={(e) => handleNavClick(e, href)}
               className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                 active
-                  ? "bg-emerald-500/10 text-emerald-400"
-                  : "text-gray-400 hover:bg-gray-800 hover:text-white"
+                  ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                  : "text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
               }`}
             >
               {item.icon}
@@ -198,20 +235,21 @@ export default function AdminSidebar({
         })}
       </nav>
 
-      {/* Role badge + Logout */}
-      <div className="shrink-0 border-t border-gray-800 p-3 space-y-1">
+      {/* Role badge + Theme + Logout */}
+      <div className="shrink-0 border-t border-gray-200 dark:border-gray-800 p-3 space-y-1">
         <div className="px-3 py-1.5">
           <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
-            role === "owner"       ? "bg-emerald-500/15 text-emerald-400" :
-            role === "manager"     ? "bg-blue-500/15 text-blue-400"       :
-                                     "bg-gray-500/15 text-gray-400"
+            role === "owner"       ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400" :
+            role === "manager"     ? "bg-blue-500/15 text-blue-600 dark:text-blue-400"          :
+                                     "bg-gray-500/15 text-gray-500 dark:text-gray-400"
           }`}>
             {ROLE_LABEL[role]}
           </span>
         </div>
+        <ThemeToggle />
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-400 transition-colors hover:bg-gray-800 hover:text-red-400"
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-red-500 dark:hover:text-red-400"
         >
           <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

@@ -119,7 +119,7 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Automation</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Automation</h1>
           <p className="mt-1 text-sm text-gray-400">
             {activeCount} rule đang hoạt động · Tự động gửi email khi sự kiện xảy ra
           </p>
@@ -137,7 +137,7 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
         {Object.entries(TRIGGER_LABELS).map(([key, { label, icon }]) => {
           const count = rules.filter((r) => r.trigger_event === key && r.is_active).length;
           return (
-            <div key={key} className="rounded-xl border border-gray-800 bg-gray-900 p-3">
+            <div key={key} className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-3">
               <div className="flex items-center gap-2 mb-1">
                 <span>{icon}</span>
                 <span className={`text-xs font-bold ${count > 0 ? "text-emerald-400" : "text-gray-600"}`}>
@@ -153,7 +153,7 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
       {/* Rules list */}
       <div className="space-y-3">
         {rules.length === 0 ? (
-          <div className="rounded-2xl border border-gray-800 bg-gray-900 px-6 py-16 text-center">
+          <div className="rounded-2xl border border-gray-200 dark:border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-6 py-16 text-center">
             <p className="text-4xl mb-3">⚡</p>
             <p className="text-gray-400 text-sm mb-3">Chưa có automation rule nào.</p>
             <button
@@ -173,25 +173,25 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
 
           return (
             <div key={r.id} className={`rounded-2xl border transition-colors ${
-              r.is_active ? "border-emerald-500/20 bg-gray-900" : "border-gray-800 bg-gray-900/50"
+              r.is_active ? "border-emerald-500/20 bg-white dark:bg-gray-900" : "border-gray-200 dark:border-gray-800 bg-gray-900/50"
             }`}>
               <div className="flex items-start gap-4 p-4">
                 <span className="text-2xl">{trigger?.icon ?? "⚡"}</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-white">{r.name}</span>
+                    <span className="font-semibold text-gray-900 dark:text-white">{r.name}</span>
                     {!r.is_active && (
                       <span className="rounded-full bg-gray-700 px-2 py-0.5 text-xs text-gray-400">Tắt</span>
                     )}
                   </div>
                   <div className="mt-1 flex flex-wrap gap-2 text-xs">
-                    <span className="rounded-full bg-gray-800 px-2 py-0.5 text-gray-300">
+                    <span className="rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-gray-600 dark:text-gray-300">
                       Sự kiện: {trigger?.label ?? r.trigger_event}
                     </span>
-                    <span className="rounded-full bg-gray-800 px-2 py-0.5 text-gray-300">
+                    <span className="rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-gray-600 dark:text-gray-300">
                       Gửi đến: {segmentLabel}
                     </span>
-                    <span className="rounded-full bg-gray-800 px-2 py-0.5 text-gray-300">
+                    <span className="rounded-full bg-gray-100 dark:bg-gray-800 px-2 py-0.5 text-gray-600 dark:text-gray-300">
                       {delayLabel}
                     </span>
                   </div>
@@ -214,7 +214,7 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
                   </button>
                   <button
                     onClick={() => openEdit(r)}
-                    className="rounded-lg bg-gray-800 px-2.5 py-1.5 text-xs text-gray-300 hover:bg-gray-700 transition-colors"
+                    className="rounded-lg bg-gray-100 dark:bg-gray-800 px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-700 transition-colors"
                   >
                     Sửa
                   </button>
@@ -234,10 +234,10 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
       {/* Create/Edit modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/70 p-4 pt-10">
-          <div className="w-full max-w-2xl rounded-2xl border border-gray-700 bg-gray-900 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-800 px-6 py-4">
-              <h2 className="font-bold text-white">{editRule ? "Sửa automation rule" : "Tạo automation rule mới"}</h2>
-              <button onClick={() => { setShowForm(false); resetForm(); }} className="text-gray-500 hover:text-white">×</button>
+          <div className="w-full max-w-2xl rounded-2xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-200 dark:border-gray-800 px-6 py-4">
+              <h2 className="font-bold text-gray-900 dark:text-white">{editRule ? "Sửa automation rule" : "Tạo automation rule mới"}</h2>
+              <button onClick={() => { setShowForm(false); resetForm(); }} className="text-gray-500 hover:text-gray-900 dark:hover:text-white">×</button>
             </div>
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <input type="hidden" name="action_type" value="send_email" />
@@ -247,7 +247,7 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
                 <input
                   name="name" required value={name} onChange={(e) => setName(e.target.value)}
                   placeholder="VD: Chào mừng khách mới mua hàng"
-                  className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-emerald-500"
+                  className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none focus:border-emerald-500"
                 />
               </div>
 
@@ -256,7 +256,7 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
                   <label className="mb-1 block text-xs font-medium text-gray-400">Sự kiện kích hoạt *</label>
                   <select
                     name="trigger_event" value={trigger} onChange={(e) => setTrigger(e.target.value)}
-                    className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
                   >
                     {Object.entries(TRIGGER_LABELS).map(([k, v]) => (
                       <option key={k} value={k}>{v.icon} {v.label}</option>
@@ -268,7 +268,7 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
                   <label className="mb-1 block text-xs font-medium text-gray-400">Gửi đến</label>
                   <select
                     name="target_segment" value={segment} onChange={(e) => setSegment(e.target.value)}
-                    className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+                    className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
                   >
                     <option value="buyer">Người vừa trigger sự kiện</option>
                     <option value="all">Tất cả khách hàng</option>
@@ -283,7 +283,7 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
                 <label className="mb-1 block text-xs font-medium text-gray-400">Thời gian delay</label>
                 <select
                   name="delay_minutes" value={delay} onChange={(e) => setDelay(Number(e.target.value))}
-                  className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white outline-none focus:border-emerald-500"
+                  className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
                 >
                   {DELAY_OPTIONS.map((d) => (
                     <option key={d.value} value={d.value}>{d.label}</option>
@@ -296,7 +296,7 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
                 <input
                   name="email_subject" value={subject} onChange={(e) => setSubject(e.target.value)}
                   placeholder="VD: Cảm ơn bạn đã mua {{product_name}}!"
-                  className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 outline-none focus:border-emerald-500"
+                  className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none focus:border-emerald-500"
                 />
               </div>
 
@@ -311,7 +311,7 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
                   </button>
                 </div>
                 {showVars && (
-                  <div className="mb-2 rounded-xl border border-gray-700 bg-gray-800 p-3">
+                  <div className="mb-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 p-3">
                     <p className="mb-2 text-xs font-medium text-gray-400">Biến template có thể dùng:</p>
                     <div className="grid grid-cols-2 gap-1">
                       {TEMPLATE_VARS.map((v) => (
@@ -327,14 +327,14 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
                   name="email_html" value={html} onChange={(e) => setHtml(e.target.value)}
                   rows={8}
                   placeholder="<p>Xin chào,</p><p>Cảm ơn bạn đã mua <strong>{{product_name}}</strong>...</p>"
-                  className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3 py-2 text-xs text-white placeholder-gray-500 outline-none focus:border-emerald-500 font-mono"
+                  className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-2 text-xs text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 outline-none focus:border-emerald-500 font-mono"
                 />
               </div>
 
               <div className="flex gap-3 pt-2">
                 <button
                   type="button" onClick={() => { setShowForm(false); resetForm(); }}
-                  className="flex-1 rounded-xl border border-gray-700 py-2.5 text-sm text-gray-300 hover:bg-gray-800 transition-colors"
+                  className="flex-1 rounded-xl border border-gray-300 dark:border-gray-700 py-2.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-800 transition-colors"
                 >
                   Hủy
                 </button>

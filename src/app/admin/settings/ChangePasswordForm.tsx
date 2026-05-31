@@ -7,7 +7,7 @@ function PasswordInput({ name, placeholder, label }: { name: string; placeholder
   const [show, setShow] = useState(false);
   return (
     <div>
-      <label className="block text-xs font-medium text-gray-400 mb-1.5">{label}</label>
+      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5">{label}</label>
       <div className="relative max-w-sm">
         <input
           name={name}
@@ -16,7 +16,7 @@ function PasswordInput({ name, placeholder, label }: { name: string; placeholder
           minLength={8}
           placeholder={placeholder ?? "••••••••"}
           autoComplete="new-password"
-          className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 pr-10 text-sm text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
+          className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 pr-10 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50"
         />
         <button
           type="button"
@@ -60,9 +60,9 @@ export default function ChangePasswordForm() {
   }
 
   return (
-    <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-800">
-        <h2 className="text-sm font-semibold text-white">Đổi mật khẩu Admin</h2>
+    <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800">
+        <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Đổi mật khẩu Admin</h2>
         <p className="mt-0.5 text-xs text-gray-500">Mật khẩu mới có hiệu lực ngay lập tức.</p>
       </div>
       <form onSubmit={handleSubmit} className="p-6 space-y-4">

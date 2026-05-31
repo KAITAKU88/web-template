@@ -19,7 +19,7 @@ export default async function MarketingPage() {
   };
 
   const STATUS_BADGE: Record<string, string> = {
-    draft:   "bg-gray-700 text-gray-300",
+    draft:   "bg-gray-700 text-gray-600 dark:text-gray-300",
     sending: "bg-yellow-500/20 text-yellow-400",
     sent:    "bg-emerald-500/20 text-emerald-400",
     failed:  "bg-red-500/20 text-red-400",
@@ -41,7 +41,7 @@ export default async function MarketingPage() {
       {/* Header */}
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Marketing</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Marketing</h1>
           <p className="mt-1 text-sm text-gray-400">
             {totalCustomers ?? 0} khách hàng trong database
           </p>
@@ -58,21 +58,21 @@ export default async function MarketingPage() {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {[
           { label: "Tất cả khách hàng", value: totalCustomers ?? 0, desc: "Đã mua ít nhất 1 lần", color: "border-emerald-500/30 bg-emerald-500/5" },
-          { label: "Mua trong 30 ngày", value: "—", desc: "Khách hàng gần đây", color: "border-gray-800 bg-gray-900" },
-          { label: "Campaigns đã gửi", value: (campaigns ?? []).filter((c) => c.status === "sent").length, desc: "Tổng lượt campaigns", color: "border-gray-800 bg-gray-900" },
+          { label: "Mua trong 30 ngày", value: "—", desc: "Khách hàng gần đây", color: "border-gray-200 dark:border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900" },
+          { label: "Campaigns đã gửi", value: (campaigns ?? []).filter((c) => c.status === "sent").length, desc: "Tổng lượt campaigns", color: "border-gray-200 dark:border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900" },
         ].map((item) => (
           <div key={item.label} className={`rounded-2xl border p-5 ${item.color}`}>
             <p className="text-xs font-medium text-gray-400">{item.label}</p>
-            <p className="mt-3 text-2xl font-bold text-white">{item.value}</p>
+            <p className="mt-3 text-2xl font-bold text-gray-900 dark:text-white">{item.value}</p>
             <p className="mt-1 text-xs text-gray-600">{item.desc}</p>
           </div>
         ))}
       </div>
 
       {/* Campaigns list */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-800">
-          <h2 className="font-semibold text-white">Email Campaigns</h2>
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-200 dark:border-gray-800">
+          <h2 className="font-semibold text-gray-900 dark:text-white">Email Campaigns</h2>
         </div>
         {!campaigns?.length ? (
           <div className="px-6 py-16 text-center">
@@ -83,7 +83,7 @@ export default async function MarketingPage() {
             </Link>
           </div>
         ) : (
-          <div className="divide-y divide-gray-800">
+          <div className="divide-y divide-gray-200 dark:divide-gray-800">
             {(campaigns as Campaign[]).map((c) => (
               <div key={c.id} className="flex items-center gap-4 px-5 py-4 hover:bg-gray-800/30 transition-colors">
                 <div className="min-w-0 flex-1">
@@ -93,7 +93,7 @@ export default async function MarketingPage() {
                     </span>
                     <span className="text-xs text-gray-600">{segmentLabel(c.segment)}</span>
                   </div>
-                  <p className="font-medium text-white truncate">{c.name}</p>
+                  <p className="font-medium text-gray-900 dark:text-white truncate">{c.name}</p>
                   <p className="text-xs text-gray-500 truncate">{c.subject}</p>
                 </div>
                 <div className="shrink-0 text-right">
@@ -107,7 +107,7 @@ export default async function MarketingPage() {
                 {c.status === "draft" && (
                   <Link
                     href={`/admin/marketing/${c.id}/edit`}
-                    className="shrink-0 rounded-lg bg-gray-800 px-3 py-1.5 text-xs text-gray-300 hover:bg-gray-700 transition-colors"
+                    className="shrink-0 rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-700 transition-colors"
                   >
                     Sửa
                   </Link>

@@ -70,21 +70,21 @@ export default function DiscountsClient({ codes: init, products }: { codes: Disc
 
       {/* Form tạo */}
       {showForm && (
-        <form onSubmit={handleCreate} className="rounded-2xl border border-gray-800 bg-gray-900 p-6 space-y-4">
-          <h2 className="text-sm font-semibold text-white">Tạo mã giảm giá mới</h2>
+        <form onSubmit={handleCreate} className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-6 space-y-4">
+          <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Tạo mã giảm giá mới</h2>
           {err && <p className="rounded-xl bg-red-500/10 px-4 py-2 text-sm text-red-400">{err}</p>}
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Mã <span className="text-red-400">*</span></label>
               <input required value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.toUpperCase() })}
-                placeholder="SUMMER20" className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white font-mono uppercase outline-none focus:border-emerald-500" />
+                placeholder="SUMMER20" className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white font-mono uppercase outline-none focus:border-emerald-500" />
             </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Loại giảm</label>
               <select value={form.type} onChange={(e) => setForm({ ...form, type: e.target.value as "percent" | "flat" })}
-                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white outline-none focus:border-emerald-500">
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500">
                 <option value="percent">Phần trăm (%)</option>
                 <option value="flat">Số tiền cố định (đ)</option>
               </select>
@@ -94,13 +94,13 @@ export default function DiscountsClient({ codes: init, products }: { codes: Disc
               <label className="block text-xs font-medium text-gray-400 mb-1">Giá trị <span className="text-red-400">*</span></label>
               <input required type="number" min={1} value={form.value} onChange={(e) => setForm({ ...form, value: e.target.value })}
                 placeholder={form.type === "percent" ? "20 (= 20%)" : "50000 (= 50.000đ)"}
-                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white outline-none focus:border-emerald-500" />
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500" />
             </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Chỉ áp dụng cho sản phẩm</label>
               <select value={form.product_id} onChange={(e) => setForm({ ...form, product_id: e.target.value })}
-                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white outline-none focus:border-emerald-500">
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500">
                 <option value="">Tất cả sản phẩm</option>
                 {products.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
@@ -109,19 +109,19 @@ export default function DiscountsClient({ codes: init, products }: { codes: Disc
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Đơn tối thiểu (đ)</label>
               <input type="number" min={0} value={form.min_amount} onChange={(e) => setForm({ ...form, min_amount: e.target.value })}
-                placeholder="0 = không giới hạn" className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white outline-none focus:border-emerald-500" />
+                placeholder="0 = không giới hạn" className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500" />
             </div>
 
             <div>
               <label className="block text-xs font-medium text-gray-400 mb-1">Số lần dùng tối đa</label>
               <input type="number" min={1} value={form.max_uses} onChange={(e) => setForm({ ...form, max_uses: e.target.value })}
-                placeholder="Để trống = không giới hạn" className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white outline-none focus:border-emerald-500" />
+                placeholder="Để trống = không giới hạn" className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500" />
             </div>
 
             <div className="sm:col-span-2">
               <label className="block text-xs font-medium text-gray-400 mb-1">Hết hạn</label>
               <input type="datetime-local" value={form.expires_at} onChange={(e) => setForm({ ...form, expires_at: e.target.value })}
-                className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2 text-sm text-white outline-none focus:border-emerald-500" />
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500" />
             </div>
           </div>
 
@@ -131,7 +131,7 @@ export default function DiscountsClient({ codes: init, products }: { codes: Disc
               {saving ? "Đang tạo…" : "Tạo mã"}
             </button>
             <button type="button" onClick={() => { setShowForm(false); setErr(""); }}
-              className="rounded-xl border border-gray-700 px-5 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+              className="rounded-xl border border-gray-300 dark:border-gray-700 px-5 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
               Hủy
             </button>
           </div>
@@ -139,11 +139,11 @@ export default function DiscountsClient({ codes: init, products }: { codes: Disc
       )}
 
       {/* Bảng danh sách */}
-      <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
+      <div className="rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-800 text-xs font-medium text-gray-500 uppercase">
+              <tr className="border-b border-gray-200 dark:border-gray-800 text-xs font-medium text-gray-500 uppercase">
                 <th className="px-4 py-3 text-left">Mã</th>
                 <th className="px-4 py-3 text-left">Giảm</th>
                 <th className="px-4 py-3 text-left">Sản phẩm</th>
@@ -153,12 +153,12 @@ export default function DiscountsClient({ codes: init, products }: { codes: Disc
                 <th className="px-4 py-3 text-center">Hành động</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
               {codes.length === 0 ? (
                 <tr><td colSpan={7} className="px-4 py-10 text-center text-gray-500">Chưa có mã giảm giá nào.</td></tr>
               ) : codes.map((dc) => (
                 <tr key={dc.id} className="hover:bg-gray-800/50 transition-colors">
-                  <td className="px-4 py-3 font-mono font-bold text-white">{dc.code}</td>
+                  <td className="px-4 py-3 font-mono font-bold text-gray-900 dark:text-white">{dc.code}</td>
                   <td className="px-4 py-3 text-emerald-400 font-semibold">
                     {dc.type === "percent" ? `${dc.value}%` : formatCurrency(dc.value)}
                     {dc.min_amount > 0 && <span className="ml-1 text-xs text-gray-500">(min {formatCurrency(dc.min_amount)})</span>}
@@ -172,7 +172,7 @@ export default function DiscountsClient({ codes: init, products }: { codes: Disc
                   </td>
                   <td className="px-4 py-3 text-center">
                     <button onClick={() => toggleActive(dc.id, dc.is_active)}
-                      className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${dc.is_active ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20" : "bg-gray-700 text-gray-500 hover:bg-gray-600"}`}>
+                      className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors ${dc.is_active ? "bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20" : "bg-gray-200 dark:bg-gray-700 text-gray-500 hover:bg-gray-600"}`}>
                       {dc.is_active ? "Đang dùng" : "Tắt"}
                     </button>
                   </td>

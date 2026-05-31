@@ -127,8 +127,8 @@ export default async function AdminDashboardPage() {
     <div className="p-4 md:p-6 space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Tổng quan</h1>
-        <p className="mt-1 text-sm text-gray-400">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tổng quan</h1>
+        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Cập nhật lúc {new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
         </p>
       </div>
@@ -161,14 +161,14 @@ export default async function AdminDashboardPage() {
       {/* Recent orders + Products */}
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Recent orders */}
-        <div className="xl:col-span-2 rounded-2xl bg-gray-900 border border-gray-800">
-          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
-            <h2 className="font-semibold text-white">Đơn hàng gần đây</h2>
+        <div className="xl:col-span-2 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-gray-800">
+            <h2 className="font-semibold text-gray-900 dark:text-white">Đơn hàng gần đây</h2>
             <a href="/admin/orders" className="text-xs text-emerald-400 hover:text-emerald-300">
               Xem tất cả →
             </a>
           </div>
-          <div className="divide-y divide-gray-800">
+          <div className="divide-y divide-gray-200 dark:divide-gray-800">
             {stats.recentOrders.length === 0 ? (
               <p className="px-5 py-6 text-sm text-gray-500">Chưa có đơn hàng nào.</p>
             ) : (
@@ -181,11 +181,11 @@ export default async function AdminDashboardPage() {
                 created_at: string;
                 products?: { name: string }[] | null;
               }) => {
-                const s = STATUS_LABEL[order.status] ?? { label: order.status, cls: "bg-gray-700 text-gray-300" };
+                const s = STATUS_LABEL[order.status] ?? { label: order.status, cls: "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300" };
                 return (
                   <div key={order.id} className="flex items-center gap-3 px-5 py-3.5">
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-medium text-white">
+                      <p className="truncate text-sm font-medium text-gray-900 dark:text-white">
                         {(order.products as { name: string } | null)?.name ?? "—"}
                       </p>
                       <p className="truncate text-xs text-gray-500">{order.customer_email}</p>
@@ -204,18 +204,18 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Products */}
-        <div className="rounded-2xl bg-gray-900 border border-gray-800">
-          <div className="px-5 py-4 border-b border-gray-800">
-            <h2 className="font-semibold text-white">Sản phẩm ({stats.products.length})</h2>
+        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
+            <h2 className="font-semibold text-gray-900 dark:text-white">Sản phẩm ({stats.products.length})</h2>
           </div>
-          <div className="divide-y divide-gray-800">
+          <div className="divide-y divide-gray-200 dark:divide-gray-800">
             {stats.products.length === 0 ? (
               <p className="px-5 py-6 text-sm text-gray-500">Chưa có sản phẩm nào.</p>
             ) : (
               stats.products.map((p: { id: string; name: string; type: string | null; price: number }) => (
                 <div key={p.id} className="flex items-center gap-3 px-5 py-3.5">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-white">{p.name}</p>
+                    <p className="truncate text-sm font-medium text-gray-900 dark:text-white">{p.name}</p>
                     <p className="text-xs text-gray-500">
                       {p.type === "google_sheet" ? "Google Sheets" : "Notion"}
                     </p>
@@ -234,9 +234,9 @@ export default async function AdminDashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
 
         {/* Phễu chuyển đổi */}
-        <div className="rounded-2xl bg-gray-900 border border-gray-800">
-          <div className="px-5 py-4 border-b border-gray-800">
-            <h2 className="font-semibold text-white">Phễu chuyển đổi</h2>
+        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
+            <h2 className="font-semibold text-gray-900 dark:text-white">Phễu chuyển đổi</h2>
             <p className="text-xs text-gray-500 mt-0.5">30 ngày gần nhất</p>
           </div>
           <div className="p-5 space-y-3">
@@ -254,15 +254,15 @@ export default async function AdminDashboardPage() {
               return (
                 <div key={row.label}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-gray-400 truncate pr-2">{row.label}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400 truncate pr-2">{row.label}</span>
                     <div className="flex items-center gap-2 shrink-0">
                       {rate !== null && (
                         <span className="text-xs text-gray-600">{rate}%</span>
                       )}
-                      <span className="text-sm font-semibold text-white">{row.value.toLocaleString()}</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">{row.value.toLocaleString()}</span>
                     </div>
                   </div>
-                  <div className="h-1.5 rounded-full bg-gray-800 overflow-hidden">
+                  <div className="h-1.5 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
                     <div className={`h-full rounded-full ${row.color} transition-all`} style={{ width: `${pct}%` }} />
                   </div>
                 </div>
@@ -275,9 +275,9 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Doanh thu 7 ngày */}
-        <div className="rounded-2xl bg-gray-900 border border-gray-800">
-          <div className="px-5 py-4 border-b border-gray-800">
-            <h2 className="font-semibold text-white">Doanh thu 7 ngày</h2>
+        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
+            <h2 className="font-semibold text-gray-900 dark:text-white">Doanh thu 7 ngày</h2>
           </div>
           <div className="p-5 space-y-2">
             {(() => {
@@ -289,7 +289,7 @@ export default async function AdminDashboardPage() {
                 return (
                   <div key={date} className="flex items-center gap-2">
                     <span className="w-16 shrink-0 text-xs text-gray-500">{label}</span>
-                    <div className="flex-1 h-5 bg-gray-800 rounded overflow-hidden">
+                    <div className="flex-1 h-5 bg-gray-200 dark:bg-gray-800 rounded overflow-hidden">
                       <div
                         className="h-full bg-emerald-500/70 rounded flex items-center justify-end pr-1.5 transition-all"
                         style={{ width: `${Math.max(pct, amount > 0 ? 8 : 0)}%` }}
@@ -305,19 +305,19 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Top sản phẩm được quan tâm */}
-        <div className="rounded-2xl bg-gray-900 border border-gray-800">
-          <div className="px-5 py-4 border-b border-gray-800">
-            <h2 className="font-semibold text-white">Sản phẩm được xem nhiều</h2>
+        <div className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+          <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-800">
+            <h2 className="font-semibold text-gray-900 dark:text-white">Sản phẩm được xem nhiều</h2>
             <p className="text-xs text-gray-500 mt-0.5">Theo buy-click 30 ngày</p>
           </div>
-          <div className="divide-y divide-gray-800">
+          <div className="divide-y divide-gray-200 dark:divide-gray-800">
             {stats.topByClicks.length === 0 ? (
               <p className="px-5 py-6 text-xs text-gray-600 text-center">Chưa có dữ liệu</p>
             ) : (
               stats.topByClicks.map((p, i) => (
                 <div key={p.id} className="flex items-center gap-3 px-5 py-3">
-                  <span className="text-xs font-bold text-gray-700 w-4 shrink-0">{i + 1}</span>
-                  <span className="flex-1 truncate text-sm text-gray-300">{p.name}</span>
+                  <span className="text-xs font-bold text-gray-400 dark:text-gray-700 w-4 shrink-0">{i + 1}</span>
+                  <span className="flex-1 truncate text-sm text-gray-700 dark:text-gray-300">{p.name}</span>
                   <span className="shrink-0 rounded-full bg-violet-500/15 px-2 py-0.5 text-xs font-medium text-violet-400">
                     {p.clicks} click
                   </span>
@@ -348,14 +348,14 @@ function StatCard({
       className={`rounded-2xl border p-5 ${
         highlight
           ? "border-emerald-500/30 bg-emerald-500/5"
-          : "border-gray-800 bg-gray-900"
+          : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
       }`}
     >
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium text-gray-400">{label}</p>
+        <p className="text-xs font-medium text-gray-500 dark:text-gray-400">{label}</p>
         <span className="text-lg">{icon}</span>
       </div>
-      <p className={`mt-3 text-2xl font-bold ${highlight ? "text-emerald-400" : "text-white"}`}>
+      <p className={`mt-3 text-2xl font-bold ${highlight ? "text-emerald-400" : "text-gray-900 dark:text-white"}`}>
         {value}
       </p>
     </div>
