@@ -42,6 +42,7 @@ export default function StorageBrowser() {
   const [moveTarget, setMoveTarget] = useState("");
   const [statsTotal, setStatsTotal] = useState<number | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
@@ -186,7 +187,10 @@ export default function StorageBrowser() {
 
   async function handleCopyUrl() {
     const item = selectedFiles[0];
-    if (item?.url) await navigator.clipboard.writeText(item.url);
+    if (!item?.url) return;
+    await navigator.clipboard.writeText(item.url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   }
 
   async function handleDeleteSelected() {
@@ -343,31 +347,6 @@ export default function StorageBrowser() {
 
         {/* Static actions */}
         <div className="flex items-center gap-2 shrink-0">
-          {showNewFolder ? (
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-1">
-                <input value={newFolderName} onChange={(e) => { setNewFolderName(e.target.value); setFolderError(""); }}
-                  onKeyDown={(e) => e.key === "Enter" && handleCreateFolder()} placeholder="Tên thư mục" autoFocus
-                  className={`w-32 rounded-xl border bg-gray-800 px-2.5 py-1.5 text-xs text-white outline-none focus:border-emerald-500 ${folderError ? "border-red-500" : "border-gray-700"}`} />
-                <button type="button" onClick={handleCreateFolder} className="rounded-lg bg-emerald-500/20 p-1.5 text-emerald-400 hover:bg-emerald-500/30">
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                </button>
-                <button type="button" onClick={() => { setShowNewFolder(false); setNewFolderName(""); setFolderError(""); }} className="rounded-lg p-1.5 text-gray-500 hover:text-white">
-                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-              </div>
-              {folderError && <p className="text-xs text-red-400 ml-0.5">{folderError}</p>}
-            </div>
-          ) : (
-            <button type="button" onClick={() => setShowNewFolder(true)}
-              className="flex items-center gap-1.5 rounded-xl border border-gray-700 px-3 py-1.5 text-xs text-gray-400 hover:text-white transition-colors">
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-              </svg>
-              Tạo thư mục
-            </button>
-          )}
-
           <label className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
             uploading ? "bg-gray-700 text-gray-500" : "bg-emerald-500 text-white hover:bg-emerald-400"
           }`}>
@@ -405,9 +384,22 @@ export default function StorageBrowser() {
           )}
           {canCopyUrl && (
             <button type="button" onClick={handleCopyUrl}
-              className="flex items-center gap-1.5 rounded-xl border border-gray-600 px-3 py-1.5 text-xs text-gray-300 hover:text-white hover:border-gray-400 transition-colors">
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-              Copy URL
+              className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium transition-all ${
+                copied
+                  ? "border-emerald-500 bg-emerald-500/10 text-emerald-400"
+                  : "border-gray-600 text-gray-300 hover:text-white hover:border-gray-400"
+              }`}>
+              {copied ? (
+                <>
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                  Đã copy!
+                </>
+              ) : (
+                <>
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                  Copy URL
+                </>
+              )}
             </button>
           )}
           {canMove && (
