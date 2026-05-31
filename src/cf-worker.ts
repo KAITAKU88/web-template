@@ -43,6 +43,7 @@ export default {
       runCron("/api/cron/expire-orders", env, ctx),
       runCron("/api/cron/abandoned-cart", env, ctx),
       runCron("/api/cron/scheduled-campaigns", env, ctx),
+      runCron("/api/cron/process-automations", env, ctx),
     ]);
   },
 } satisfies ExportedHandler<Env>;

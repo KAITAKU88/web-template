@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/settings";
 import { formatCurrency } from "@/lib/utils";
+import { queueAutomation } from "@/lib/automation";
 
 interface SupabaseWebhookPayload {
   type: "INSERT" | "UPDATE" | "DELETE";
@@ -133,6 +134,19 @@ export async function POST(req: NextRequest) {
       (e) => console.error("Meta CAPI error:", e)
     );
   }
+
+  // Trigger automation rules cho sự kiện order_success
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://web-template-cloudflare.thankful-to-all-88.workers.dev";
+  queueAutomation("order_success", {
+    customer_email: order.customer_email,
+    product_id:     order.product_id,
+    product_name:   mainProduct.name,
+    product_url:    `${siteUrl}/products/${mainProduct.id}`,
+    checkout_url:   `${siteUrl}/checkout/${mainProduct.id}`,
+    order_id:       order.id,
+    site_name:      siteName,
+    site_url:       siteUrl,
+  }).catch((e) => console.error("Automation queue error:", e));
 
   return NextResponse.json({ ok: true });
 }

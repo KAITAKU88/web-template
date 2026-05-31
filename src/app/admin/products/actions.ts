@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/settings";
 import { revalidatePath } from "next/cache";
 import type { ProductCopy } from "@/lib/productContent";
+import { queueAutomation } from "@/lib/automation";
 
 function buildPrompt(name: string, type: string, description: string, audience: string): string {
   const typeLabel = type === "google_sheet" ? "Google Sheets" : type === "notion" ? "Notion" : type;
@@ -212,8 +213,25 @@ export async function deleteProduct(id: string) {
 
 export async function toggleProductStatus(id: string, newStatus: "published" | "draft") {
   const supabase = createAdminClient();
-  const { error } = await supabase.from("products").update({ status: newStatus }).eq("id", id);
+  const { data: product, error } = await supabase
+    .from("products")
+    .update({ status: newStatus })
+    .eq("id", id)
+    .select("id, name, slug")
+    .single();
   if (error) throw new Error(error.message);
   revalidatePath("/admin/products");
   revalidatePath("/");
+
+  // Trigger automation khi publish sản phẩm mới
+  if (newStatus === "published" && product) {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://web-template-cloudflare.thankful-to-all-88.workers.dev";
+    queueAutomation("product_published", {
+      product_id:   product.id,
+      product_name: product.name,
+      product_url:  `${siteUrl}/products/${product.slug ?? product.id}`,
+      checkout_url: `${siteUrl}/checkout/${product.slug ?? product.id}`,
+      site_url:     siteUrl,
+    }).catch((e) => console.error("product_published automation error:", e));
+  }
 }
