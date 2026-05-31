@@ -6,6 +6,7 @@ import { buildDefaultLanding } from "@/lib/landingTemplate";
 import type { ProductCopy } from "@/lib/productContent";
 import type { Product } from "@/types";
 import LandingEditor from "@/components/LandingEditor";
+import ImageUploadField from "@/components/ImageUploadField";
 
 interface Category { id: string; name: string; }
 
@@ -155,13 +156,15 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
 
           {/* Image URL */}
           <div className="sm:col-span-2">
-            <label className="block text-xs font-medium text-gray-400 mb-1.5">Ảnh thumbnail URL</label>
-            <input
+            <label className="block text-xs font-medium text-gray-400 mb-1.5">Ảnh thumbnail</label>
+            <ImageUploadField
               name="image_url"
-              type="url"
+              bucket="product-images"
+              folder="thumbnails"
               defaultValue={product?.image_url ?? ""}
-              placeholder="https://..."
-              className="w-full rounded-xl border border-gray-700 bg-gray-800 px-3.5 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500"
+              placeholder="https://... hoặc tải ảnh lên"
+              previewSize="md"
+              hint="Tỉ lệ 4:3 hoặc 16:9 — tối đa 3 MB (JPG, PNG, WebP, GIF)"
             />
           </div>
 
