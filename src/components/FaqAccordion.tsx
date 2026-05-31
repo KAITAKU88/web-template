@@ -10,12 +10,12 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
       {items.map(({ q, a }, i) => (
         <div
           key={i}
-          className={`overflow-hidden rounded-xl border transition-colors ${
-            open === i ? "border-green-400" : "border-gray-200 bg-white"
+          className={`overflow-hidden rounded-xl border transition-colors dark:bg-gray-800 ${
+            open === i ? "border-green-400" : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
           }`}
         >
           <button
-            className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-semibold text-gray-800"
+            className="flex w-full items-center justify-between gap-3 px-5 py-4 text-left text-sm font-semibold text-gray-800 hover:bg-gray-50 dark:text-gray-200 dark:hover:bg-gray-700/30 transition-colors"
             onClick={() => setOpen(open === i ? null : i)}
           >
             {q}
@@ -34,7 +34,7 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
               open === i ? "max-h-48" : "max-h-0"
             }`}
           >
-            <p className="border-t border-gray-100 px-5 pb-4 pt-3 text-sm leading-relaxed text-gray-500">
+            <p className="border-t border-gray-100 dark:border-gray-700 px-5 pb-4 pt-3 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
               {a}
             </p>
           </div>

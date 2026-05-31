@@ -167,7 +167,7 @@ export default function ProductGrid({ products, categories = [] }: { products: P
           <p className="font-medium">Không tìm thấy template phù hợp.</p>
           <button
             onClick={() => { setQuery(""); setPriceIdx(0); setTypeFilter("all"); }}
-            className="mt-3 text-sm text-green-600 underline"
+            className="mt-3 text-sm text-green-600 underline hover:text-green-700 active:scale-95 transition-colors"
           >
             Xóa bộ lọc
           </button>
