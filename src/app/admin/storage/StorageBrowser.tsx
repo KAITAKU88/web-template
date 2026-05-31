@@ -117,12 +117,11 @@ export default function StorageBrowser() {
     return paths;
   }
 
-  async function makePlaceholderBlob(): Promise<Blob> {
-    return new Promise((resolve) => {
-      const canvas = document.createElement("canvas");
-      canvas.width = 1; canvas.height = 1;
-      canvas.toBlob((b) => resolve(b ?? new Blob()), "image/png");
-    });
+  function makePlaceholderBlob(): Blob {
+    // Minimal 1×1 transparent PNG (68 bytes) — hardcoded to avoid Canvas API issues
+    const b64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    return new Blob([bytes], { type: "image/png" });
   }
 
   // ── Navigation ───────────────────────────────────────────────────
@@ -155,7 +154,7 @@ export default function StorageBrowser() {
     setFolderError("");
     const prefix = folder ? `${folder}/` : "";
     const path = `${prefix}${name}/.emptyFolderPlaceholder`;
-    const placeholder = await makePlaceholderBlob();
+    const placeholder = makePlaceholderBlob();
     const { error } = await supabase.storage
       .from(bucket)
       .upload(path, placeholder, { contentType: "image/png", upsert: true });

@@ -37,20 +37,39 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
 
   const loadLibrary = useCallback(async () => {
     setLoading(true);
-    const { data } = await supabase.storage.from(bucket).list(folder || undefined, {
+    const all: StorageFile[] = [];
+
+    // Load root level — collect files + subfolder names
+    const { data: rootData } = await supabase.storage.from(bucket).list(undefined, {
       sortBy: { column: "updated_at", order: "desc" },
-      limit: 100,
+      limit: 300,
     });
-    const items = (data ?? [])
-      .filter((f) => f.name !== ".emptyFolderPlaceholder" && f.metadata)
-      .map((f) => {
-        const path = folder ? `${folder}/${f.name}` : f.name;
-        const { data: urlData } = supabase.storage.from(bucket).getPublicUrl(path);
-        return { name: f.name, url: urlData.publicUrl, updatedAt: f.updated_at ?? "" };
+    const subfolders: string[] = [];
+    for (const f of rootData ?? []) {
+      if (f.name === ".emptyFolderPlaceholder") continue;
+      if (!f.metadata) { subfolders.push(f.name); continue; }
+      const { data: u } = supabase.storage.from(bucket).getPublicUrl(f.name);
+      all.push({ name: f.name, url: u.publicUrl, updatedAt: f.updated_at ?? "" });
+    }
+
+    // Load each subfolder (1 level deep)
+    for (const sub of subfolders) {
+      const { data: subData } = await supabase.storage.from(bucket).list(sub, {
+        sortBy: { column: "updated_at", order: "desc" },
+        limit: 200,
       });
-    setFiles(items);
+      for (const f of subData ?? []) {
+        if (f.name === ".emptyFolderPlaceholder" || !f.metadata) continue;
+        const path = `${sub}/${f.name}`;
+        const { data: u } = supabase.storage.from(bucket).getPublicUrl(path);
+        all.push({ name: f.name, url: u.publicUrl, updatedAt: f.updated_at ?? "" });
+      }
+    }
+
+    all.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+    setFiles(all);
     setLoading(false);
-  }, [bucket, folder, supabase]);
+  }, [bucket, supabase]);
 
   useEffect(() => {
     if (tab === "library") loadLibrary();
