@@ -9,6 +9,11 @@ import type { Product } from "@/types";
 
 type SortKey = "newest" | "price_asc" | "price_desc" | "popular";
 
+const LEGACY_TYPE_LABEL: Record<string, string> = {
+  notion: "Notion",
+  google_sheet: "Google Sheets",
+};
+
 const PRICE_RANGES = [
   { label: "Tất cả",      min: 0,      max: Infinity },
   { label: "Dưới 50k",   min: 0,      max: 50000    },
@@ -200,7 +205,9 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                 <div className="flex flex-1 flex-col p-5">
                   {product.type && (
                     <span className="mb-2 inline-flex w-fit items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                      {categories.find((c) => c.id === product.type)?.name ?? product.type}
+                      {categories.find((c) => c.id === product.type)?.name
+                        ?? LEGACY_TYPE_LABEL[product.type]
+                        ?? product.type}
                     </span>
                   )}
                   <h2 className="mb-1 font-bold text-gray-900 leading-snug dark:text-white">{product.name}</h2>

@@ -32,7 +32,7 @@ export default async function CheckoutPage({ params }: Props) {
     .eq(isUuid ? "id" : "slug", productId)
     .single();
 
-  if (error || !product) notFound();
+  if (error || !product || product.status === "draft") notFound();
 
   // Tìm sản phẩm bán kèm: ưu tiên cùng loại, phổ biến nhất, khác sản phẩm hiện tại
   let companionQuery = supabase

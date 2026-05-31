@@ -41,19 +41,21 @@ export async function expireStaleOrders(): Promise<number> {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://web-template-cloudflare.thankful-to-all-88.workers.dev";
 
-  // Trigger automation order_cancelled cho từng đơn
-  for (const order of staleOrders) {
-    const product = productMap.get(order.product_id) as { id: string; name: string; slug: string | null } | undefined;
-    queueAutomation("order_cancelled", {
-      customer_email: order.customer_email,
-      product_id:     order.product_id,
-      product_name:   product?.name ?? "",
-      product_url:    `${siteUrl}/products/${product?.slug ?? order.product_id}`,
-      checkout_url:   `${siteUrl}/checkout/${product?.slug ?? order.product_id}`,
-      order_id:       order.id,
-      site_url:       siteUrl,
-    }).catch((e) => console.error("[expireOrders] automation error:", e));
-  }
+  // Trigger automation order_cancelled cho từng đơn (await để đảm bảo queue insert xong)
+  await Promise.all(
+    staleOrders.map((order) => {
+      const product = productMap.get(order.product_id) as { id: string; name: string; slug: string | null } | undefined;
+      return queueAutomation("order_cancelled", {
+        customer_email: order.customer_email,
+        product_id:     order.product_id,
+        product_name:   product?.name ?? "",
+        product_url:    `${siteUrl}/products/${product?.slug ?? order.product_id}`,
+        checkout_url:   `${siteUrl}/checkout/${product?.slug ?? order.product_id}`,
+        order_id:       order.id,
+        site_url:       siteUrl,
+      }).catch((e) => console.error("[expireOrders] automation error:", e));
+    })
+  );
 
   return staleOrders.length;
 }

@@ -26,12 +26,15 @@ export async function POST(req: NextRequest) {
     // Lấy thông tin sản phẩm chính
     const { data: product, error: productError } = await supabase
       .from("products")
-      .select("id, price, name")
+      .select("id, price, name, status")
       .eq("id", product_id)
       .single();
 
     if (productError || !product) {
       return NextResponse.json({ error: "Sản phẩm không tồn tại." }, { status: 404 });
+    }
+    if (product.status === "draft") {
+      return NextResponse.json({ error: "Sản phẩm không còn bán." }, { status: 400 });
     }
 
     // Tính giá bump từ DB (không tin giá từ client)
