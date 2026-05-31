@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { slugifyFilename } from "@/lib/utils";
+import { compressToWebP } from "@/lib/browser-utils";
 
 interface Props {
   bucket: string;
@@ -62,9 +63,10 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
     setUploadProgress({ done: 0, total: images.length });
     const urls: string[] = [];
     for (const file of images) {
+      const compressed = await compressToWebP(file);
       const prefix = folder ? `${folder}/` : "";
-      const path = `${prefix}${slugifyFilename(file.name)}`;
-      const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
+      const path = `${prefix}${slugifyFilename(compressed.name)}`;
+      const { error } = await supabase.storage.from(bucket).upload(path, compressed, { upsert: true });
       if (!error) {
         urls.push(supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl);
       }
