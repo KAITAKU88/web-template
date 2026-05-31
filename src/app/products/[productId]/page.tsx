@@ -9,6 +9,7 @@ import Image from "next/image";
 import { StarRating } from "@/components/StarRating";
 import { FaqAccordion } from "@/components/FaqAccordion";
 import SocialProofToast from "@/components/SocialProofToast";
+import ImageCarousel from "@/components/ImageCarousel";
 
 const TYPE_LABEL: Record<string, string> = { notion: "Notion", google_sheet: "Google Sheets" };
 const TYPE_ICON: Record<string, string>  = { notion: "📓", google_sheet: "📊" };
@@ -191,38 +192,33 @@ export default async function ProductPage({ params }: Props) {
       {/* ══════════════════════════════════════════
           4. GIAO DIỆN THỰC TẾ
       ══════════════════════════════════════════ */}
-      <section className="mb-2 rounded-2xl border border-gray-100 bg-gray-50 p-6">
-        <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">Giao diện thực tế</span>
-        <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900">Nhìn thấy trước khi mua</h2>
+      {(product.gallery_images?.length > 0 || product.image_url) && (
+        <section className="mb-2 rounded-2xl border border-gray-100 bg-gray-50 p-6">
+          <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">Giao diện thực tế</span>
+          <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900">Nhìn thấy trước khi mua</h2>
 
-        {product.image_url ? (
-          <div className="overflow-hidden rounded-xl border-2 border-gray-200 shadow-md">
-            <div className="flex items-center gap-1.5 border-b border-gray-200 bg-white px-3 py-2">
-              <span className="h-3 w-3 rounded-full bg-red-400" />
-              <span className="h-3 w-3 rounded-full bg-amber-400" />
-              <span className="h-3 w-3 rounded-full bg-green-400" />
-              <span className="ml-2 flex-1 rounded bg-gray-100 px-3 py-1 text-xs text-gray-400">
-                notion.so / {product.name.toLowerCase().replace(/\s+/g, "-")}
-              </span>
-            </div>
-            <div className="relative aspect-video w-full bg-gray-100">
-              <Image src={product.image_url} alt={`Preview ${product.name}`} fill className="object-cover" unoptimized />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                <div className="flex flex-col items-center gap-2 text-white">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                    <span className="text-3xl">▶</span>
-                  </div>
-                  <span className="text-sm font-semibold">Xem demo thực tế</span>
-                </div>
+          {product.gallery_images?.length > 0 ? (
+            <ImageCarousel
+              images={product.gallery_images}
+              productName={product.name}
+            />
+          ) : product.image_url ? (
+            <div className="overflow-hidden rounded-xl border-2 border-gray-200 shadow-md">
+              <div className="flex items-center gap-1.5 border-b border-gray-200 bg-white px-3 py-2">
+                <span className="h-3 w-3 rounded-full bg-red-400" />
+                <span className="h-3 w-3 rounded-full bg-amber-400" />
+                <span className="h-3 w-3 rounded-full bg-green-400" />
+                <span className="ml-2 flex-1 rounded bg-gray-100 px-3 py-1 text-xs text-gray-400">
+                  notion.so / {product.name.toLowerCase().replace(/\s+/g, "-")}
+                </span>
+              </div>
+              <div className="relative aspect-video w-full bg-gray-100">
+                <Image src={product.image_url} alt={`Preview ${product.name}`} fill className="object-cover" unoptimized />
               </div>
             </div>
-          </div>
-        ) : (
-          <div className="flex h-48 items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-white text-gray-400">
-            <span>Preview sẽ có sớm</span>
-          </div>
-        )}
-      </section>
+          ) : null}
+        </section>
+      )}
 
       {/* ══════════════════════════════════════════
           5. ĐIỂM KHÁC BIỆT

@@ -7,6 +7,7 @@ import type { ProductCopy } from "@/lib/productContent";
 import type { Product } from "@/types";
 import LandingEditor from "@/components/LandingEditor";
 import ImageUploadField from "@/components/ImageUploadField";
+import MediaPicker from "@/components/MediaPicker";
 
 interface Category { id: string; name: string; }
 
@@ -34,6 +35,8 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
   const [downloadCount, setDownloadCount] = useState<number>(
     product?.download_count ?? Math.floor(Math.random() * 1451) + 50
   );
+  const [galleryImages, setGalleryImages] = useState<string[]>(product?.gallery_images ?? []);
+  const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
 
   function handleUseTemplate() {
     if (!formRef.current) return;
@@ -72,6 +75,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     if (landing) fd.set("landing_content", JSON.stringify(landing));
+    fd.set("gallery_images", JSON.stringify(galleryImages));
     startSave(async () => {
       await onSubmit(fd);
       setSaved(true);
@@ -217,6 +221,74 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
           </div>
         </div>
       </div>
+
+      {/* ── Thư viện ảnh thực tế ─────────────────────────────── */}
+      <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-800 flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-semibold text-white">Giao diện thực tế</h2>
+            <p className="mt-0.5 text-xs text-gray-500">Ảnh hiển thị dạng slideshow trên trang sản phẩm — khách bấm để xem toàn màn hình</p>
+          </div>
+          <button type="button" onClick={() => setGalleryPickerOpen(true)}
+            className="shrink-0 flex items-center gap-2 rounded-xl border border-dashed border-gray-600 px-4 py-2 text-xs font-medium text-gray-400 hover:border-emerald-500 hover:text-emerald-400 transition-colors">
+            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+            </svg>
+            Thêm ảnh
+          </button>
+        </div>
+        <div className="p-6">
+          {galleryImages.length === 0 ? (
+            <button type="button" onClick={() => setGalleryPickerOpen(true)}
+              className="flex w-full flex-col items-center gap-3 rounded-xl border-2 border-dashed border-gray-700 py-10 text-gray-600 hover:border-gray-500 hover:text-gray-400 transition-colors">
+              <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+              </svg>
+              <span className="text-sm">Upload ảnh hoặc chọn từ thư viện</span>
+            </button>
+          ) : (
+            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+              {galleryImages.map((url, i) => (
+                <div key={i} className="relative group aspect-video rounded-xl overflow-hidden border border-gray-700 bg-gray-800">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt={`Gallery ${i + 1}`} className="h-full w-full object-cover" />
+                  {/* Order badge */}
+                  <div className="absolute left-1.5 top-1.5 rounded-full bg-black/60 px-1.5 py-0.5 text-xs text-white font-mono">{i + 1}</div>
+                  {/* Remove button */}
+                  <button type="button"
+                    onClick={() => setGalleryImages((prev) => prev.filter((_, idx) => idx !== i))}
+                    className="absolute right-1 top-1 rounded-lg bg-black/60 p-1 text-white opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all">
+                    <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+              {/* Add more */}
+              <button type="button" onClick={() => setGalleryPickerOpen(true)}
+                className="aspect-video rounded-xl border-2 border-dashed border-gray-700 flex items-center justify-center text-gray-600 hover:border-gray-500 hover:text-gray-400 transition-colors">
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+              </button>
+            </div>
+          )}
+          <p className="mt-3 text-xs text-gray-600">Thứ tự ảnh từ trái sang phải = thứ tự slide. Kéo để sắp xếp lại (sắp có).</p>
+        </div>
+      </div>
+
+      {/* Gallery picker modal */}
+      {galleryPickerOpen && (
+        <MediaPicker
+          bucket="product-images"
+          folder="gallery"
+          onSelect={(url) => {
+            setGalleryImages((prev) => prev.includes(url) ? prev : [...prev, url]);
+          }}
+          onClose={() => setGalleryPickerOpen(false)}
+          multiSelect
+        />
+      )}
 
       {/* ── Landing Page Editor ───────────────────────────────── */}
       <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">

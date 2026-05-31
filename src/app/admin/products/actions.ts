@@ -164,6 +164,7 @@ export async function createProduct(formData: FormData) {
     download_count: Number(formData.get("download_count") ?? 0),
     landing_content: landing,
     label: (formData.get("label") as string) || null,
+    gallery_images: JSON.parse((formData.get("gallery_images") as string) || "[]"),
   });
 
   if (error) throw new Error(error.message);
@@ -188,6 +189,7 @@ export async function updateProduct(id: string, formData: FormData) {
     download_count: Number(formData.get("download_count") ?? 0),
     landing_content: landing,
     label: (formData.get("label") as string) || null,
+    gallery_images: JSON.parse((formData.get("gallery_images") as string) || "[]"),
   }).eq("id", id);
 
   if (error) throw new Error(error.message);

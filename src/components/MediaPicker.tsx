@@ -8,6 +8,7 @@ interface Props {
   bucket: string;
   folder?: string;
   accept?: string;
+  multiSelect?: boolean;
   onSelect: (url: string) => void;
   onClose: () => void;
 }
@@ -20,13 +21,14 @@ interface StorageFile {
   updatedAt: string;
 }
 
-export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,image/png,image/webp,image/gif", onSelect, onClose }: Props) {
+export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,image/png,image/webp,image/gif", multiSelect = false, onSelect, onClose }: Props) {
   const [tab, setTab] = useState<Tab>("upload");
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  const [multiSelected, setMultiSelected] = useState<Set<string>>(new Set());
 
   const supabase = createClient();
 
@@ -84,7 +86,21 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
   }
 
   function handleConfirmSelect() {
-    if (selected) { onSelect(selected); onClose(); }
+    if (multiSelect) {
+      multiSelected.forEach((url) => onSelect(url));
+      onClose();
+    } else if (selected) {
+      onSelect(selected);
+      onClose();
+    }
+  }
+
+  function toggleMultiSelect(url: string) {
+    setMultiSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(url)) next.delete(url); else next.add(url);
+      return next;
+    });
   }
 
   async function handleDelete(file: StorageFile) {
@@ -185,15 +201,15 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
                   {files.map((file) => (
                     <div key={file.name} className="relative group">
                       <button
-                        onClick={() => setSelected(selected === file.url ? null : file.url)}
+                        onClick={() => multiSelect ? toggleMultiSelect(file.url) : setSelected(selected === file.url ? null : file.url)}
                         className={`relative w-full aspect-square rounded-xl overflow-hidden border-2 transition-all ${
-                          selected === file.url
+                          (multiSelect ? multiSelected.has(file.url) : selected === file.url)
                             ? "border-emerald-500 ring-2 ring-emerald-500/30"
                             : "border-gray-700 hover:border-gray-500"
                         }`}
                       >
                         <Image src={file.url} alt={file.name} fill className="object-cover" unoptimized />
-                        {selected === file.url && (
+                        {(multiSelect ? multiSelected.has(file.url) : selected === file.url) && (
                           <div className="absolute inset-0 bg-emerald-500/20 flex items-center justify-center">
                             <div className="rounded-full bg-emerald-500 p-1">
                               <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -226,15 +242,17 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
         {tab === "library" && (
           <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-gray-800 shrink-0">
             <span className="text-xs text-gray-500">
-              {selected ? "Đã chọn 1 ảnh" : `${files.length} ảnh trong thư viện`}
+              {multiSelect
+                ? multiSelected.size > 0 ? `Đã chọn ${multiSelected.size} ảnh` : `${files.length} ảnh trong thư viện`
+                : selected ? "Đã chọn 1 ảnh" : `${files.length} ảnh trong thư viện`}
             </span>
             <div className="flex gap-2">
               <button onClick={onClose} className="rounded-xl border border-gray-700 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
                 Hủy
               </button>
-              <button onClick={handleConfirmSelect} disabled={!selected}
+              <button onClick={handleConfirmSelect} disabled={multiSelect ? multiSelected.size === 0 : !selected}
                 className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                Chọn ảnh này
+                {multiSelect && multiSelected.size > 0 ? `Thêm ${multiSelected.size} ảnh` : "Chọn ảnh này"}
               </button>
             </div>
           </div>
