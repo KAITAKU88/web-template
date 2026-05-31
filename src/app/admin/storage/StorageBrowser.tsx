@@ -59,11 +59,15 @@ export default function StorageBrowser() {
 
   useEffect(() => { load(); }, [load]);
 
-  const openFolder = (name: string) =>
+  const openFolder = (name: string) => {
     setFolder((f) => f ? `${f}/${name}` : name);
+    setSearch("");
+  };
 
-  const navigateTo = (idx: number) =>
+  const navigateTo = (idx: number) => {
     setFolder(breadcrumbs.slice(0, idx + 1).join("/"));
+    setSearch("");
+  };
 
   async function handleUpload(fileList: FileList) {
     const files = Array.from(fileList).filter((f) => f.type.startsWith("image/"));
@@ -141,7 +145,7 @@ export default function StorageBrowser() {
       {/* Bucket tabs */}
       <div className="flex gap-2 flex-wrap">
         {BUCKETS.map((b) => (
-          <button key={b.id} onClick={() => { setBucket(b.id); setFolder(""); }}
+          <button key={b.id} onClick={() => { setBucket(b.id); setFolder(""); setSearch(""); }}
             className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
               bucket === b.id ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-gray-800 text-gray-400 hover:text-white border border-transparent"
             }`}>
