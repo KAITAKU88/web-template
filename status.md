@@ -66,11 +66,24 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 ## Ngữ cảnh phiên làm việc hiện tại
 > Cập nhật tự động — dùng để tiếp tục nếu phiên bị ngắt
 
-**Trạng thái:** Marketing system hoàn thành. Các tác vụ 🟡 cần bạn thao tác thủ công (SePay webhook, Supabase webhook, custom domain).
+**Trạng thái (2026-05-31):** Phiên này đã hoàn thành 5 tasks lớn:
+- ✅ URL slug thay UUID trong checkout
+- ✅ Draft/Publish sản phẩm  
+- ✅ Trang Khách hàng + nhóm khách hàng
+- ✅ Link bảo vệ tải template có thời hạn
+- ✅ Automation rules + Marketing lên lịch theo sự kiện
 
 ---
 
 ## Việc cần làm tiếp
+
+### ✅ Đã hoàn thành trong phiên 2026-05-31
+- ✅ URL slug thay UUID trong checkout — `/products/{slug}` và `/checkout/{slug}`
+- ✅ Draft/Publish sản phẩm — mặc định draft khi tạo mới, nút toggle trong admin
+- ✅ Trang Khách hàng (`/admin/customers`) — aggregate từ orders, tạo nhóm, lọc, sắp xếp
+- ✅ Link bảo vệ tải template — token có thời hạn + giới hạn lượt truy cập
+- ✅ Automation rules — tự động gửi email theo sự kiện (4 loại sự kiện, delay, nhóm)
+- ✅ Marketing lên lịch — gửi ngay hoặc đặt giờ, nhắm theo nhóm KH
 
 ### 🔴 Ưu tiên cao
 - ✅ **Abandoned Cart Email** — hoàn chỉnh
@@ -120,13 +133,17 @@ https://web-template-cloudflare.thankful-to-all-88.workers.dev
 - **SePay Webhook URL** cấu hình trực tiếp trên SePay Dashboard — không phải trong Admin app
 
 
-
-1. Phần tiêu đề website, hiện tại chưa cho phép tùy chỉnh, hiện tại ngoài tên Brand như TemplateStores thì phần Template Notion & Google Sheets 
 2. Hiện tại làm cách nào để tùy chỉnh nội dung email, gửi nhiều kịch bản email khác nhau:
 - Khi khách mua thành công => Gửi email xác nhận đơn hàng và thanh toán thành công, gửi link tải, gửi link zalo nhóm (cần hỏi gì vào nhóm hỏi)
 - Khi khách bấm mua nhưng không thanh toán thành công => Gửi email thông báo, nhắc nhở
 ...
-3. Hiện tại khi khách mua combo (tích chọn vào upsell) khi thanh toán thì gửi link như thế nào, nút tải template gồm mấy nút, phần đơn hàng trong bảng dashboard thì ghi tách riêng ra chứ, ví dụ khách mua Template A, kèm theo template B (được giảm 50% khi upsell) thì sẽ cần 2 dòng khác nhau trong bảng đơn hàng, có mã đơn hàng giống nhau.
-4. Cũng chưa có tính năng tạo mã giảm giá cho từng sản phẩm.
+
 5. Trường hợp khách mua mà gửi email bị lỗi (hệ thống không gửi được email) thì xử lý như thế nào . Resend sẽ tự kích hoạt 1 email gửi lại 3 lần, rồi nếu vẫn không được thì sẽ gửi 1 email báo cáo đến email cá nhân hay là thế nào. Trường hợp này có cách nào để Quản trị viên vào trong dashboard chọn 1 hoặc nhiều sản phẩm (lúc này sẽ xuất hiện nút Send to Email) và gửi đến email, cho phép chọn trong danh sách email của khách hàng và gửi, sẽ gửi dưới danh nghĩa là email tùy chỉnh theo tên miền như support@templatestores.com
-6. Hiện tại chưa cho phép chủ động gắn Label như "Hot", "Bestseller" kèm theo icon, có cách nào để khi tạo sản phẩm có thêm 1 trường dữ liệu là label, có 1 loạt các label tạo sẵn kèm icon đẹp mắt, có thể cho  phép tạo thêm label nếu muốn.
+
+====Nội dung tiếp theo cần làm (đã hoàn thành 2026-05-31):
+- ✅ 0. URL slug thay UUID
+- ✅ 1. Khách hàng dashboard  
+- ✅ 2. Automation rules
+- ✅ 3. Marketing lên lịch/sự kiện
+- ✅ 4. Draft/Publish sản phẩm
+- ✅ 5. Link bảo vệ tải template có thời hạn
