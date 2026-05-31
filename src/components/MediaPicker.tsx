@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import { slugifyFilename } from "@/lib/utils";
 
 interface Props {
   bucket: string;
@@ -26,6 +27,7 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
   const [dragOver, setDragOver] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [multiSelected, setMultiSelected] = useState<Set<string>>(new Set());
@@ -53,36 +55,39 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
     if (tab === "library") loadLibrary();
   }, [tab, loadLibrary]);
 
-  async function handleUpload(file: File) {
+  async function handleUpload(fileList: File[]) {
+    const images = fileList.filter((f) => f.type.startsWith("image/"));
+    if (!images.length) return;
     setUploading(true);
-    try {
-      const ext = file.name.split(".").pop() ?? "bin";
+    setUploadProgress({ done: 0, total: images.length });
+    const urls: string[] = [];
+    for (const file of images) {
       const prefix = folder ? `${folder}/` : "";
-      const path = `${prefix}${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = `${prefix}${slugifyFilename(file.name)}`;
       const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true });
-      if (error) throw error;
-      const { data } = supabase.storage.from(bucket).getPublicUrl(path);
-      onSelect(data.publicUrl);
-      onClose();
-    } catch (err) {
-      console.error(err);
-      alert(`Upload thất bại. Kiểm tra bucket '${bucket}' đã được tạo chưa.`);
-    } finally {
-      setUploading(false);
+      if (!error) {
+        urls.push(supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl);
+      }
+      setUploadProgress((p) => ({ ...p, done: p.done + 1 }));
     }
+    setUploading(false);
+    if (!urls.length) {
+      alert(`Upload thất bại. Kiểm tra bucket '${bucket}' đã được tạo chưa.`);
+      return;
+    }
+    urls.forEach((url) => onSelect(url));
+    onClose();
   }
 
   function handleFileInput(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (file) handleUpload(file);
+    if (e.target.files?.length) handleUpload(Array.from(e.target.files));
     e.target.value = "";
   }
 
   function handleDrop(e: React.DragEvent) {
     e.preventDefault();
     setDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file && file.type.startsWith("image/")) handleUpload(file);
+    if (e.dataTransfer.files?.length) handleUpload(Array.from(e.dataTransfer.files));
   }
 
   function handleConfirmSelect() {
@@ -162,7 +167,9 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
               {uploading ? (
                 <div className="flex flex-col items-center gap-3">
                   <div className="h-8 w-8 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
-                  <p className="text-sm text-gray-400">Đang upload…</p>
+                  <p className="text-sm text-gray-400">
+                    Đang upload {uploadProgress.done}/{uploadProgress.total} ảnh…
+                  </p>
                 </div>
               ) : (
                 <>
@@ -173,12 +180,12 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-300">Kéo thả ảnh vào đây</p>
-                    <p className="mt-1 text-xs text-gray-500">hoặc click để chọn file từ máy tính</p>
-                    <p className="mt-2 text-xs text-gray-600">JPG, PNG, WebP, GIF — tối đa 3 MB</p>
+                    <p className="mt-1 text-xs text-gray-500">hoặc click để chọn — có thể chọn nhiều ảnh cùng lúc</p>
+                    <p className="mt-2 text-xs text-gray-600">JPG, PNG, WebP, GIF — tối đa 3 MB/ảnh</p>
                   </div>
                 </>
               )}
-              <input type="file" accept={accept} className="hidden" disabled={uploading} onChange={handleFileInput} />
+              <input type="file" accept={accept} multiple className="hidden" disabled={uploading} onChange={handleFileInput} />
             </label>
           )}
 

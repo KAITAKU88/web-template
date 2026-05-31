@@ -3,6 +3,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import { slugifyFilename } from "@/lib/utils";
 
 const BUCKETS = [
   { id: "product-images", label: "Ảnh sản phẩm", icon: "🖼️" },
@@ -30,6 +31,8 @@ export default function StorageBrowser() {
   const [showNewFolder, setShowNewFolder] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
+  const [folderError, setFolderError] = useState("");
+  const [search, setSearch] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
@@ -69,9 +72,8 @@ export default function StorageBrowser() {
     setUploadProgress(0);
     let done = 0;
     for (const file of files) {
-      const ext = file.name.split(".").pop() ?? "bin";
       const prefix = folder ? `${folder}/` : "";
-      const path = `${prefix}${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = `${prefix}${slugifyFilename(file.name)}`;
       await supabase.storage.from(bucket).upload(path, file, { upsert: true });
       done++;
       setUploadProgress(Math.round((done / files.length) * 100));
@@ -81,11 +83,20 @@ export default function StorageBrowser() {
   }
 
   async function handleCreateFolder() {
-    if (!newFolderName.trim()) return;
+    const name = newFolderName.trim();
+    if (!name) return;
+    setFolderError("");
     const prefix = folder ? `${folder}/` : "";
-    const path = `${prefix}${newFolderName.trim()}/.emptyFolderPlaceholder`;
-    await supabase.storage.from(bucket).upload(path, new Blob([""]), { upsert: true });
-    setNewFolderName(""); setShowNewFolder(false);
+    const path = `${prefix}${name}/.emptyFolderPlaceholder`;
+    const { error } = await supabase.storage
+      .from(bucket)
+      .upload(path, new Blob(["placeholder"], { type: "text/plain" }), { upsert: true });
+    if (error) {
+      setFolderError(error.message);
+      return;
+    }
+    setNewFolderName("");
+    setShowNewFolder(false);
     load();
   }
 
@@ -121,6 +132,10 @@ export default function StorageBrowser() {
     await navigator.clipboard.writeText(url);
   }
 
+  const visible = search.trim()
+    ? files.filter((f) => f.name.toLowerCase().includes(search.toLowerCase()))
+    : files;
+
   return (
     <div className="space-y-4">
       {/* Bucket tabs */}
@@ -152,6 +167,18 @@ export default function StorageBrowser() {
           ))}
         </div>
 
+        {/* Search */}
+        <div className="relative shrink-0">
+          <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-500 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
+          </svg>
+          <input
+            value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="Tìm theo tên..."
+            className="w-40 rounded-xl border border-gray-700 bg-gray-800 pl-8 pr-3 py-1.5 text-xs text-white outline-none focus:border-emerald-500 placeholder:text-gray-600"
+          />
+        </div>
+
         {/* Actions */}
         <div className="flex items-center gap-2 shrink-0">
           {selected.size > 0 && (
@@ -165,21 +192,24 @@ export default function StorageBrowser() {
           )}
 
           {showNewFolder ? (
-            <div className="flex items-center gap-1">
-              <input value={newFolderName} onChange={(e) => setNewFolderName(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleCreateFolder()}
-                placeholder="Tên thư mục" autoFocus
-                className="w-32 rounded-xl border border-gray-700 bg-gray-800 px-2.5 py-1.5 text-xs text-white outline-none focus:border-emerald-500" />
-              <button onClick={handleCreateFolder} className="rounded-lg bg-emerald-500/20 p-1.5 text-emerald-400 hover:bg-emerald-500/30">
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                </svg>
-              </button>
-              <button onClick={() => { setShowNewFolder(false); setNewFolderName(""); }} className="rounded-lg p-1.5 text-gray-500 hover:text-white">
-                <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-1">
+                <input value={newFolderName} onChange={(e) => { setNewFolderName(e.target.value); setFolderError(""); }}
+                  onKeyDown={(e) => e.key === "Enter" && handleCreateFolder()}
+                  placeholder="Tên thư mục" autoFocus
+                  className={`w-32 rounded-xl border bg-gray-800 px-2.5 py-1.5 text-xs text-white outline-none focus:border-emerald-500 ${folderError ? "border-red-500" : "border-gray-700"}`} />
+                <button type="button" onClick={handleCreateFolder} className="rounded-lg bg-emerald-500/20 p-1.5 text-emerald-400 hover:bg-emerald-500/30">
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </button>
+                <button type="button" onClick={() => { setShowNewFolder(false); setNewFolderName(""); setFolderError(""); }} className="rounded-lg p-1.5 text-gray-500 hover:text-white">
+                  <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              {folderError && <p className="text-xs text-red-400 ml-0.5">{folderError}</p>}
             </div>
           ) : (
             <button onClick={() => setShowNewFolder(true)}
@@ -233,16 +263,22 @@ export default function StorageBrowser() {
               <p className="text-xs mt-1">hoặc dùng nút Upload ở trên</p>
             </div>
           </div>
+        ) : visible.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 py-20 text-gray-600">
+            <p className="text-sm text-gray-500">Không tìm thấy ảnh nào với từ khóa <span className="text-gray-300">&quot;{search}&quot;</span></p>
+            <button onClick={() => setSearch("")} className="text-xs text-emerald-400 hover:text-emerald-300">Xóa tìm kiếm</button>
+          </div>
         ) : view === "grid" ? (
           <div className="p-4">
             {/* Select all */}
             <div className="mb-3 flex items-center gap-2">
               <button onClick={toggleAll} className="text-xs text-gray-500 hover:text-gray-300 transition-colors">
-                {selected.size === files.length ? "Bỏ chọn tất cả" : `Chọn tất cả (${files.length})`}
+                {selected.size === files.length ? "Bỏ chọn tất cả" : `Chọn tất cả (${visible.length})`}
               </button>
+              {search && <span className="text-xs text-gray-600">— {visible.length} kết quả</span>}
             </div>
             <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 gap-3">
-              {files.map((file) => (
+              {visible.map((file) => (
                 <div key={file.name} className="relative group">
                   {file.isFolder ? (
                     <button onClick={() => openFolder(file.name)}
@@ -291,7 +327,7 @@ export default function StorageBrowser() {
               <tr className="border-b border-gray-800 text-xs text-gray-500">
                 <th className="px-4 py-2 text-left w-8">
                   <input type="checkbox" checked={selected.size === files.length && files.length > 0} onChange={toggleAll}
-                    className="rounded accent-emerald-500" />
+                    className="rounded accent-emerald-500" title="Chọn tất cả" />
                 </th>
                 <th className="px-4 py-2 text-left">Tên</th>
                 <th className="px-4 py-2 text-right">Dung lượng</th>
@@ -300,7 +336,7 @@ export default function StorageBrowser() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800/60">
-              {files.map((file) => (
+              {visible.map((file) => (
                 <tr key={file.name} className="hover:bg-gray-800/30 transition-colors">
                   <td className="px-4 py-2">
                     {!file.isFolder && (
