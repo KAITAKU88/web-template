@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useState, useRef } from "react";
+import { useTransition, useState, useRef, useEffect } from "react";
 import { generateLandingContent } from "./actions";
 import { buildDefaultLanding } from "@/lib/landingTemplate";
 import type { ProductCopy } from "@/lib/productContent";
@@ -35,8 +35,25 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
   const [downloadCount, setDownloadCount] = useState<number>(
     product?.download_count ?? Math.floor(Math.random() * 1451) + 50
   );
-  const [galleryImages, setGalleryImages] = useState<string[]>(product?.gallery_images ?? []);
+  const [isDirty, setIsDirty] = useState(false);
+  const [galleryImages, setGalleryImagesRaw] = useState<string[]>(product?.gallery_images ?? []);
+  const setGalleryImages: typeof setGalleryImagesRaw = (v) => { setIsDirty(true); setGalleryImagesRaw(v); };
   const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
+
+  // Cảnh báo khi đóng/refresh tab mà chưa lưu
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = ""; };
+    if (isDirty) window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [isDirty]);
+
+  // Expose dirty state để Sidebar có thể chặn navigation
+  useEffect(() => {
+    (window as Window & { __adminProductDirty?: boolean }).__adminProductDirty = isDirty;
+    return () => {
+      (window as Window & { __adminProductDirty?: boolean }).__adminProductDirty = false;
+    };
+  }, [isDirty]);
 
   function handleUseTemplate() {
     if (!formRef.current) return;
@@ -47,6 +64,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
     const category = (fd.get("type") as string) || "notion";
     const description = (fd.get("description") as string) || "";
     setLanding(buildDefaultLanding(name, category, description));
+    setIsDirty(true);
   }
 
   function handleGenerate() {
@@ -65,6 +83,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
           fd.get("audience") as string ?? "",
         );
         setLanding(content);
+        setIsDirty(true);
       } catch (e) {
         setGenError(e instanceof Error ? e.message : "Lỗi khi gọi AI. Thử dùng Template mặc định.");
       }
@@ -78,13 +97,14 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
     fd.set("gallery_images", JSON.stringify(galleryImages));
     startSave(async () => {
       await onSubmit(fd);
+      setIsDirty(false);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     });
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
+    <form ref={formRef} onSubmit={handleSubmit} onChange={() => setIsDirty(true)} className="space-y-6">
 
       {/* ── Thông tin cơ bản ─────────────────────────────────── */}
       <div className="rounded-2xl border border-gray-800 bg-gray-900 overflow-hidden">
@@ -376,22 +396,36 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
       </div>
 
       {/* ── Submit ────────────────────────────────────────────── */}
-      <div className="flex items-center gap-4">
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-xl bg-emerald-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-emerald-400 disabled:opacity-50 transition-colors"
-        >
-          {saving ? "Đang lưu…" : submitLabel}
-        </button>
-        {saved && (
-          <span className="flex items-center gap-1.5 text-sm text-emerald-400">
-            <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15 3.293 9.879a1 1 0 111.414-1.414L8.414 12.172l6.879-6.879a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-            Đã lưu
-          </span>
-        )}
+      <div className={`sticky bottom-0 -mx-0 rounded-2xl transition-all duration-300 ${
+        isDirty ? "bg-gray-950/95 backdrop-blur border border-emerald-500/30 px-6 py-4 shadow-xl shadow-emerald-900/20" : "px-0 py-2"
+      }`}>
+        <div className="flex items-center gap-4">
+          <button
+            type="submit"
+            disabled={saving}
+            className={`rounded-xl px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 ${
+              isDirty && !saving
+                ? "bg-emerald-500 hover:bg-emerald-400 shadow-lg shadow-emerald-500/30"
+                : "bg-emerald-500/30 cursor-not-allowed"
+            }`}
+          >
+            {saving ? "Đang lưu…" : submitLabel}
+          </button>
+          {isDirty && !saving && (
+            <span className="text-xs text-amber-400 flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
+              Có thay đổi chưa lưu
+            </span>
+          )}
+          {saved && (
+            <span className="flex items-center gap-1.5 text-sm text-emerald-400">
+              <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15 3.293 9.879a1 1 0 111.414-1.414L8.414 12.172l6.879-6.879a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              Đã lưu thành công
+            </span>
+          )}
+        </div>
       </div>
     </form>
   );

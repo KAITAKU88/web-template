@@ -106,16 +106,34 @@ export default function AdminSidebar({
     window.location.href = "/admin/login";
   }
 
-  // Chặn navigation khi đang có unsaved changes trên trang Settings
+  // Chặn navigation khi đang có unsaved changes
   function handleNavClick(e: React.MouseEvent<HTMLAnchorElement>, href: string) {
+    type DirtyWindow = Window & {
+      __adminSettingsDirty?: boolean;
+      __adminProductDirty?: boolean;
+    };
+    const w = typeof window !== "undefined" ? window as DirtyWindow : null;
+    if (!w) return;
+
     const settingsPath = `${basePath}/settings`;
+    const productsPath = `${basePath}/products`;
+
     const leavingSettings = pathname.startsWith(settingsPath) && !href.startsWith(settingsPath);
-    const dirty = typeof window !== "undefined" &&
-      (window as Window & { __adminSettingsDirty?: boolean }).__adminSettingsDirty;
-    if (leavingSettings && dirty) {
+    const leavingProduct  = pathname.startsWith(productsPath) && !href.startsWith(productsPath);
+
+    if (leavingSettings && w.__adminSettingsDirty) {
       e.preventDefault();
       if (window.confirm("Bạn có thay đổi chưa được lưu.\nRời khỏi trang Cấu hình không?")) {
-        (window as Window & { __adminSettingsDirty?: boolean }).__adminSettingsDirty = false;
+        w.__adminSettingsDirty = false;
+        router.push(href);
+      }
+      return;
+    }
+
+    if (leavingProduct && w.__adminProductDirty) {
+      e.preventDefault();
+      if (window.confirm("Bạn có thay đổi chưa được lưu.\nRời khỏi trang Sản phẩm không?")) {
+        w.__adminProductDirty = false;
         router.push(href);
       }
     }
