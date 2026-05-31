@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 
 interface Product { id: string; name: string; }
+interface Group { id: string; name: string; }
 interface Campaign {
   id?: string; name: string; subject: string; html_body: string;
-  segment: string; status: string;
+  segment: string; status: string; scheduled_at?: string | null; target_group_id?: string | null;
 }
 
 // Template mẫu cho email marketing
@@ -63,10 +64,12 @@ const textareaCls = `${inputCls} resize-none`;
 export default function CampaignForm({
   campaign,
   products,
+  groups,
   recipientPreview,
 }: {
   campaign?: Campaign;
   products: Product[];
+  groups?: Group[];
   recipientPreview: Record<string, number>;
 }) {
   const router = useRouter();
@@ -76,10 +79,13 @@ export default function CampaignForm({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const [name,    setName]    = useState(campaign?.name    ?? "");
-  const [subject, setSubject] = useState(campaign?.subject ?? "");
-  const [body,    setBody]    = useState(campaign?.html_body ?? TEMPLATES[0].body);
-  const [segment, setSegment] = useState(campaign?.segment  ?? "all");
+  const [name,        setName]        = useState(campaign?.name    ?? "");
+  const [subject,     setSubject]     = useState(campaign?.subject ?? "");
+  const [body,        setBody]        = useState(campaign?.html_body ?? TEMPLATES[0].body);
+  const [segment,     setSegment]     = useState(campaign?.segment  ?? "all");
+  const [groupId,     setGroupId]     = useState(campaign?.target_group_id ?? "");
+  const [sendMode,    setSendMode]    = useState<"now" | "schedule">("now");
+  const [scheduledAt, setScheduledAt] = useState("");
 
   const isDraft = !campaign || campaign.status === "draft";
   const recipientCount = recipientPreview[segment] ?? 0;
@@ -102,13 +108,19 @@ export default function CampaignForm({
     }
     if (andSend) setSending(true); else setSaving(true);
     try {
+      const action = andSend
+        ? (sendMode === "schedule" && scheduledAt ? "schedule" : "send")
+        : "save";
+
       const res = await fetch("/api/marketing/campaigns", {
         method: campaign?.id ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: campaign?.id,
           name, subject, html_body: body, segment,
-          action: andSend ? "send" : "save",
+          action,
+          scheduled_at: action === "schedule" ? scheduledAt : null,
+          target_group_id: groupId || null,
         }),
       });
       const data = await res.json();
@@ -170,18 +182,37 @@ export default function CampaignForm({
         </div>
 
         <div className="space-y-1.5">
-          <label className="text-xs font-medium text-gray-400">Phân khúc khách hàng</label>
-          <select value={segment} onChange={(e) => setSegment(e.target.value)}
-            className={inputCls}>
-            <option value="all">Tất cả khách hàng ({recipientPreview.all ?? 0} người)</option>
-            <option value="recent_30d">Mua trong 30 ngày ({recipientPreview.recent_30d ?? 0} người)</option>
-            {products.map((p) => (
-              <option key={p.id} value={`product:${p.id}`}>
-                Người mua: {p.name} ({recipientPreview[`product:${p.id}`] ?? 0} người)
-              </option>
-            ))}
-          </select>
-          <p className="text-xs text-gray-600">Sẽ gửi đến ~{recipientCount} email</p>
+          <label className="text-xs font-medium text-gray-400">Gửi đến</label>
+          {groups && groups.length > 0 && (
+            <div className="flex gap-2 mb-2">
+              <button type="button" onClick={() => setGroupId("")}
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${!groupId ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+                Theo segment
+              </button>
+              <button type="button" onClick={() => setGroupId(groups[0]?.id ?? "")}
+                className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${groupId ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-800 text-gray-400 hover:bg-gray-700"}`}>
+                Theo nhóm khách hàng
+              </button>
+            </div>
+          )}
+          {!groupId ? (
+            <select value={segment} onChange={(e) => setSegment(e.target.value)} className={inputCls}>
+              <option value="all">Tất cả khách hàng ({recipientPreview.all ?? 0} người)</option>
+              <option value="recent_30d">Mua trong 30 ngày ({recipientPreview.recent_30d ?? 0} người)</option>
+              {products.map((p) => (
+                <option key={p.id} value={`product:${p.id}`}>
+                  Người mua: {p.name} ({recipientPreview[`product:${p.id}`] ?? 0} người)
+                </option>
+              ))}
+            </select>
+          ) : (
+            <select value={groupId} onChange={(e) => setGroupId(e.target.value)} className={inputCls}>
+              {(groups ?? []).map((g) => (
+                <option key={g.id} value={g.id}>{g.name}</option>
+              ))}
+            </select>
+          )}
+          <p className="text-xs text-gray-600">Sẽ gửi đến ~{groupId ? "?" : recipientCount} email</p>
         </div>
 
         <div className="space-y-1.5">
@@ -208,24 +239,50 @@ export default function CampaignForm({
         {success && <p className="rounded-xl bg-emerald-500/10 px-4 py-2.5 text-sm text-emerald-400">{success}</p>}
 
         {isDraft && (
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={() => handleSave(false)}
-              disabled={saving || sending || !!success}
-              className="flex-1 rounded-xl border border-gray-700 py-2.5 text-sm font-medium text-gray-300 hover:border-gray-600 hover:text-white transition-colors disabled:opacity-50"
-            >
-              {saving ? "Đang lưu..." : "Lưu nháp"}
-            </button>
-            <button
-              type="button"
-              onClick={() => handleSave(true)}
-              disabled={saving || sending || !!success || recipientCount === 0}
-              className="flex-1 rounded-xl bg-emerald-500 py-2.5 text-sm font-semibold text-white hover:bg-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {sending ? "Đang gửi..." : `Gửi ngay → ${recipientCount} người`}
-            </button>
-          </div>
+          <>
+            {/* Chế độ gửi */}
+            <div className="flex gap-2">
+              {(["now", "schedule"] as const).map((mode) => (
+                <button key={mode} type="button" onClick={() => setSendMode(mode)}
+                  className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-colors ${
+                    sendMode === mode ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  }`}>
+                  {mode === "now" ? "⚡ Gửi ngay" : "📅 Lên lịch"}
+                </button>
+              ))}
+            </div>
+            {sendMode === "schedule" && (
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-400">Thời gian gửi</label>
+                <input
+                  type="datetime-local"
+                  value={scheduledAt}
+                  onChange={(e) => setScheduledAt(e.target.value)}
+                  min={new Date().toISOString().slice(0, 16)}
+                  className={inputCls}
+                />
+                <p className="text-xs text-gray-600">Cron job tự động gửi vào thời điểm này (mỗi 5 phút check 1 lần)</p>
+              </div>
+            )}
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => handleSave(false)}
+                disabled={saving || sending || !!success}
+                className="flex-1 rounded-xl border border-gray-700 py-2.5 text-sm font-medium text-gray-300 hover:border-gray-600 hover:text-white transition-colors disabled:opacity-50"
+              >
+                {saving ? "Đang lưu..." : "Lưu nháp"}
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSave(true)}
+                disabled={saving || sending || !!success || (sendMode === "now" && recipientCount === 0) || (sendMode === "schedule" && !scheduledAt)}
+                className="flex-1 rounded-xl bg-emerald-500 py-2.5 text-sm font-semibold text-white hover:bg-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {sending ? "Đang gửi..." : sendMode === "schedule" ? `Lên lịch gửi` : `Gửi ngay → ${recipientCount} người`}
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>

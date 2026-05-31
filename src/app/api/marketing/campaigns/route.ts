@@ -11,8 +11,11 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { name, subject, html_body, segment, action } = body as {
-    name: string; subject: string; html_body: string; segment: string; action: "save" | "send";
+  const { name, subject, html_body, segment, action, scheduled_at, target_group_id } = body as {
+    name: string; subject: string; html_body: string; segment: string;
+    action: "save" | "send" | "schedule";
+    scheduled_at?: string | null;
+    target_group_id?: string | null;
   };
 
   if (!name?.trim() || !subject?.trim() || !html_body?.trim()) {
@@ -22,16 +25,22 @@ export async function POST(req: NextRequest) {
   const supabase = createAdminClient();
 
   // Lưu nháp trước
+  const insertData: Record<string, unknown> = {
+    name: name.trim(), subject: subject.trim(), html_body, segment, status: "draft",
+  };
+  if (scheduled_at) insertData.scheduled_at = scheduled_at;
+  if (target_group_id) insertData.target_group_id = target_group_id;
+
   const { data: campaign, error: insertError } = await supabase
-    .from("email_campaigns")
-    .insert({ name: name.trim(), subject: subject.trim(), html_body, segment, status: "draft" })
-    .select("id")
-    .single();
+    .from("email_campaigns").insert(insertData).select("id").single();
 
   if (insertError || !campaign) {
     return NextResponse.json({ error: insertError?.message ?? "DB error" }, { status: 500 });
   }
 
+  if (action === "schedule" && scheduled_at) {
+    return NextResponse.json({ id: campaign.id, status: "scheduled", scheduled_at });
+  }
   if (action !== "send") {
     return NextResponse.json({ id: campaign.id, status: "draft" });
   }
@@ -85,15 +94,26 @@ async function sendCampaign(campaignId: string, req: NextRequest) {
   if (!campaign) return NextResponse.json({ error: "Campaign không tồn tại." }, { status: 404 });
 
   // Lấy danh sách email theo segment
-  let emailQuery = supabase.from("orders").select("customer_email, product_id").eq("status", "success");
-  if (campaign.segment === "recent_30d") {
-    emailQuery = emailQuery.gte("paid_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
-  } else if (campaign.segment.startsWith("product:")) {
-    const pid = campaign.segment.replace("product:", "");
-    emailQuery = emailQuery.eq("product_id", pid);
+  let uniqueEmails: string[] = [];
+
+  if (campaign.target_group_id) {
+    // Gửi theo nhóm khách hàng
+    const { data: members } = await supabase
+      .from("customer_group_members")
+      .select("email")
+      .eq("group_id", campaign.target_group_id);
+    uniqueEmails = (members ?? []).map((m: { email: string }) => m.email);
+  } else {
+    let emailQuery = supabase.from("orders").select("customer_email, product_id").eq("status", "success");
+    if (campaign.segment === "recent_30d") {
+      emailQuery = emailQuery.gte("paid_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+    } else if (campaign.segment.startsWith("product:")) {
+      const pid = campaign.segment.replace("product:", "");
+      emailQuery = emailQuery.eq("product_id", pid);
+    }
+    const { data: orders } = await emailQuery;
+    uniqueEmails = [...new Set((orders ?? []).map((o: { customer_email: string }) => o.customer_email))];
   }
-  const { data: orders } = await emailQuery;
-  const uniqueEmails = [...new Set((orders ?? []).map((o: { customer_email: string }) => o.customer_email))];
 
   if (uniqueEmails.length === 0) {
     return NextResponse.json({ error: "Không có email nào trong phân khúc này." }, { status: 400 });

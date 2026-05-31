@@ -4,12 +4,13 @@ import CampaignForm from "../CampaignForm";
 export default async function NewCampaignPage() {
   const supabase = createAdminClient();
 
-  const [{ data: products }, { data: allOrders }, { data: recentOrders }] = await Promise.all([
+  const [{ data: products }, { data: allOrders }, { data: recentOrders }, { data: groups }] = await Promise.all([
     supabase.from("products").select("id, name").order("name"),
     supabase.from("orders").select("customer_email, product_id").eq("status", "success"),
     supabase.from("orders").select("customer_email")
       .eq("status", "success")
       .gte("paid_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+    supabase.from("customer_groups").select("id, name").order("created_at"),
   ]);
 
   // Tính số người nhận theo từng segment
@@ -31,6 +32,7 @@ export default async function NewCampaignPage() {
   return (
     <CampaignForm
       products={products ?? []}
+      groups={groups ?? []}
       recipientPreview={recipientPreview}
     />
   );

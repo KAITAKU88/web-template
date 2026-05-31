@@ -42,6 +42,7 @@ export default {
     await Promise.all([
       runCron("/api/cron/expire-orders", env, ctx),
       runCron("/api/cron/abandoned-cart", env, ctx),
+      runCron("/api/cron/scheduled-campaigns", env, ctx),
     ]);
   },
 } satisfies ExportedHandler<Env>;
