@@ -122,7 +122,7 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 shrink-0">
           <h2 className="text-base font-semibold text-white">Chọn ảnh</h2>
-          <button onClick={onClose} className="rounded-lg p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 transition-colors">
+          <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 transition-colors">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -135,7 +135,7 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
             { key: "upload" as Tab, label: "Upload mới" },
             { key: "library" as Tab, label: "Thư viện" },
           ].map((t) => (
-            <button key={t.key} onClick={() => setTab(t.key)}
+            <button type="button" key={t.key} onClick={() => setTab(t.key)}
               className={`rounded-xl px-4 py-1.5 text-sm font-medium transition-colors ${
                 tab === t.key ? "bg-emerald-500/20 text-emerald-400" : "text-gray-500 hover:text-gray-300"
               }`}>
@@ -192,7 +192,7 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
               ) : files.length === 0 ? (
                 <div className="py-12 text-center text-gray-500 text-sm">
                   Chưa có ảnh nào trong thư viện.
-                  <button onClick={() => setTab("upload")} className="block mx-auto mt-3 text-emerald-400 hover:text-emerald-300 text-xs underline">
+                  <button type="button" onClick={() => setTab("upload")} className="block mx-auto mt-3 text-emerald-400 hover:text-emerald-300 text-xs underline">
                     Upload ảnh đầu tiên →
                   </button>
                 </div>
@@ -201,6 +201,7 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
                   {files.map((file) => (
                     <div key={file.name} className="relative group">
                       <button
+                        type="button"
                         onClick={() => multiSelect ? toggleMultiSelect(file.url) : setSelected(selected === file.url ? null : file.url)}
                         className={`relative w-full aspect-square rounded-xl overflow-hidden border-2 transition-all ${
                           (multiSelect ? multiSelected.has(file.url) : selected === file.url)
@@ -221,6 +222,7 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
                       </button>
                       {/* Delete button */}
                       <button
+                        type="button"
                         onClick={() => handleDelete(file)}
                         className="absolute top-1 right-1 rounded-lg bg-black/60 p-1 text-gray-300 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all"
                         title="Xóa ảnh"
@@ -247,10 +249,10 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
                 : selected ? "Đã chọn 1 ảnh" : `${files.length} ảnh trong thư viện`}
             </span>
             <div className="flex gap-2">
-              <button onClick={onClose} className="rounded-xl border border-gray-700 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
+              <button type="button" onClick={onClose} className="rounded-xl border border-gray-700 px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors">
                 Hủy
               </button>
-              <button onClick={handleConfirmSelect} disabled={multiSelect ? multiSelected.size === 0 : !selected}
+              <button type="button" onClick={handleConfirmSelect} disabled={multiSelect ? multiSelected.size === 0 : !selected}
                 className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                 {multiSelect && multiSelected.size > 0 ? `Thêm ${multiSelected.size} ảnh` : "Chọn ảnh này"}
               </button>
