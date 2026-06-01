@@ -45,6 +45,10 @@ tsconfig.tsbuildinfo
 
 # Local working files
 todolist.md
+
+# Design assets (không phải source code — dùng cục bộ)
+*.zip
+Running Cat.json
 thamkhao.html
 thietke.md
 *.deb
