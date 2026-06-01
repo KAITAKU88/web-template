@@ -2,6 +2,19 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes squirrel-sway {
+  0%   { transform: rotate(-12deg) translateY(0px); }
+  25%  { transform: rotate(-4deg)  translateY(-3px); }
+  75%  { transform: rotate(4deg)   translateY(-3px); }
+  100% { transform: rotate(12deg)  translateY(0px); }
+}
+
+.squirrel-dance {
+  display: inline-block;
+  transform-origin: bottom center;
+  animation: squirrel-sway 0.9s ease-in-out infinite alternate;
+}
+
 /* Brand color CSS variable — overridden by root layout from DB settings */
 :root {
   --brand: #16a34a;

@@ -184,10 +184,6 @@ export default function ProductGrid({ products, categories = [] }: { products: P
             return (
               <div key={product.id} className="group relative card flex flex-col overflow-visible transition-all duration-300 ease-out hover:-translate-y-3 hover:shadow-2xl hover:shadow-emerald-300/40 dark:hover:shadow-emerald-500/20 dark:bg-gray-800 dark:hover:border-emerald-700/60">
 
-                {/* Squirrel nhô ra từ phía dưới khi hover */}
-                <div className="pointer-events-none absolute -bottom-1 right-4 z-20 translate-y-full opacity-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:translate-y-0 group-hover:opacity-100 select-none text-2xl leading-none">
-                  🐿️
-                </div>
 
                 {/* Thumbnail */}
                 <div className="relative flex h-44 items-center justify-center overflow-hidden rounded-t-2xl bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900">
@@ -252,12 +248,19 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                         </div>
                       )}
                     </div>
-                    <Link
-                      href={productUrl(product)}
-                      className="flex-shrink-0 rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 transition-all duration-200 active:scale-95 group-hover:border-green-500 group-hover:bg-green-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-green-400/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:group-hover:border-emerald-500 dark:group-hover:bg-emerald-500 dark:group-hover:text-white"
-                    >
-                      Xem thêm →
-                    </Link>
+                    {/* Wrapper để squirrel có thể nhô ra từ phía sau nút */}
+                    <div className="relative flex-shrink-0">
+                      {/* Squirrel ôm nút từ phía sau — z-0 nên bị che bởi nút z-10 */}
+                      <div className="pointer-events-none select-none absolute -top-3 left-1/2 -translate-x-1/2 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span className="squirrel-dance block text-base leading-none">🐿️</span>
+                      </div>
+                      <Link
+                        href={productUrl(product)}
+                        className="relative z-10 block rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 transition-all duration-200 active:scale-95 group-hover:border-green-500 group-hover:bg-green-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-green-400/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:group-hover:border-emerald-500 dark:group-hover:bg-emerald-500 dark:group-hover:text-white"
+                      >
+                        Xem thêm →
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>
