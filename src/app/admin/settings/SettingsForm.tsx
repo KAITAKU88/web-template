@@ -127,6 +127,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           defaultValue={settings.admin_email ?? ""}
           placeholder="admin@yourdomain.com"
           hint="Hiển thị trong email gửi khách & dùng làm Reply-To. Khuyến nghị: admin@domain.com rồi dùng Cloudflare Email Routing chuyển tiếp về Gmail cá nhân."
+          tooltip="Email này hiển thị công khai trong email giao hàng cho khách — họ có thể reply vào đây để liên hệ bạn. Nên dùng email nghiêm túc (không phải Gmail cá nhân). Dùng Cloudflare Email Routing để chuyển tiếp về Gmail."
         />
         <Field
           label="Email cá nhân (ẩn)"
@@ -135,6 +136,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           defaultValue={settings.personal_email ?? ""}
           placeholder="gmail@gmail.com"
           hint="Gmail nhận thư khi khách reply vào Email hỗ trợ (qua Cloudflare Email Routing). Chỉ lưu để bạn tham khảo — không hiển thị với khách hàng."
+          tooltip="Email thật của bạn — không bao giờ hiển thị với khách. Dùng để ghi nhớ email Gmail cá nhân đang nhận thư qua Cloudflare Email Routing."
         />
         <Field
           label="Link Zalo"
@@ -142,6 +144,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           defaultValue={settings.zalo_link ?? ""}
           placeholder="https://zalo.me/g/xxxxxx"
           hint="Link Zalo cá nhân hoặc Zalo Group — hiển thị trong email gửi khách để họ liên hệ nhanh"
+          tooltip="Mở Zalo → Profile → Share → copy link dạng zalo.me/0xxxxxxxxx (cá nhân) hoặc zalo.me/g/xxxxxx (nhóm). Link này xuất hiện dưới dạng nút 'Nhắn Zalo' trong email xác nhận đơn hàng."
         />
       </Section>
 
@@ -168,12 +171,14 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           name="sepay_webhook_secret"
           hasValue={!!settings.sepay_webhook_secret}
           hint="Secret để xác thực request từ SePay — phải khớp với cấu hình trong SePay Dashboard → Webhook → API Key"
+          tooltip="Vào my.sepay.vn → Dịch vụ → Webhook → copy API Key. Dán vào đây. Bắt buộc phải có — nếu thiếu hệ thống sẽ từ chối tất cả webhook từ SePay và đơn hàng sẽ không tự xác nhận."
         />
         <SecretField
           label="SePay API Key"
           name="sepay_api_key"
           hasValue={!!settings.sepay_api_key}
           hint="API Key để gọi SePay API (dùng cho tính năng nâng cao — để trống nếu chưa cần)"
+          tooltip="API Key để truy vấn lịch sử giao dịch từ SePay (tính năng nâng cao). Không cần thiết cho luồng mua hàng cơ bản — chỉ điền khi muốn dùng SePay API trực tiếp."
         />
       </Section>
 
@@ -187,6 +192,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           name="resend_api_key"
           hasValue={!!settings.resend_api_key}
           hint="Để trống = giữ nguyên key cũ"
+          tooltip="Lấy tại resend.com/api-keys → Create API Key → Full Access. Key dạng re_xxxxxxx. Cần set cả trên Cloudflare env vars (RESEND_API_KEY) để production hoạt động."
         />
         <Field
           label="From Email"
@@ -194,12 +200,14 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           defaultValue={settings.resend_from_email ?? ""}
           placeholder="no-reply@yourdomain.com"
           hint="Phải verify domain trên Resend"
+          tooltip="Địa chỉ email người gửi hiển thị với khách. Phải là domain đã verify trên Resend. Tạm thời dùng onboarding@resend.dev để test (chỉ gửi được đến email đăng ký Resend)."
         />
         <Field
           label="From Name"
           name="resend_from_name"
           defaultValue={settings.resend_from_name ?? ""}
           placeholder="TemplateLab"
+          tooltip="Tên người gửi hiển thị trong hộp thư đến của khách — ví dụ: 'TemplateLab'. Nên dùng tên thương hiệu của bạn để khách nhận ra."
         />
       </Section>
 
@@ -214,6 +222,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           defaultValue={settings.gtm_id ?? ""}
           placeholder="GTM-XXXXXXX"
           hint="Google Tag Manager — sau khi nhập ID này, cấu hình GA4, Facebook Pixel, TikTok Pixel bên trong GTM Dashboard"
+          tooltip="Lấy tại tagmanager.google.com → tạo Container → copy ID dạng GTM-XXXXXXX. GTM là trung tâm quản lý tất cả tracking — chỉ cần nhập 1 ID này, sau đó thêm GA4/Pixel trong GTM mà không cần sửa code."
         />
         <Field
           label="Google Analytics ID"
@@ -221,6 +230,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           defaultValue={settings.ga_id ?? ""}
           placeholder="G-XXXXXXXXXX"
           hint="Chỉ dùng khi không có GTM. Khi đã có GTM Container ID thì cấu hình GA4 bên trong GTM."
+          tooltip="Lấy tại analytics.google.com → Admin → Data Streams → Web → Measurement ID dạng G-XXXXXXXXXX. Chỉ điền vào đây nếu bạn không dùng GTM — nếu đã có GTM thì thêm GA4 tag bên trong GTM Dashboard."
         />
         <Field
           label="Facebook Pixel ID"
@@ -228,12 +238,14 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           defaultValue={settings.meta_pixel_id ?? ""}
           placeholder="123456789012345"
           hint="Lấy tại Meta Business → Events Manager → Pixel ID. Thêm vào GTM tag. Dùng kèm Meta Access Token bên dưới để bật CAPI (server-side)."
+          tooltip="Lấy tại business.facebook.com → Events Manager → chọn Pixel → copy ID (dãy số). Khi điền kèm Meta Access Token, hệ thống tự gửi sự kiện 'Purchase' server-side khi có đơn thành công — giúp theo dõi chính xác hơn dù khách dùng adblocker."
         />
         <SecretField
           label="Meta Access Token (CAPI)"
           name="meta_access_token"
           hasValue={!!settings.meta_access_token}
           hint="Lấy tại Meta Business → Events Manager → Pixel → Settings → Generate Access Token. Khi có token này, hệ thống tự gửi Purchase event server-side khi đơn thành công."
+          tooltip="Vào business.facebook.com → Events Manager → Pixel → Settings → Generate Access Token. Token này cho phép server gửi trực tiếp sự kiện mua hàng đến Meta, vượt qua adblocker, tăng tỷ lệ tracking chính xác khi chạy quảng cáo Facebook/Instagram."
         />
         <Field
           label="TikTok Pixel ID"
@@ -241,6 +253,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           defaultValue={settings.tiktok_pixel_id ?? ""}
           placeholder="CXXXXXXXXXXXXXXX"
           hint="Lấy tại TikTok Ads Manager → Assets → Events → Web Events → Pixel ID. Thêm vào GTM tag."
+          tooltip="Lấy tại ads.tiktok.com → Assets → Events → Web Events → chọn Pixel → copy Pixel ID dạng CXXXXXXXXXXXXXXX. Thêm TikTok Pixel tag vào GTM để theo dõi conversion khi chạy quảng cáo TikTok."
         />
         <Field
           label="Google Ads Conversion ID"
@@ -248,6 +261,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           defaultValue={settings.google_ads_id ?? ""}
           placeholder="AW-XXXXXXXXXX"
           hint="Lấy tại Google Ads → Tools → Conversions. Thêm vào GTM tag để theo dõi conversion."
+          tooltip="Lấy tại ads.google.com → Tools & Settings → Conversions → chọn conversion → Tag setup → copy ID dạng AW-XXXXXXXXXX. Thêm Google Ads Conversion tag vào GTM để Google Ads biết ai đã mua sau khi click quảng cáo."
         />
       </Section>
 
@@ -261,6 +275,7 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
           name="supabase_webhook_secret"
           hasValue={!!settings.supabase_webhook_secret}
           hint="Secret để xác thực webhook từ Supabase Database — phải khớp khi cấu hình Database Webhooks trong Supabase Dashboard"
+          tooltip="Khi tạo Database Webhook trong Supabase, thêm HTTP Header 'x-webhook-secret' với giá trị bằng secret này. Bắt buộc để email giao hàng tự động gửi khi đơn chuyển sang 'Thành công'."
         />
       </Section>
 
@@ -378,6 +393,20 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
 
 /* ── Sub-components ───────────────────────────────────────────── */
 
+function InfoTooltip({ text }: { text: string }) {
+  return (
+    <span className="relative ml-1.5 inline-flex items-center align-middle group/tip">
+      <span className="flex h-[15px] w-[15px] cursor-help select-none items-center justify-center rounded-full bg-gray-700 text-[9px] font-bold text-gray-400 transition-colors hover:bg-emerald-500/20 hover:text-emerald-400">
+        i
+      </span>
+      <span className="pointer-events-none invisible absolute bottom-full left-1/2 z-50 mb-2 w-64 -translate-x-1/2 rounded-xl border border-gray-700 bg-gray-950 px-3 py-2.5 text-xs leading-relaxed text-gray-300 opacity-0 shadow-xl transition-all duration-150 group-hover/tip:visible group-hover/tip:opacity-100">
+        {text}
+        <span className="absolute left-1/2 top-full -translate-x-1/2 border-4 border-transparent border-t-gray-950" />
+      </span>
+    </span>
+  );
+}
+
 function Section({
   title,
   description,
@@ -405,6 +434,7 @@ function Field({
   placeholder,
   hint,
   type = "text",
+  tooltip,
 }: {
   label: string;
   name: string;
@@ -412,12 +442,14 @@ function Field({
   placeholder?: string;
   hint?: string;
   type?: string;
+  tooltip?: string;
 }) {
   return (
     <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
       <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor={name} className="inline-flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
+          {tooltip && <InfoTooltip text={tooltip} />}
         </label>
         {hint && <p className="mt-0.5 text-xs text-gray-500">{hint}</p>}
       </div>
@@ -484,19 +516,22 @@ function SecretField({
   name,
   hasValue,
   hint,
+  tooltip,
 }: {
   label: string;
   name: string;
   hasValue: boolean;
   hint?: React.ReactNode;
+  tooltip?: string;
 }) {
   const [editing, setEditing] = useState(false);
 
   return (
     <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
       <div>
-        <label htmlFor={name} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label htmlFor={name} className="inline-flex items-center text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
+          {tooltip && <InfoTooltip text={tooltip} />}
         </label>
         {hint && <div className="mt-0.5 text-xs text-gray-500">{hint}</div>}
       </div>
