@@ -34,8 +34,9 @@ export function productUrl(product: { id: string; slug?: string | null }): strin
  * Format: TML + 8 ký tự hex ngẫu nhiên (VD: TML4A2F9B1C)
  */
 export function generateOrderId(): string {
-  const random = Math.random().toString(16).slice(2, 10).toUpperCase();
-  return `TML${random}`;
+  const bytes = crypto.getRandomValues(new Uint8Array(4));
+  const hex = Array.from(bytes).map((b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+  return `TML${hex}`;
 }
 
 /**

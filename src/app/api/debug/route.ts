@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { getAdminRole } from "@/lib/get-role";
 
 export async function GET() {
+  const role = await getAdminRole();
+  if (!role) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "MISSING";
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "MISSING";
 

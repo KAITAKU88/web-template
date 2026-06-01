@@ -60,6 +60,13 @@ export async function GET(
 
   const remaining = data.max_accesses > 0 ? data.max_accesses - newCount : null;
 
+  // Escape HTML để tránh XSS khi nhúng template_link vào HTML
+  const safeLink = data.template_link
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
   // Nếu có giới hạn lượt: hiện trang cảnh báo + auto-redirect 5s
   if (remaining !== null) {
     const isLow = remaining <= 1;
@@ -83,7 +90,7 @@ export async function GET(
     .btn:hover{background:#15803d}
     .note{margin-top:16px;font-size:12px;color:#475569}
   </style>
-  <meta http-equiv="refresh" content="5;url=${data.template_link}">
+  <meta http-equiv="refresh" content="5;url=${safeLink}">
 </head>
 <body>
   <div class="card">
@@ -96,7 +103,7 @@ export async function GET(
       ? `⚠️ <strong style="color:#fbbf24">Lưu ý:</strong> Link này ${remaining === 0 ? "không còn lượt nào sau lần này" : `chỉ còn <strong style="color:#fbbf24">${remaining} lượt</strong> nữa`}. Vui lòng <strong>không chia sẻ link</strong> này.`
       : `Link của bạn còn <strong style="color:#4ade80">${remaining} lượt</strong> truy cập. Hãy Duplicate template vào tài khoản của bạn ngay sau khi mở.`
     }</p>
-    <a href="${data.template_link}" class="btn">Mở template ngay →</a>
+    <a href="${safeLink}" class="btn">Mở template ngay →</a>
     <p class="note">Tự động chuyển hướng sau 5 giây…</p>
   </div>
 </body>
@@ -107,6 +114,6 @@ export async function GET(
     });
   }
 
-  // Không giới hạn lượt — redirect thẳng
+  // Không giới hạn lượt — redirect thẳng (template_link đã được admin set, không qua user input)
   return NextResponse.redirect(data.template_link, { status: 302 });
 }

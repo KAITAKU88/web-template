@@ -19,12 +19,14 @@ export async function POST(req: NextRequest) {
     // Ưu tiên đọc từ DB settings (cấu hình qua Dashboard), fallback về env var
     const settings = await getSettings();
     const secret = settings.sepay_webhook_secret || process.env.SEPAY_WEBHOOK_SECRET || null;
-    if (secret) {
-      const authHeader = req.headers.get("Authorization");
-      const token = authHeader?.replace("Apikey ", "").trim();
-      if (token !== secret) {
-        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-      }
+    // Bắt buộc phải có secret — từ chối toàn bộ nếu chưa cấu hình
+    if (!secret) {
+      return NextResponse.json({ error: "Webhook secret not configured" }, { status: 401 });
+    }
+    const authHeader = req.headers.get("Authorization");
+    const token = authHeader?.replace("Apikey ", "").trim();
+    if (token !== secret) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const payload: SepayWebhookPayload = await req.json();
