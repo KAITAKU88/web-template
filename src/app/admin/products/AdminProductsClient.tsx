@@ -10,7 +10,7 @@ interface ProductRow {
   id: string; name: string; type: string | null; price: number;
   original_price: number | null; landing_content: unknown;
   download_count: number; created_at: string; status: string; slug: string | null;
-  rating: number; rating_count: number;
+  rating: number; rating_count: number; is_combo: boolean;
 }
 
 type SortKey = "newest" | "price" | "downloads";
@@ -150,7 +150,12 @@ export default function AdminProductsClient({
                 {filtered.map((p) => (
                   <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-800/40 transition-colors">
                     <td className="px-5 py-4">
-                      <p className="font-medium text-gray-900 dark:text-white truncate max-w-[220px]">{p.name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-gray-900 dark:text-white truncate max-w-[200px]">{p.name}</p>
+                        {p.is_combo && (
+                          <span className="shrink-0 rounded-full bg-violet-500/20 px-2 py-0.5 text-xs font-medium text-violet-400">📦 Combo</span>
+                        )}
+                      </div>
                       <p className="text-xs text-gray-600 font-mono mt-0.5">
                         {p.slug ? `/${p.slug}` : p.id.slice(0, 8) + "…"}
                       </p>

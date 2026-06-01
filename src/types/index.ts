@@ -18,6 +18,8 @@ export interface Product {
   gallery_images: string[];      // Ảnh thực tế — carousel ở trang sản phẩm
   slug: string | null;           // SEO URL: /products/[slug]
   status: "published" | "draft"; // 'published' = hiển thị, 'draft' = bản nháp
+  is_combo: boolean;             // true = sản phẩm combo (nhiều link tải)
+  combo_product_ids: string[];   // UUID[] các sản phẩm trong combo
   created_at: string;
 }
 

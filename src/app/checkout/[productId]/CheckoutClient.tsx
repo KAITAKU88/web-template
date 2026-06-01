@@ -644,8 +644,8 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
             </div>
           )}
 
-          {/* Nút tải template — chỉ hiện khi không phải bundle */}
-          {!isBundleOrder && product.template_link && (
+          {/* Nút tải template — chỉ hiện khi không phải bundle và không phải combo */}
+          {!isBundleOrder && !product.is_combo && product.template_link && (
             <a
               href={product.template_link}
               target="_blank"

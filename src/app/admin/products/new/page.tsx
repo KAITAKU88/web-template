@@ -1,9 +1,9 @@
-import Link from "next/link";
 import ProductForm from "../ProductForm";
 import { createProduct } from "../actions";
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/server";
 import { adminPath } from "@/lib/admin-redirect";
+import CancelButton from "./CancelButton";
 
 export default async function NewProductPage() {
   const supabase = createAdminClient();
@@ -21,14 +21,8 @@ export default async function NewProductPage() {
 
   return (
     <div className="p-4 md:p-6 space-y-6">
-      <div className="flex items-center gap-3">
-        <Link href={productsPath} className="text-gray-500 hover:text-gray-300 transition-colors">
-          ← Quay lại
-        </Link>
-        <h1 className="text-2xl font-bold text-white">Thêm sản phẩm mới</h1>
-      </div>
-
-      <ProductForm onSubmit={handleCreate} submitLabel="Tạo sản phẩm" categories={categories} />
+      <h1 className="text-2xl font-bold text-white">Thêm sản phẩm mới</h1>
+      <CancelButton onSubmit={handleCreate} submitLabel="Tạo sản phẩm" categories={categories} />
     </div>
   );
 }

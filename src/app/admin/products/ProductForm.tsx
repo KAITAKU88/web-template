@@ -10,12 +10,15 @@ import { slugify } from "@/lib/utils";
 import LandingEditor from "@/components/LandingEditor";
 import ImageUploadField from "@/components/ImageUploadField";
 import MediaPicker from "@/components/MediaPicker";
+import { createClient } from "@/lib/supabase/client";
 
 interface Category { id: string; name: string; }
+interface SimpleProduct { id: string; name: string; type: string | null; price: number; }
 
 interface Props {
   product?: Product;
   onSubmit: (formData: FormData) => Promise<void>;
+  onCancel?: () => void;
   submitLabel?: string;
   categories?: Category[];
 }
@@ -25,7 +28,7 @@ const DEFAULT_CATEGORIES: Category[] = [
   { id: "google_sheet", name: "Google Sheets" },
 ];
 
-export default function ProductForm({ product, onSubmit, submitLabel = "Lưu sản phẩm", categories = DEFAULT_CATEGORIES }: Props) {
+export default function ProductForm({ product, onSubmit, onCancel, submitLabel = "Lưu sản phẩm", categories = DEFAULT_CATEGORIES }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const [saving, startSave] = useTransition();
   const [generating, startGenerate] = useTransition();
@@ -47,6 +50,25 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
   const [productName, setProductName] = useState(product?.name ?? "");
   const [slug, setSlug] = useState(product?.slug ?? "");
   const [slugLocked, setSlugLocked] = useState(!!(product?.slug));
+  const [selectedLabel, setSelectedLabel] = useState<string>(product?.label ?? "");
+  const [isCombo, setIsCombo] = useState<boolean>(product?.is_combo ?? false);
+  const [comboProductIds, setComboProductIds] = useState<string[]>(product?.combo_product_ids ?? []);
+  const [availableProducts, setAvailableProducts] = useState<SimpleProduct[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("products")
+      .select("id, name, type, price")
+      .eq("is_combo", false)
+      .eq("status", "published")
+      .order("name")
+      .then(({ data }) => {
+        if (data) {
+          setAvailableProducts(data.filter((p) => p.id !== product?.id));
+        }
+      });
+  }, [product?.id]);
 
   const handleSlugChange = useCallback((val: string) => {
     setSlug(val);
@@ -56,6 +78,7 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
   const [galleryImages, setGalleryImagesRaw] = useState<string[]>(product?.gallery_images ?? []);
   const setGalleryImages: typeof setGalleryImagesRaw = (v) => { setIsDirty(true); setGalleryImagesRaw(v); };
   const [galleryPickerOpen, setGalleryPickerOpen] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
 
   useUnsavedChanges(isDirty);
 
@@ -99,6 +122,9 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
     const fd = new FormData(e.currentTarget);
     if (landing) fd.set("landing_content", JSON.stringify(landing));
     fd.set("gallery_images", JSON.stringify(galleryImages));
+    fd.set("is_combo", isCombo ? "true" : "false");
+    fd.set("combo_product_ids", JSON.stringify(comboProductIds));
+    if (isCombo) fd.set("template_link", "");
     startSave(async () => {
       await onSubmit(fd);
       setIsDirty(false);
@@ -208,18 +234,92 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
             />
           </div>
 
-          {/* Template link */}
-          <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1.5">Template Link <span className="text-red-400">*</span></label>
-            <input
-              name="template_link"
-              type="url"
-              required
-              defaultValue={product?.template_link ?? ""}
-              placeholder="https://notion.so/..."
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500"
-            />
+          {/* Loại sản phẩm: Đơn lẻ / Combo */}
+          <div className="sm:col-span-2">
+            <label className="block text-xs font-medium text-gray-400 mb-2">Loại sản phẩm</label>
+            <div className="flex gap-3">
+              {[
+                { value: false, label: "Sản phẩm đơn", desc: "1 link tải", icon: "📄" },
+                { value: true,  label: "Combo",        desc: "Nhiều sản phẩm gộp lại", icon: "📦" },
+              ].map((opt) => (
+                <button
+                  key={String(opt.value)}
+                  type="button"
+                  onClick={() => { setIsCombo(opt.value); setIsDirty(true); }}
+                  className={`flex items-center gap-2.5 rounded-xl border px-4 py-2.5 text-sm transition-colors ${
+                    isCombo === opt.value
+                      ? "border-emerald-500 bg-emerald-500/10 text-emerald-300"
+                      : "border-gray-700 text-gray-400 hover:border-gray-500"
+                  }`}
+                >
+                  <span>{opt.icon}</span>
+                  <div className="text-left">
+                    <div className="font-medium">{opt.label}</div>
+                    <div className="text-xs opacity-70">{opt.desc}</div>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* Template link — chỉ hiện với sản phẩm đơn */}
+          {!isCombo && (
+            <div>
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">Template Link <span className="text-red-400">*</span></label>
+              <input
+                name="template_link"
+                type="url"
+                required
+                defaultValue={product?.template_link ?? ""}
+                placeholder="https://notion.so/..."
+                className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500"
+              />
+            </div>
+          )}
+
+          {/* Combo product selector — chỉ hiện khi là combo */}
+          {isCombo && (
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">
+                Sản phẩm trong combo <span className="text-red-400">*</span>
+                {comboProductIds.length > 0 && (
+                  <span className="ml-2 rounded-full bg-emerald-500/20 px-2 py-0.5 text-emerald-400">{comboProductIds.length} đã chọn</span>
+                )}
+              </label>
+              {availableProducts.length === 0 ? (
+                <p className="text-xs text-gray-500 py-3">Chưa có sản phẩm đơn nào. Hãy tạo sản phẩm đơn trước.</p>
+              ) : (
+                <div className="rounded-xl border border-gray-700 divide-y divide-gray-800 max-h-64 overflow-y-auto">
+                  {availableProducts.map((p) => {
+                    const checked = comboProductIds.includes(p.id);
+                    return (
+                      <label key={p.id} className={`flex items-center gap-3 px-4 py-3 cursor-pointer transition-colors ${checked ? "bg-emerald-500/5" : "hover:bg-gray-800/50"}`}>
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            setComboProductIds(prev =>
+                              e.target.checked ? [...prev, p.id] : prev.filter(id => id !== p.id)
+                            );
+                            setIsDirty(true);
+                          }}
+                          className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-emerald-500 focus:ring-emerald-500/50"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-200 truncate">{p.name}</p>
+                          <p className="text-xs text-gray-500">{p.type === "google_sheet" ? "Google Sheets" : "Notion"} · {(p.price / 1000).toFixed(0)}k</p>
+                        </div>
+                        {checked && <span className="text-emerald-500 text-xs shrink-0">✓</span>}
+                      </label>
+                    );
+                  })}
+                </div>
+              )}
+              {isCombo && comboProductIds.length < 2 && (
+                <p className="mt-1.5 text-xs text-amber-500">Cần chọn ít nhất 2 sản phẩm để tạo combo.</p>
+              )}
+            </div>
+          )}
 
           {/* Image URL */}
           <div className="sm:col-span-2">
@@ -312,12 +412,12 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
                 { value: "👑 Premium", text: "👑 Premium" },
                 { value: "💎 Exclusive", text: "💎 Exclusive" },
               ].map((opt) => {
-                const checked = (product?.label ?? "") === opt.value;
+                const isSelected = selectedLabel === opt.value;
                 return (
                   <label key={opt.value} className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-1.5 text-sm transition-colors ${
-                    checked ? "border-emerald-500 bg-emerald-500/10 text-emerald-300" : "border-gray-700 text-gray-400 hover:border-gray-500"
+                    isSelected ? "border-emerald-500 bg-emerald-500/10 text-emerald-300" : "border-gray-700 text-gray-400 hover:border-gray-500"
                   }`}>
-                    <input type="radio" name="label" value={opt.value} defaultChecked={checked} className="sr-only" />
+                    <input type="radio" name="label" value={opt.value} checked={isSelected} onChange={() => { setSelectedLabel(opt.value); setIsDirty(true); }} className="sr-only" />
                     {opt.text}
                   </label>
                 );
@@ -497,6 +597,16 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
           >
             {saving ? "Đang lưu…" : submitLabel}
           </button>
+          {onCancel && (
+            <button
+              type="button"
+              onClick={() => setShowCancelConfirm(true)}
+              disabled={saving}
+              className="rounded-xl border border-gray-700 px-6 py-2.5 text-sm font-semibold text-gray-400 hover:border-gray-500 hover:text-gray-200 transition-colors disabled:opacity-40"
+            >
+              Hủy
+            </button>
+          )}
           {isDirty && !saving && (
             <span className="text-xs text-amber-400 flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-amber-400 animate-pulse" />
@@ -513,6 +623,39 @@ export default function ProductForm({ product, onSubmit, submitLabel = "Lưu s�
           )}
         </div>
       </div>
+
+      {/* ── Popup xác nhận hủy ───────────────────────────────── */}
+      {showCancelConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowCancelConfirm(false)} />
+          <div className="relative bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl">
+            <div className="mb-1 text-2xl text-center">⚠️</div>
+            <h3 className="text-base font-semibold text-white text-center mb-2">Hủy tạo sản phẩm?</h3>
+            <p className="text-sm text-gray-400 text-center mb-6">
+              {isDirty
+                ? "Bạn có thay đổi chưa lưu. Nếu hủy, toàn bộ thông tin đã nhập sẽ mất."
+                : "Xác nhận quay lại mà không tạo sản phẩm?"
+              }
+            </p>
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setShowCancelConfirm(false)}
+                className="flex-1 rounded-xl border border-gray-700 px-4 py-2.5 text-sm font-medium text-gray-300 hover:border-gray-500 hover:text-white transition-colors"
+              >
+                Tiếp tục chỉnh sửa
+              </button>
+              <button
+                type="button"
+                onClick={() => { setShowCancelConfirm(false); onCancel?.(); }}
+                className="flex-1 rounded-xl bg-red-500/20 border border-red-500/40 px-4 py-2.5 text-sm font-semibold text-red-400 hover:bg-red-500/30 transition-colors"
+              >
+                Hủy bỏ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </form>
   );
 }

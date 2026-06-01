@@ -11,7 +11,7 @@ export default async function AdminProductsPage() {
     getAdminRole(),
     supabase
       .from("products")
-      .select("id, name, type, price, original_price, image_url, landing_content, download_count, created_at, status, slug, rating, rating_count")
+      .select("id, name, type, price, original_price, image_url, landing_content, download_count, created_at, status, slug, rating, rating_count, is_combo")
       .order("created_at", { ascending: false }),
     supabase.from("categories").select("id, name").order("sort_order"),
   ]);

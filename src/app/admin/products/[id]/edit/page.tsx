@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import ProductForm from "../../ProductForm";
+import ProductFormWithCancel from "../../new/CancelButton";
 import { updateProduct } from "../../actions";
 import { redirect } from "next/navigation";
 import type { Product } from "@/types";
@@ -37,7 +37,7 @@ export default async function EditProductPage({ params }: Props) {
         <h1 className="text-2xl font-bold text-white">Chỉnh sửa: {product.name}</h1>
       </div>
 
-      <ProductForm product={product} onSubmit={handleUpdate} submitLabel="Lưu thay đổi" categories={categories} />
+      <ProductFormWithCancel product={product} onSubmit={handleUpdate} submitLabel="Lưu thay đổi" categories={categories} />
     </div>
   );
 }

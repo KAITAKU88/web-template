@@ -154,13 +154,16 @@ export async function createProduct(formData: FormData) {
   const landingRaw = formData.get("landing_content") as string | null;
   const landing = landingRaw ? JSON.parse(landingRaw) : null;
 
+  const isCombo = formData.get("is_combo") === "true";
+  const comboProductIds = JSON.parse((formData.get("combo_product_ids") as string) || "[]");
+
   const { error } = await supabase.from("products").insert({
     name: formData.get("name") as string,
     slug: (formData.get("slug") as string) || null,
     type: (formData.get("type") as string) || null,
     price: Number(formData.get("price")),
     original_price: formData.get("original_price") ? Number(formData.get("original_price")) : null,
-    template_link: formData.get("template_link") as string,
+    template_link: isCombo ? "" : (formData.get("template_link") as string),
     description: (formData.get("description") as string) || null,
     image_url: (formData.get("image_url") as string) || null,
     download_count: Number(formData.get("download_count") ?? 0),
@@ -169,6 +172,8 @@ export async function createProduct(formData: FormData) {
     landing_content: landing,
     label: (formData.get("label") as string) || null,
     gallery_images: JSON.parse((formData.get("gallery_images") as string) || "[]"),
+    is_combo: isCombo,
+    combo_product_ids: comboProductIds,
     status: "draft",
   });
 
@@ -184,13 +189,16 @@ export async function updateProduct(id: string, formData: FormData) {
   const landing = landingRaw ? JSON.parse(landingRaw) : null;
 
   const slugVal = (formData.get("slug") as string) || null;
+  const isCombo = formData.get("is_combo") === "true";
+  const comboProductIds = JSON.parse((formData.get("combo_product_ids") as string) || "[]");
+
   const { error } = await supabase.from("products").update({
     name: formData.get("name") as string,
     slug: slugVal,
     type: (formData.get("type") as string) || null,
     price: Number(formData.get("price")),
     original_price: formData.get("original_price") ? Number(formData.get("original_price")) : null,
-    template_link: formData.get("template_link") as string,
+    template_link: isCombo ? "" : (formData.get("template_link") as string),
     description: (formData.get("description") as string) || null,
     image_url: (formData.get("image_url") as string) || null,
     download_count: Number(formData.get("download_count") ?? 0),
@@ -199,6 +207,8 @@ export async function updateProduct(id: string, formData: FormData) {
     landing_content: landing,
     label: (formData.get("label") as string) || null,
     gallery_images: JSON.parse((formData.get("gallery_images") as string) || "[]"),
+    is_combo: isCombo,
+    combo_product_ids: comboProductIds,
   }).eq("id", id);
 
   if (error) throw new Error(error.message);

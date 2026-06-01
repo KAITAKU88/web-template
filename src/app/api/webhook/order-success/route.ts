@@ -51,10 +51,10 @@ export async function POST(req: NextRequest) {
   const productIds = [order.product_id, order.bump_product_id].filter(Boolean) as string[];
   const { data: products } = await supabase
     .from("products")
-    .select("id, name, template_link, type")
+    .select("id, name, template_link, type, is_combo, combo_product_ids")
     .in("id", productIds);
 
-  type ProductRow = { id: string; name: string; template_link: string; type: string | null };
+  type ProductRow = { id: string; name: string; template_link: string; type: string | null; is_combo: boolean; combo_product_ids: string[] };
   const mainProduct = (products as ProductRow[] | null)?.find((p) => p.id === order.product_id);
   const bumpProduct = order.bump_product_id
     ? (products as ProductRow[] | null)?.find((p) => p.id === order.bump_product_id)
@@ -65,13 +65,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Product not found" }, { status: 500 });
   }
 
+  // Nếu main hoặc bump là combo, fetch sản phẩm con
+  const allComboChildIds = [
+    ...(mainProduct.is_combo ? mainProduct.combo_product_ids : []),
+    ...(bumpProduct?.is_combo ? bumpProduct.combo_product_ids : []),
+  ];
+  type SimpleProductRow = { id: string; name: string; template_link: string; type: string | null };
+  let comboChildren: SimpleProductRow[] = [];
+  if (allComboChildIds.length > 0) {
+    const { data: childData } = await supabase
+      .from("products")
+      .select("id, name, template_link, type")
+      .in("id", allComboChildIds);
+    comboChildren = (childData as SimpleProductRow[] | null) ?? [];
+  }
+
   // Tạo download tokens nếu tính năng được bật
   const expiryHours = Number(settings.download_link_expiry_hours ?? 0);
   const maxAccesses = Number(settings.download_link_max_accesses ?? 0);
   const useTokens = expiryHours > 0 || maxAccesses > 0;
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://web-template-cloudflare.thankful-to-all-88.workers.dev";
 
-  async function createToken(product: ProductRow): Promise<string> {
+  async function createToken(product: SimpleProductRow): Promise<string> {
     if (!useTokens) return product.template_link;
     const expiresAt = expiryHours > 0
       ? new Date(Date.now() + expiryHours * 60 * 60 * 1000).toISOString()
@@ -88,10 +103,24 @@ export async function POST(req: NextRequest) {
     return `${baseUrl}/api/download/${tok.token}`;
   }
 
-  const [mainLink, bumpLink] = await Promise.all([
-    createToken(mainProduct),
-    bumpProduct ? createToken(bumpProduct) : Promise.resolve(null),
+  // Tạo link cho từng sản phẩm (combo thì tạo cho từng con)
+  async function resolveLinks(p: ProductRow): Promise<{ name: string; link: string; type: string | null }[]> {
+    if (!p.is_combo) {
+      return [{ name: p.name, link: await createToken(p), type: p.type }];
+    }
+    const children = comboChildren.filter((c) => p.combo_product_ids.includes(c.id));
+    const links = await Promise.all(children.map(async (c) => ({ name: c.name, link: await createToken(c), type: c.type })));
+    return links;
+  }
+
+  const [mainLinks, bumpLinks] = await Promise.all([
+    resolveLinks(mainProduct),
+    bumpProduct ? resolveLinks(bumpProduct) : Promise.resolve([] as { name: string; link: string; type: string | null }[]),
   ]);
+
+  // Backward compat: mainLink / bumpLink cho các hàm cũ
+  const mainLink = mainLinks[0]?.link ?? "";
+  const bumpLink = bumpLinks[0]?.link ?? null;
 
   // settings đã được đọc ở đầu hàm (dùng chung)
   const siteName   = settings.site_name   ?? "TemplateLab";
@@ -109,6 +138,7 @@ export async function POST(req: NextRequest) {
 
   // Gửi email xác nhận đơn hàng
   const resend = new Resend(apiKey);
+  const allLinks = [...mainLinks, ...bumpLinks];
   const { error } = await resend.emails.send({
     from,
     to: order.customer_email,
@@ -116,7 +146,7 @@ export async function POST(req: NextRequest) {
     subject: `✅ Đơn hàng ${order.id} đã được xác nhận – ${siteName}`,
     html: buildEmailHtml({
       order, mainProduct, bumpProduct, paidAt, siteName, brandColor, adminEmail, zaloLink,
-      mainLink, bumpLink,
+      allLinks,
       expiryHours, maxAccesses,
     }),
   });
@@ -199,20 +229,18 @@ async function sendMetaCapi(params: {
 
 function buildEmailHtml(params: {
   order: SupabaseWebhookPayload["record"];
-  mainProduct: { name: string; template_link: string; type: string | null };
-  bumpProduct: { name: string; template_link: string; type: string | null } | null | undefined;
+  mainProduct: { name: string; type: string | null };
+  bumpProduct: { name: string; type: string | null } | null | undefined;
   paidAt: string;
   siteName: string;
   brandColor: string;
   adminEmail?: string;
   zaloLink?: string;
-  mainLink: string;
-  bumpLink: string | null;
+  allLinks: { name: string; link: string; type: string | null }[];
   expiryHours: number;
   maxAccesses: number;
 }) {
-  const { order, mainProduct, bumpProduct, paidAt, siteName, brandColor, adminEmail, zaloLink,
-          mainLink, bumpLink, expiryHours, maxAccesses } = params;
+  const { order, paidAt, siteName, brandColor, adminEmail, zaloLink, allLinks, expiryHours, maxAccesses } = params;
 
   const typeLabel = (type: string | null) =>
     type === "google_sheet" ? "Google Sheets" : "Notion";
@@ -236,7 +264,6 @@ function buildEmailHtml(params: {
       </a>
     </div>`;
 
-  // Màu nhạt cho background box (10% opacity giả lập bằng hex)
   const lightBg = "#f0fdf4";
   const lightBorder = "#bbf7d0";
 
@@ -264,10 +291,9 @@ function buildEmailHtml(params: {
       <!-- Template links -->
       <div style="background:${lightBg};border:1px solid ${lightBorder};border-radius:12px;padding:20px;margin-bottom:24px;">
         <p style="margin:0 0 14px;font-size:13px;font-weight:700;color:#15803d;text-transform:uppercase;letter-spacing:.5px;">
-          Template của bạn
+          Template của bạn (${allLinks.length} template)
         </p>
-        ${templateButton(mainProduct.name, mainLink, mainProduct.type)}
-        ${bumpProduct && bumpLink ? templateButton(bumpProduct.name, bumpLink, bumpProduct.type) : ""}
+        ${allLinks.map((l) => templateButton(l.name, l.link, l.type)).join("")}
         ${expiryNotice}${accessNotice}
       </div>
 
