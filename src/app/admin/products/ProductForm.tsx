@@ -417,7 +417,7 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
                   <label key={opt.value} className={`flex cursor-pointer items-center gap-2 rounded-xl border px-3 py-1.5 text-sm transition-colors ${
                     isSelected ? "border-emerald-500 bg-emerald-500/10 text-emerald-300" : "border-gray-700 text-gray-400 hover:border-gray-500"
                   }`}>
-                    <input type="radio" name="label" value={opt.value} checked={isSelected} onChange={() => { setSelectedLabel(opt.value); setIsDirty(true); }} className="sr-only" />
+                    <input type="radio" name="label" value={opt.value} checked={isSelected} onChange={() => { setSelectedLabel(opt.value); setIsDirty(true); }} className="sr-only" tabIndex={-1} />
                     {opt.text}
                   </label>
                 );

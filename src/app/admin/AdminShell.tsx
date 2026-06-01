@@ -89,7 +89,7 @@ export default function AdminShell({
           <ThemeToggle />
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto relative">
           {children}
         </div>
       </div>
