@@ -2,18 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
-@keyframes squirrel-sway {
-  0%   { transform: rotate(-12deg) translateY(0px); }
-  25%  { transform: rotate(-4deg)  translateY(-3px); }
-  75%  { transform: rotate(4deg)   translateY(-3px); }
-  100% { transform: rotate(12deg)  translateY(0px); }
+/* ── Squirrel character — each body part animated independently ── */
+@keyframes sq-head-bob {
+  0%,100% { transform: translateX(-50%) rotate(-9deg); }
+  50%     { transform: translateX(-50%) rotate(9deg) translateY(-1px); }
+}
+@keyframes sq-blink {
+  0%,91%,100% { transform: scaleY(1); }
+  95%          { transform: scaleY(0.08); }
+}
+@keyframes sq-arm-l {
+  0%,100% { transform: rotate(-18deg); }
+  50%     { transform: rotate(-3deg); }
+}
+@keyframes sq-arm-r {
+  0%,100% { transform: rotate(18deg); }
+  50%     { transform: rotate(3deg); }
+}
+@keyframes sq-tail-wag {
+  0%,100% { transform: translateX(-50%) rotate(-13deg) scaleY(1); }
+  50%     { transform: translateX(-50%) rotate(13deg) scaleY(1.07); }
 }
 
-.squirrel-dance {
-  display: inline-block;
-  transform-origin: bottom center;
-  animation: squirrel-sway 0.9s ease-in-out infinite alternate;
-}
+.sq-head { transform-origin: bottom center; animation: sq-head-bob 1.4s ease-in-out infinite; }
+.sq-blink { animation: sq-blink 4s ease-in-out infinite; }
+.sq-arm-l { transform-origin: right center; animation: sq-arm-l 1.1s ease-in-out infinite; }
+.sq-arm-r { transform-origin: left center;  animation: sq-arm-r 1.1s ease-in-out infinite 0.2s; }
+.sq-tail  { transform-origin: bottom center; animation: sq-tail-wag 1.5s ease-in-out infinite; }
 
 /* Brand color CSS variable — overridden by root layout from DB settings */
 :root {

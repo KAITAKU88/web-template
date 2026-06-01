@@ -208,7 +208,7 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                 </div>
 
                 {/* Content */}
-                <div className="flex flex-1 flex-col overflow-hidden rounded-b-2xl p-5">
+                <div className="flex flex-1 flex-col p-5">
                   {product.type && (
                     <span className="mb-2 inline-flex w-fit items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
                       {categories.find((c) => c.id === product.type)?.name
@@ -248,18 +248,48 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                         </div>
                       )}
                     </div>
-                    {/* Wrapper để squirrel có thể nhô ra từ phía sau nút */}
+                    {/* Button + CSS squirrel (tay/đuôi trước nút trong DOM → bị che; đầu sau → nổi trên) */}
                     <div className="relative flex-shrink-0">
-                      {/* Squirrel ôm nút từ phía sau — z-0 nên bị che bởi nút z-10 */}
-                      <div className="pointer-events-none select-none absolute -top-3 left-1/2 -translate-x-1/2 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                        <span className="squirrel-dance block text-base leading-none">🐿️</span>
+
+                      {/* ── Tay trái (DOM trước nút → ở sau nút) ── */}
+                      <div className="sq-arm-l pointer-events-none select-none absolute -left-4 top-[9px] h-2 w-6 rounded-full bg-[#c17a3a] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute -top-1 left-0 h-[10px] w-[10px] rounded-full bg-[#e8a86e]" />
                       </div>
+
+                      {/* ── Tay phải ── */}
+                      <div className="sq-arm-r pointer-events-none select-none absolute -right-4 top-[9px] h-2 w-6 rounded-full bg-[#c17a3a] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute -top-1 right-0 h-[10px] w-[10px] rounded-full bg-[#e8a86e]" />
+                      </div>
+
+                      {/* ── Đuôi ── */}
+                      <div className="sq-tail pointer-events-none select-none absolute left-1/2 bottom-[-10px] h-[18px] w-[13px] rounded-[50%_50%_30%_30%] bg-[#a0611a] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                      {/* ── Nút bấm (giữa trong DOM) ── */}
                       <Link
                         href={productUrl(product)}
-                        className="relative z-10 block rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 transition-all duration-200 active:scale-95 group-hover:border-green-500 group-hover:bg-green-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-green-400/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:group-hover:border-emerald-500 dark:group-hover:bg-emerald-500 dark:group-hover:text-white"
+                        className="relative block rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 transition-all duration-200 active:scale-95 group-hover:border-green-500 group-hover:bg-green-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-green-400/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:group-hover:border-emerald-500 dark:group-hover:bg-emerald-500 dark:group-hover:text-white"
                       >
                         Xem thêm →
                       </Link>
+
+                      {/* ── Đầu (DOM cuối → nổi trên nút) ── */}
+                      <div className="sq-head pointer-events-none select-none absolute left-1/2 -top-[22px] h-[17px] w-[22px] -translate-x-1/2 rounded-[50%_50%_45%_45%] bg-[#c17a3a] opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        {/* Tai trái */}
+                        <div className="absolute -top-[5px] left-[2px] h-[7px] w-[7px] rounded-[50%_50%_0_50%] bg-[#c17a3a]" style={{ transform: 'rotate(-20deg)' }} />
+                        {/* Tai phải */}
+                        <div className="absolute -top-[5px] right-[2px] h-[7px] w-[7px] rounded-[50%_50%_0_50%] bg-[#c17a3a]" style={{ transform: 'rotate(20deg) scaleX(-1)' }} />
+                        {/* Mắt trái */}
+                        <div className="sq-blink absolute top-[5px] left-[3px] h-[4px] w-[4px] rounded-full bg-[#1a0a00]" />
+                        {/* Mắt phải — chớp lệch pha */}
+                        <div className="sq-blink absolute top-[5px] right-[3px] h-[4px] w-[4px] rounded-full bg-[#1a0a00]" style={{ animationDelay: '0.5s' }} />
+                        {/* Má phồng trái */}
+                        <div className="absolute bottom-0 -left-[2px] h-[6px] w-[8px] rounded-full bg-[#e8a86e] opacity-80" />
+                        {/* Má phồng phải */}
+                        <div className="absolute bottom-0 -right-[2px] h-[6px] w-[8px] rounded-full bg-[#e8a86e] opacity-80" />
+                        {/* Mũi */}
+                        <div className="absolute bottom-[4px] left-1/2 -translate-x-1/2 h-[3px] w-[4px] rounded-full bg-[#e05c3a]" />
+                      </div>
+
                     </div>
                   </div>
                 </div>
