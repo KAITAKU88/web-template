@@ -252,8 +252,8 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                     </div>
                     {/* Nút + mèo chạy Lottie */}
                     <div className="relative flex-shrink-0">
-                      {/* Mèo chạy — nhô từ dưới nút khi hover */}
-                      <div className="pointer-events-none select-none absolute -bottom-1 left-1/2 -translate-x-1/2 w-14 translate-y-full opacity-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:translate-y-0 group-hover:opacity-100">
+                      {/* Mèo chạy trên mặt đất (= nút Xem thêm) — trượt vào từ trái khi hover */}
+                      <div className="pointer-events-none select-none absolute -top-9 left-0 w-12 -translate-x-4 opacity-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:translate-x-1 group-hover:opacity-100">
                         <Lottie animationData={runningCatAnimation} loop />
                       </div>
                       <Link
