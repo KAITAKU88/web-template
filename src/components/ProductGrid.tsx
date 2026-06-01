@@ -104,10 +104,10 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                   <button
                     key={t}
                     onClick={() => setTypeFilter(t)}
-                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                    className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-all duration-200 active:scale-95 ${
                       typeFilter === t
-                        ? "border-green-500 bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                        : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300"
+                        ? "border-green-500 bg-green-50 text-green-700 shadow-md shadow-green-200/60 dark:bg-green-900/30 dark:text-green-400 dark:shadow-green-900/40 scale-105"
+                        : "border-gray-200 bg-white text-gray-600 hover:-translate-y-0.5 hover:scale-105 hover:border-green-300 hover:text-green-600 hover:shadow-md hover:shadow-green-100/80 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:border-emerald-600 dark:hover:text-emerald-400 dark:hover:shadow-emerald-900/50"
                     }`}
                   >
                     {t === "all" ? "Tất cả" : categories.find((c) => c.id === t)?.name ?? t}
@@ -182,14 +182,24 @@ export default function ProductGrid({ products, categories = [] }: { products: P
             const isHot = !customLabel && !isBestseller && (product.download_count >= 500 || product.rating >= 4.9);
 
             return (
-              <div key={product.id} className="card flex flex-col overflow-hidden transition hover:shadow-md dark:bg-gray-800">
+              <div key={product.id} className="group relative card flex flex-col overflow-visible transition-all duration-300 ease-out hover:-translate-y-3 hover:shadow-2xl hover:shadow-emerald-300/40 dark:hover:shadow-emerald-500/20 dark:bg-gray-800 dark:hover:border-emerald-700/60">
+
+                {/* Squirrel nhô ra từ phía dưới khi hover */}
+                <div className="pointer-events-none absolute -bottom-1 right-4 z-20 translate-y-full opacity-0 transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:translate-y-0 group-hover:opacity-100 select-none text-2xl leading-none">
+                  🐿️
+                </div>
+
                 {/* Thumbnail */}
-                <div className="relative flex h-44 items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900">
+                <div className="relative flex h-44 items-center justify-center overflow-hidden rounded-t-2xl bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-950 dark:to-emerald-900">
                   {product.image_url ? (
-                    <Image src={product.image_url} alt={product.name} fill className="object-cover" />
+                    <Image src={product.image_url} alt={product.name} fill className="object-cover transition-transform duration-500 ease-out group-hover:scale-110" />
                   ) : (
-                    <span className="text-6xl">📄</span>
+                    <span className="text-6xl transition-transform duration-300 group-hover:scale-125 group-hover:rotate-6 inline-block">📄</span>
                   )}
+
+                  {/* Shine sweep */}
+                  <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-in-out group-hover:translate-x-full" />
+
                   {customLabel && (
                     <span className="absolute left-2 top-2 rounded-full bg-violet-600 px-2.5 py-0.5 text-xs font-bold text-white shadow">{customLabel}</span>
                   )}
@@ -202,7 +212,7 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                 </div>
 
                 {/* Content */}
-                <div className="flex flex-1 flex-col p-5">
+                <div className="flex flex-1 flex-col overflow-hidden rounded-b-2xl p-5">
                   {product.type && (
                     <span className="mb-2 inline-flex w-fit items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-400">
                       {categories.find((c) => c.id === product.type)?.name
@@ -242,7 +252,10 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                         </div>
                       )}
                     </div>
-                    <Link href={productUrl(product)} className="btn-secondary flex-shrink-0 px-4 py-2 text-xs">
+                    <Link
+                      href={productUrl(product)}
+                      className="flex-shrink-0 rounded-xl border border-gray-200 bg-white px-4 py-2 text-xs font-medium text-gray-700 transition-all duration-200 active:scale-95 group-hover:border-green-500 group-hover:bg-green-500 group-hover:text-white group-hover:shadow-lg group-hover:shadow-green-400/30 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:group-hover:border-emerald-500 dark:group-hover:bg-emerald-500 dark:group-hover:text-white"
+                    >
                       Xem thêm →
                     </Link>
                   </div>
