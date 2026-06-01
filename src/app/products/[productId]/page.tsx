@@ -214,7 +214,7 @@ export default async function ProductPage({ params }: Props) {
                 <span className="h-3 w-3 rounded-full bg-red-400" />
                 <span className="h-3 w-3 rounded-full bg-amber-400" />
                 <span className="h-3 w-3 rounded-full bg-green-400" />
-                <span className="ml-2 flex-1 rounded bg-gray-100 px-3 py-1 text-xs text-gray-400">
+                <span className="ml-2 flex-1 rounded-xl bg-gray-100 px-3 py-1 text-xs text-gray-400"> {/* đã đồng bộ design system */}
                   notion.so / {product.name.toLowerCase().replace(/\s+/g, "-")}
                 </span>
               </div>
@@ -313,12 +313,14 @@ export default async function ProductPage({ params }: Props) {
             {hasDiscount && (
               <div className="mb-3 flex items-center gap-2">
                 <span className="text-sm text-gray-400 line-through">{formatCurrency(product.original_price!)}</span>
-                <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-500">
+                {/* đã đồng bộ design system — badge token */}
+                <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-400">
                   -{calcDiscountPercent(product.price, product.original_price!)}%
                 </span>
               </div>
             )}
-            <div className="mb-4 rounded-lg bg-white/70 p-3 text-xs leading-relaxed text-green-800">
+            {/* đã đồng bộ design system — surface token */}
+            <div className="mb-4 rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 p-3 text-xs leading-relaxed text-gray-700 dark:text-gray-300">
               ✓ Thanh toán 1 lần — không subscription<br />
               ✓ Nhận link qua email trong vài phút<br />
               ✓ Dùng vĩnh viễn, tự do chỉnh sửa

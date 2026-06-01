@@ -148,7 +148,7 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 shrink-0">
           <h2 className="text-base font-semibold text-white">Chọn ảnh</h2>
-          <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 transition-colors">
+          <button type="button" onClick={onClose} className="rounded-xl p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 transition-colors"> /* đã đồng bộ design system */
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -252,7 +252,7 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
                       <button
                         type="button"
                         onClick={() => handleDelete(file)}
-                        className="absolute top-1 right-1 rounded-lg bg-black/60 p-1 text-gray-300 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all"
+                        className="absolute top-1 right-1 rounded-xl bg-black/60 p-1 text-gray-300 opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all" /* đã đồng bộ design system */
                         title="Xóa ảnh"
                       >
                         <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

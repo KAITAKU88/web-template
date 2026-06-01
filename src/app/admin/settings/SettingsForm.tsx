@@ -491,7 +491,7 @@ function ColorField({
           type="color"
           value={hex}
           onChange={(e) => setHex(e.target.value)}
-          className="h-10 w-14 cursor-pointer rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-1"
+          className="h-10 w-14 cursor-pointer rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 p-1" /* đã đồng bộ design system */
         />
         <input
           id={`${name}_text`}
@@ -503,7 +503,7 @@ function ColorField({
           className="w-36 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-colors font-mono"
         />
         <div
-          className="h-8 w-8 rounded-lg border border-gray-300 dark:border-gray-700"
+          className="h-8 w-8 rounded-xl border border-gray-300 dark:border-gray-700" /* đã đồng bộ design system */
           style={{ backgroundColor: hex }}
         />
       </div>

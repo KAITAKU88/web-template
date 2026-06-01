@@ -38,7 +38,7 @@ export default function ImageCarousel({ images, autoPlayMs = 4000, productName =
           <span className="h-3 w-3 rounded-full bg-red-400" />
           <span className="h-3 w-3 rounded-full bg-amber-400" />
           <span className="h-3 w-3 rounded-full bg-green-400" />
-          <span className="ml-2 flex-1 rounded bg-gray-100 px-3 py-1 text-xs text-gray-400 truncate">
+          <span className="ml-2 flex-1 rounded-xl bg-gray-100 px-3 py-1 text-xs text-gray-400 truncate"> {/* đã đồng bộ design system */}
             notion.so / {productName.toLowerCase().replace(/\s+/g, "-")}
           </span>
           <span className="text-xs text-gray-400">{current + 1}/{images.length}</span>
@@ -70,12 +70,12 @@ export default function ImageCarousel({ images, autoPlayMs = 4000, productName =
           <div className="flex items-center justify-between bg-white px-4 py-2">
             {/* Prev/Next */}
             <div className="flex gap-1">
-              <button onClick={prev} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors">
+              <button onClick={prev} className="rounded-xl p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"> /* đã đồng bộ design system */
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <button onClick={next} className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors">
+              <button onClick={next} className="rounded-xl p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"> /* đã đồng bộ design system */
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                 </svg>

@@ -508,7 +508,7 @@ export default function StorageBrowser() {
                           <input value={renamingItem.draft}
                             onChange={(e) => setRenamingItem({ ...renamingItem, draft: e.target.value })}
                             onKeyDown={(e) => { if (e.key === "Enter") handleRenameFile(file.name, renamingItem.draft); if (e.key === "Escape") setRenamingItem(null); }}
-                            autoFocus className="flex-1 text-xs bg-gray-100 dark:bg-gray-800 border border-emerald-500 rounded px-1.5 py-0.5 text-white outline-none min-w-0"
+                            autoFocus className="flex-1 text-xs bg-gray-100 dark:bg-gray-800 border border-emerald-500 rounded-xl px-1.5 py-0.5 text-white outline-none min-w-0" /* đã đồng bộ design system */
                             onClick={(e) => e.stopPropagation()} />
                           <button type="button" onClick={() => handleRenameFile(file.name, renamingItem.draft)} className="text-emerald-400 hover:text-emerald-300 text-xs shrink-0">✓</button>
                           <button type="button" onClick={() => setRenamingItem(null)} className="text-gray-500 hover:text-gray-900 dark:hover:text-white text-xs shrink-0">✗</button>
@@ -554,7 +554,7 @@ export default function StorageBrowser() {
                             if (e.key === "Enter") renamingItem.isFolder ? handleRenameFolder(file.name, renamingItem.draft) : handleRenameFile(file.name, renamingItem.draft);
                             if (e.key === "Escape") setRenamingItem(null);
                           }}
-                          autoFocus className="flex-1 text-xs bg-gray-100 dark:bg-gray-800 border border-emerald-500 rounded px-2 py-1 text-white outline-none" />
+                          autoFocus className="flex-1 text-xs bg-gray-100 dark:bg-gray-800 border border-emerald-500 rounded-xl px-2 py-1 text-white outline-none" /> /* đã đồng bộ design system */
                         <button type="button" onClick={() => renamingItem.isFolder ? handleRenameFolder(file.name, renamingItem.draft) : handleRenameFile(file.name, renamingItem.draft)}
                           className="text-emerald-400 hover:text-emerald-300 text-xs px-1">✓</button>
                         <button type="button" onClick={() => setRenamingItem(null)} className="text-gray-500 hover:text-gray-900 dark:hover:text-white text-xs px-1">✗</button>
