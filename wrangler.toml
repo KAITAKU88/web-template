@@ -1,4 +1,5 @@
 name = "web-template-cloudflare"
+account_id = "37bf38733c50498a991caa8d3b2248c7"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
