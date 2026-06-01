@@ -128,7 +128,8 @@ export default async function ProductPage({ params }: Props) {
               {hasDiscount && (
                 <div className="mt-0.5 flex items-center gap-2">
                   <span className="text-sm text-gray-400 line-through">{formatCurrency(product.original_price!)}</span>
-                  <span className="rounded bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-red-500">
+                  {/* đã đồng bộ design system — token: bg-red-500/10 text-red-400 rounded-full */}
+                  <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-400">
                     Tiết kiệm {formatCurrency(product.original_price! - product.price)}
                   </span>
                 </div>

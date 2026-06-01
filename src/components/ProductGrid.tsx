@@ -246,7 +246,8 @@ export default function ProductGrid({ products, categories = [] }: { products: P
                       {discount && product.original_price && (
                         <div className="flex items-center gap-1.5">
                           <span className="text-xs text-gray-400 line-through">{formatCurrency(product.original_price)}</span>
-                          <span className="rounded bg-red-50 px-1 py-0.5 text-xs font-semibold text-red-500">-{discount}%</span>
+                          {/* đã đồng bộ design system — token: bg-red-500/10 text-red-400 rounded-full */}
+                          <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-400">-{discount}%</span>
                         </div>
                       )}
                     </div>

@@ -629,7 +629,8 @@ export default function StorageBrowser() {
       )}
 
       {dragOver && (
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-emerald-500/10 backdrop-blur-sm pointer-events-none">
+        // đã đồng bộ design system — bỏ backdrop-blur-sm (gây compositing bug trong AdminShell fixed container)
+        <div className="fixed inset-0 z-40 flex items-center justify-center bg-emerald-500/5 pointer-events-none">
           <div className="rounded-2xl border-2 border-emerald-500 bg-white dark:bg-gray-900 px-10 py-8 text-center">
             <div className="text-4xl mb-3">⬆️</div>
             <p className="text-lg font-semibold text-emerald-400">Thả ảnh để upload</p>

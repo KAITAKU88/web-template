@@ -211,7 +211,8 @@ export default function ProductDetail({ product }: { product: Product }) {
             {discount && product.original_price && (
               <>
                 <span className="text-base text-gray-400 line-through mb-0.5">{formatCurrency(product.original_price)}</span>
-                <span className="mb-0.5 rounded-md bg-red-50 px-2 py-0.5 text-sm font-bold text-red-500">-{discount}%</span>
+                {/* đã đồng bộ design system — token: bg-red-500/10 text-red-400 rounded-full */}
+                <span className="mb-0.5 rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-400">-{discount}%</span>
               </>
             )}
           </div>
