@@ -582,8 +582,8 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
       </div>
 
       {/* ── Submit ────────────────────────────────────────────── */}
-      <div className={`sticky bottom-0 -mx-0 rounded-2xl transition-all duration-300 ${
-        isDirty ? "bg-gray-950 border border-emerald-500/30 px-6 py-4 shadow-xl shadow-emerald-900/20" : "px-0 py-2"
+      <div className={`rounded-2xl px-6 py-4 border transition-colors duration-200 ${
+        isDirty ? "bg-gray-950 border-emerald-500/30 shadow-xl shadow-emerald-900/20" : "bg-gray-900/50 border-gray-800"
       }`}>
         <div className="flex items-center gap-4">
           <button
