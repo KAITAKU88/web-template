@@ -36,7 +36,7 @@ function ThemeToggle() {
     <button
       onClick={cycleTheme}
       title={`Giao diện: ${labels[theme]} — nhấn để đổi`}
-      className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
+      className="flex items-center gap-1.5 rounded-xl px-2.5 py-1.5 text-xs text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors" /* đã đồng bộ design system */
     >
       <span>{icons[theme]}</span>
       <span className="hidden sm:inline">{labels[theme]}</span>

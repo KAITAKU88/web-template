@@ -369,7 +369,7 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
                   const rc = Math.floor(downloadCount * (0.1 + Math.random() * 0.23));
                   setRating(r); setRatingCount(rc); setIsDirty(true);
                 }}
-                className="rounded-lg bg-violet-500/10 px-2.5 py-1 text-xs text-violet-400 hover:bg-violet-500/20 transition-colors"
+                className="rounded-xl bg-violet-500/10 px-2.5 py-1 text-xs text-violet-400 hover:bg-violet-500/20 transition-colors" /* đã đồng bộ design system */
               >
                 ✨ Auto-fill
               </button>
@@ -463,7 +463,7 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
                   {/* Remove button */}
                   <button type="button"
                     onClick={() => setGalleryImages((prev) => prev.filter((_, idx) => idx !== i))}
-                    className="absolute right-1 top-1 rounded-lg bg-black/60 p-1 text-white opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all">
+                    className="absolute right-1 top-1 rounded-xl bg-black/60 p-1 text-white opacity-0 group-hover:opacity-100 hover:text-red-400 transition-all" /* đã đồng bộ design system */>
                     <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                     </svg>

@@ -214,13 +214,13 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
                   </button>
                   <button
                     onClick={() => openEdit(r)}
-                    className="rounded-lg bg-gray-100 dark:bg-gray-800 px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-700 transition-colors"
+                    className="rounded-xl bg-gray-100 dark:bg-gray-800 px-2.5 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-700 transition-colors" /* đã đồng bộ design system */
                   >
                     Sửa
                   </button>
                   <button
                     onClick={() => handleDelete(r.id)}
-                    className="rounded-lg bg-red-500/10 px-2.5 py-1.5 text-xs text-red-400 hover:bg-red-500/20 transition-colors"
+                    className="rounded-xl bg-red-500/10 px-2.5 py-1.5 text-xs text-red-400 hover:bg-red-500/20 transition-colors" /* đã đồng bộ design system */
                   >
                     Xóa
                   </button>
@@ -316,7 +316,7 @@ export default function AutomationClient({ rules: initial, groups }: { rules: Ru
                     <div className="grid grid-cols-2 gap-1">
                       {TEMPLATE_VARS.map((v) => (
                         <div key={v.var} className="flex items-center gap-2">
-                          <code className="rounded bg-gray-700 px-1.5 py-0.5 text-xs text-emerald-400">{v.var}</code>
+                          <code className="rounded-lg bg-gray-700 px-1.5 py-0.5 text-xs text-emerald-400">{v.var}</code> {/* đã đồng bộ design system */}
                           <span className="text-xs text-gray-500">{v.desc}</span>
                         </div>
                       ))}

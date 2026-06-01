@@ -464,7 +464,7 @@ export default function StorageBrowser() {
                           <input value={renamingItem.draft}
                             onChange={(e) => setRenamingItem({ ...renamingItem, draft: e.target.value })}
                             onKeyDown={(e) => { if (e.key === "Enter") handleRenameFolder(file.name, renamingItem.draft); if (e.key === "Escape") setRenamingItem(null); }}
-                            autoFocus className="w-full text-xs bg-gray-700 border border-emerald-500 rounded px-1.5 py-0.5 text-white outline-none text-center"
+                            autoFocus className="w-full text-xs bg-gray-700 border border-emerald-500 rounded-xl px-1.5 py-0.5 text-white outline-none text-center" /* đã đồng bộ design system */
                             onClick={(e) => e.stopPropagation()} />
                           <div className="flex gap-2">
                             <button type="button" onClick={() => handleRenameFolder(file.name, renamingItem.draft)} className="text-emerald-400 text-xs hover:text-emerald-300">✓</button>
@@ -598,7 +598,7 @@ export default function StorageBrowser() {
             </p>
             <div className="space-y-1 mb-4 max-h-52 overflow-y-auto">
               <button type="button" onClick={() => setMoveTarget("")}
-                className={`w-full text-left rounded-lg px-3 py-2 text-xs transition-colors ${moveTarget === "" ? "bg-emerald-500/20 text-emerald-400" : "text-gray-400 hover:bg-gray-800"}`}>
+                className={`w-full text-left rounded-xl px-3 py-2 text-xs transition-colors ${moveTarget === "" ? "bg-emerald-500/20 text-emerald-400" : "text-gray-400 hover:bg-gray-800"}`}> /* đã đồng bộ design system */
                 <span className="flex items-center gap-2">
                   <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
                   / (Root)
@@ -607,7 +607,7 @@ export default function StorageBrowser() {
               </button>
               {moveFolders.map((f) => (
                 <button type="button" key={f} onClick={() => setMoveTarget(f)}
-                  className={`w-full text-left rounded-lg px-3 py-2 text-xs transition-colors ${moveTarget === f ? "bg-emerald-500/20 text-emerald-400" : "text-gray-400 hover:bg-gray-800"}`}>
+                  className={`w-full text-left rounded-xl px-3 py-2 text-xs transition-colors ${moveTarget === f ? "bg-emerald-500/20 text-emerald-400" : "text-gray-400 hover:bg-gray-800"}`}> /* đã đồng bộ design system */
                   <span className="flex items-center gap-2">
                     <svg className="h-3.5 w-3.5 text-amber-400" fill="currentColor" viewBox="0 0 24 24"><path d="M10 4H4c-1.11 0-2 .89-2 2v12a2 2 0 002 2h16a2 2 0 002-2V8c0-1.11-.89-2-2-2h-8l-2-2z" /></svg>
                     {f}/

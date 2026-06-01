@@ -15,7 +15,7 @@ function LoginTabs({ active }: { active: string }) {
     <div className="mb-6 flex rounded-xl border border-gray-800 bg-gray-800/50 p-1 gap-1">
       {LOGIN_TABS.map((tab) => (
         <Link key={tab.href} href={tab.href}
-          className={`flex-1 rounded-lg py-2 text-center text-xs font-semibold transition ${
+          className={`flex-1 rounded-xl py-2 text-center text-xs font-semibold transition ${ /* đã đồng bộ design system */
             active === tab.href
               ? "bg-gray-700 text-white shadow"
               : "text-gray-500 hover:text-gray-300"
@@ -96,13 +96,13 @@ export default function LoginForm({ brandName, showHint = false }: { brandName: 
           </div>
 
           {showHint && (
-            <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-300">
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-xs text-amber-300"> {/* đã đồng bộ design system */}
               <p className="font-semibold mb-0.5">Mật khẩu mặc định</p>
               <p className="font-mono tracking-wide">admin12345678</p>
               <p className="mt-1.5 text-amber-400/70">Hint này ẩn sau khi bạn đổi mật khẩu.</p>
             </div>
           )}
-          {error && <p className="rounded-lg bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>}
+          {error && <p className="rounded-xl bg-red-500/10 px-4 py-2.5 text-sm text-red-400">{error}</p>} {/* đã đồng bộ design system */}
 
           <button type="submit" disabled={loading}
             className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-semibold text-white transition hover:bg-emerald-600 disabled:opacity-60">

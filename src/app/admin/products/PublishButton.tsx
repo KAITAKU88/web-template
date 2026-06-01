@@ -19,7 +19,7 @@ export function PublishButton({ id, status }: { id: string; status: string }) {
     <button
       onClick={handleToggle}
       disabled={isPending}
-      className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${
+      className={`rounded-xl px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50 ${ /* đã đồng bộ design system */
         currentStatus === "published"
           ? "bg-emerald-500/10 text-emerald-400 hover:bg-red-500/10 hover:text-red-400"
           : "bg-gray-800 text-gray-400 hover:bg-emerald-500/10 hover:text-emerald-400"

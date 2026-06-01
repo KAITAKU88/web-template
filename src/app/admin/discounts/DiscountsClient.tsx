@@ -178,7 +178,7 @@ export default function DiscountsClient({ codes: init, products }: { codes: Disc
                   </td>
                   <td className="px-4 py-3 text-center">
                     <button onClick={() => handleDelete(dc.id)}
-                      className="rounded-lg px-2.5 py-1 text-xs text-red-400 hover:bg-red-500/10 transition-colors">
+                      className="rounded-xl px-2.5 py-1 text-xs text-red-400 hover:bg-red-500/10 transition-colors"> /* đã đồng bộ design system */
                       Xóa
                     </button>
                   </td>

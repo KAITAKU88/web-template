@@ -107,7 +107,7 @@ export default async function MarketingPage() {
                 {c.status === "draft" && (
                   <Link
                     href={`/admin/marketing/${c.id}/edit`}
-                    className="shrink-0 rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-700 transition-colors"
+                    className="shrink-0 rounded-xl bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-700 transition-colors" /* đã đồng bộ design system */
                   >
                     Sửa
                   </Link>

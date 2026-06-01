@@ -16,7 +16,7 @@ export default function ResendEmailButton({ orderId }: { orderId: string }) {
     <button
       onClick={handleClick}
       disabled={state === "sending" || state === "ok"}
-      className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-colors ${
+      className={`rounded-xl px-2.5 py-1 text-xs font-medium transition-colors ${ /* đã đồng bộ design system */
         state === "ok"  ? "bg-emerald-500/20 text-emerald-400 cursor-default" :
         state === "err" ? "bg-red-500/20 text-red-400 hover:bg-red-500/30" :
         state === "sending" ? "bg-gray-700 text-gray-500 cursor-wait" :

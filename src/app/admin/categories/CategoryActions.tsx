@@ -29,19 +29,19 @@ export default function CategoryActions({ id, name, isFirst, isLast }: Props) {
         <button
           disabled={isFirst || pending}
           onClick={() => startTransition(() => reorderCategory(id, "up"))}
-          className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-700 hover:text-white disabled:opacity-20"
+          className="rounded-xl p-1.5 text-gray-400 transition hover:bg-gray-700 hover:text-white disabled:opacity-20" /* đã đồng bộ design system */
           title="Lên"
         >↑</button>
         <button
           disabled={isLast || pending}
           onClick={() => startTransition(() => reorderCategory(id, "down"))}
-          className="rounded-lg p-1.5 text-gray-400 transition hover:bg-gray-700 hover:text-white disabled:opacity-20"
+          className="rounded-xl p-1.5 text-gray-400 transition hover:bg-gray-700 hover:text-white disabled:opacity-20" /* đã đồng bộ design system */
           title="Xuống"
         >↓</button>
         <button
           disabled={pending}
           onClick={handleDelete}
-          className="rounded-lg p-1.5 text-gray-400 transition hover:bg-red-500/10 hover:text-red-400 disabled:opacity-20"
+          className="rounded-xl p-1.5 text-gray-400 transition hover:bg-red-500/10 hover:text-red-400 disabled:opacity-20" /* đã đồng bộ design system */
           title="Xóa"
         >✕</button>
       </div>

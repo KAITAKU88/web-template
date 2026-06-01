@@ -16,7 +16,7 @@ export function DeleteButton({ id, name }: { id: string; name: string }) {
       type="button"
       onClick={handleClick}
       disabled={pending}
-      className="rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-400 hover:bg-red-500/20 hover:text-red-400 transition-colors disabled:opacity-50"
+      className="rounded-xl bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-400 hover:bg-red-500/20 hover:text-red-400 transition-colors disabled:opacity-50" /* đã đồng bộ design system */
     >
       {pending ? "…" : "Xóa"}
     </button>

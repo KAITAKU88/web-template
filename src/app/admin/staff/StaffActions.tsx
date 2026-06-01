@@ -62,7 +62,7 @@ export function StaffRow({ staff }: { staff: Staff }) {
             onClick={() => setShowReset(!showReset)}
             disabled={pending}
             title="Đặt lại mật khẩu"
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-700 hover:text-white transition"
+            className="rounded-xl p-1.5 text-gray-400 hover:bg-gray-700 hover:text-white transition" /* đã đồng bộ design system */
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
@@ -72,7 +72,7 @@ export function StaffRow({ staff }: { staff: Staff }) {
             onClick={handleToggle}
             disabled={pending}
             title={staff.is_active ? "Khóa tài khoản" : "Mở khóa"}
-            className={`rounded-lg p-1.5 transition ${staff.is_active ? "text-gray-400 hover:bg-amber-500/10 hover:text-amber-400" : "text-gray-400 hover:bg-emerald-500/10 hover:text-emerald-400"}`}
+            className={`rounded-xl p-1.5 transition ${staff.is_active ? "text-gray-400 hover:bg-amber-500/10 hover:text-amber-400" : "text-gray-400 hover:bg-emerald-500/10 hover:text-emerald-400"}`} /* đã đồng bộ design system */
           >
             {staff.is_active ? (
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -84,7 +84,7 @@ export function StaffRow({ staff }: { staff: Staff }) {
             onClick={handleDelete}
             disabled={pending}
             title="Xóa"
-            className="rounded-lg p-1.5 text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition"
+            className="rounded-xl p-1.5 text-gray-400 hover:bg-red-500/10 hover:text-red-400 transition" /* đã đồng bộ design system */
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}><path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
           </button>

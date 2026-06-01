@@ -201,7 +201,7 @@ export default function AdminProductsClient({
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/admin/products/${p.id}/edit`}
-                            className="rounded-lg bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors"
+                            className="rounded-xl bg-gray-100 dark:bg-gray-800 px-3 py-1.5 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white transition-colors" /* đã đồng bộ design system */
                           >
                             Sửa
                           </Link>
