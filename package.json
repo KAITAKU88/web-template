@@ -19,6 +19,7 @@
     "@google/genai": "^2.6.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.1",
+    "lottie-react": "^2.4.1",
     "next": "15.5.18",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
