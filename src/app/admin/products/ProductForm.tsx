@@ -22,6 +22,7 @@ interface Props {
   submitLabel?: string;
   categories?: Category[];
   aiProvider?: string | null;
+  aiModel?: string | null;
 }
 
 const DEFAULT_CATEGORIES: Category[] = [
@@ -29,7 +30,7 @@ const DEFAULT_CATEGORIES: Category[] = [
   { id: "google_sheet", name: "Google Sheets" },
 ];
 
-export default function ProductForm({ product, onSubmit, onCancel, submitLabel = "Lưu sản phẩm", categories = DEFAULT_CATEGORIES, aiProvider }: Props) {
+export default function ProductForm({ product, onSubmit, onCancel, submitLabel = "Lưu sản phẩm", categories = DEFAULT_CATEGORIES, aiProvider, aiModel }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const [saving, startSave] = useTransition();
   const [generating, startGenerate] = useTransition();
@@ -538,12 +539,12 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
             ) : aiProvider === "gemini" ? (
               <p className="flex items-center gap-1.5 text-xs text-blue-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shrink-0" />
-                Đang dùng <span className="font-semibold">Gemini API</span> (gemini-2.0-flash)
+                Đang dùng <span className="font-semibold">Gemini API</span>{aiModel ? ` (${aiModel})` : ""}
               </p>
             ) : aiProvider === "claude" ? (
               <p className="flex items-center gap-1.5 text-xs text-violet-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-violet-400 shrink-0" />
-                Đang dùng <span className="font-semibold">Claude API</span> (claude-sonnet-4-6)
+                Đang dùng <span className="font-semibold">Claude API</span>{aiModel ? ` (${aiModel})` : ""}
               </p>
             ) : (
               <p className="flex items-center gap-1.5 text-xs text-red-400">

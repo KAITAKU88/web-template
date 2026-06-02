@@ -39,7 +39,14 @@ export default async function EditProductPage({ params }: Props) {
         <h1 className="text-2xl font-bold text-white">Chỉnh sửa: {product.name}</h1>
       </div>
 
-      <ProductFormWithCancel product={product} onSubmit={handleUpdate} submitLabel="Lưu thay đổi" categories={categories} aiProvider={settings.ai_provider ?? null} />
+      <ProductFormWithCancel
+        product={product}
+        onSubmit={handleUpdate}
+        submitLabel="Lưu thay đổi"
+        categories={categories}
+        aiProvider={settings.ai_provider ?? null}
+        aiModel={settings.ai_provider === "gemini" ? (settings.gemini_model ?? "gemini-2.0-flash") : settings.ai_provider === "claude" ? (settings.claude_model ?? "claude-sonnet-4-6") : null}
+      />
     </div>
   );
 }

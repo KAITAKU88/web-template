@@ -285,9 +285,11 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
         description="Tự động tạo nội dung marketing khi thêm sản phẩm mới"
       >
         <ProviderField
-          currentProvider={settings.ai_provider ?? "claude"}
+          currentProvider={settings.ai_provider ?? ""}
           hasClaudeKey={!!settings.claude_api_key}
           hasGeminiKey={!!settings.gemini_api_key}
+          claudeModel={settings.claude_model ?? "claude-sonnet-4-6"}
+          geminiModel={settings.gemini_model ?? "gemini-2.0-flash"}
         />
       </Section>
 
@@ -719,10 +721,14 @@ function ProviderField({
   currentProvider,
   hasClaudeKey,
   hasGeminiKey,
+  claudeModel,
+  geminiModel,
 }: {
   currentProvider: string;
   hasClaudeKey: boolean;
   hasGeminiKey: boolean;
+  claudeModel: string;
+  geminiModel: string;
 }) {
   const [provider, setProvider] = useState(currentProvider);
 
@@ -766,7 +772,7 @@ function ProviderField({
         </div>
       </div>
 
-      {/* Claude API Key */}
+      {/* Claude API Key + Model */}
       <div className={provider !== "claude" ? "opacity-40 pointer-events-none" : ""}>
         <SecretField
           label="Claude API Key"
@@ -786,9 +792,16 @@ function ProviderField({
             </span>
           }
         />
+        <Field
+          label="Claude Model"
+          name="claude_model"
+          defaultValue={claudeModel}
+          placeholder="claude-sonnet-4-6"
+          hint="Ví dụ: claude-sonnet-4-6, claude-opus-4-8, claude-haiku-4-5-20251001"
+        />
       </div>
 
-      {/* Gemini API Key */}
+      {/* Gemini API Key + Model */}
       <div className={provider !== "gemini" ? "opacity-40 pointer-events-none" : ""}>
         <SecretField
           label="Gemini API Key"
@@ -807,6 +820,13 @@ function ProviderField({
               </a>
             </span>
           }
+        />
+        <Field
+          label="Gemini Model"
+          name="gemini_model"
+          defaultValue={geminiModel}
+          placeholder="gemini-2.0-flash"
+          hint="Ví dụ: gemini-2.0-flash, gemini-1.5-pro, gemini-2.0-flash-lite"
         />
       </div>
     </>

@@ -100,10 +100,10 @@ function parseJson(raw: string): ProductCopy {
   }
 }
 
-async function generateWithClaude(prompt: string, apiKey: string): Promise<ProductCopy> {
+async function generateWithClaude(prompt: string, apiKey: string, model: string): Promise<ProductCopy> {
   const client = new Anthropic({ apiKey });
   const message = await client.messages.create({
-    model: "claude-sonnet-4-6",
+    model,
     max_tokens: 4096,
     messages: [{ role: "user", content: prompt }],
   });
@@ -112,12 +112,12 @@ async function generateWithClaude(prompt: string, apiKey: string): Promise<Produ
   return parseJson(raw);
 }
 
-async function generateWithGemini(prompt: string, apiKey: string): Promise<ProductCopy> {
+async function generateWithGemini(prompt: string, apiKey: string, model: string): Promise<ProductCopy> {
   const ai = new GoogleGenAI({ apiKey });
   let response;
   try {
     response = await ai.models.generateContent({
-      model: "gemini-2.0-flash",
+      model,
       contents: prompt,
     });
   } catch (err) {
@@ -155,13 +155,15 @@ export async function generateLandingContent(
     if (provider === "gemini") {
       const apiKey = settings.gemini_api_key;
       if (!apiKey) return { error: "Gemini API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key." };
-      return { data: await generateWithGemini(prompt, apiKey) };
+      const model = settings.gemini_model ?? "gemini-2.0-flash";
+      return { data: await generateWithGemini(prompt, apiKey, model) };
     }
 
     if (provider === "claude") {
       const apiKey = settings.claude_api_key;
       if (!apiKey) return { error: "Claude API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key." };
-      return { data: await generateWithClaude(prompt, apiKey) };
+      const model = settings.claude_model ?? "claude-sonnet-4-6";
+      return { data: await generateWithClaude(prompt, apiKey, model) };
     }
 
     return { error: `AI provider không hợp lệ: "${provider}". Vào Admin → Cấu hình → AI để cấu hình lại.` };
