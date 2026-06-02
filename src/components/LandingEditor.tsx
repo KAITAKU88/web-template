@@ -396,11 +396,11 @@ export default function LandingEditor({ value, onChange, productId, productSlug 
                   value={icon}
                   onChange={(e) => patch({ solutionFormula: { ...lp.solutionFormula, [key]: `${e.target.value} ${text}`.trim() } })}
                   placeholder="📥"
-                  className={`${inputCls} w-14 shrink-0 text-center`}
+                  className="w-14 shrink-0 text-center rounded-xl border border-gray-700 bg-gray-800 px-2 py-2 text-sm text-white placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30"
                 />
                 <input
                   value={text}
-                  onChange={(e) => patch({ solutionFormula: { ...lp.solutionFormula, [key]: `${icon} ${e.target.value}`.trim() } })}
+                  onChange={(e) => patch({ solutionFormula: { ...lp.solutionFormula, [key]: icon ? `${icon} ${e.target.value}` : e.target.value } })}
                   placeholder={idx === 2 ? "Không bao giờ quên" : "Capture nhanh"}
                   className={`${inputCls} flex-1`}
                 />

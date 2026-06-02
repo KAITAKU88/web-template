@@ -121,29 +121,31 @@ export default async function ProductPage({ params }: Props) {
             </div>
           )}
 
-          {/* Giá + CTA */}
-          <div className="flex items-end justify-between gap-5">
-            <div>
-              <div className="text-3xl font-extrabold text-brand">{formatCurrency(product.price)}</div>
-              {hasDiscount && (
-                <div className="mt-0.5 flex items-center gap-2">
-                  <span className="text-sm text-gray-400 line-through">{formatCurrency(product.original_price!)}</span>
-                  <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:text-red-400">
-                    Tiết kiệm {formatCurrency(product.original_price! - product.price)}
-                  </span>
-                </div>
-              )}
+          {/* Giá + CTA + Trust badges — cùng một khối, center */}
+          <div className="mx-auto w-fit">
+            <div className="flex w-full items-end justify-between gap-8">
+              <div>
+                <div className="text-3xl font-extrabold text-brand">{formatCurrency(product.price)}</div>
+                {hasDiscount && (
+                  <div className="mt-0.5 flex items-center gap-2">
+                    <span className="text-sm text-gray-400 line-through">{formatCurrency(product.original_price!)}</span>
+                    <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:text-red-400">
+                      Tiết kiệm {formatCurrency(product.original_price! - product.price)}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <Link href={`/checkout/${product.slug ?? product.id}`} className="btn-primary shrink-0">
+                Mua ngay →
+              </Link>
             </div>
-            <Link href={`/checkout/${product.slug ?? product.id}`} className="btn-primary">
-              Mua ngay →
-            </Link>
-          </div>
 
-          {/* Trust badges */}
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-gray-400">
-            <span>✓ Thanh toán 1 lần — dùng vĩnh viễn</span>
-            <span>✓ Nhận link qua email tức thì</span>
-            <span>✓ Tự do chỉnh sửa</span>
+            {/* Trust badges */}
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-x-6 gap-y-1 text-xs text-gray-400">
+              <span>✓ Thanh toán 1 lần — dùng vĩnh viễn</span>
+              <span>✓ Nhận link qua email tức thì</span>
+              <span>✓ Tự do chỉnh sửa</span>
+            </div>
           </div>
         </div>
       </section>
