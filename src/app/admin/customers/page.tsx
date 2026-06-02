@@ -61,10 +61,22 @@ export default async function CustomersPage() {
     }
   }
 
-  // Gắn groups vào từng khách hàng
+  // Gắn groups vào từng khách hàng (và thêm email chỉ có trong group nhưng chưa có orders)
   for (const m of groupMembers ?? []) {
     const c = customerMap.get(m.email);
-    if (c) c.groups.push(m.group_id);
+    if (c) {
+      c.groups.push(m.group_id);
+    } else {
+      // Email được import vào group nhưng chưa có orders → vẫn hiển thị
+      customerMap.set(m.email, {
+        email: m.email,
+        phone: null,
+        total_orders: 0,
+        total_revenue: 0,
+        last_purchase: null,
+        groups: [m.group_id],
+      });
+    }
   }
 
   const customers = Array.from(customerMap.values());

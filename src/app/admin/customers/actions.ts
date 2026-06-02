@@ -38,3 +38,21 @@ export async function removeFromGroup(email: string, groupId: string) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin/customers");
 }
+
+export async function bulkAddToGroup(
+  emails: string[],
+  groupId: string,
+): Promise<{ added: number; errors: string[] }> {
+  const supabase = createAdminClient();
+  const rows = emails
+    .map((e) => e.trim().toLowerCase())
+    .filter((e) => e.includes("@"))
+    .map((email) => ({ email, group_id: groupId }));
+  if (!rows.length) return { added: 0, errors: ["Không có email hợp lệ"] };
+  const { error } = await supabase
+    .from("customer_group_members")
+    .upsert(rows, { ignoreDuplicates: true });
+  if (error) return { added: 0, errors: [error.message] };
+  revalidatePath("/admin/customers");
+  return { added: rows.length, errors: [] };
+}
