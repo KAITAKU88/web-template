@@ -75,6 +75,21 @@ export function buildDefaultLanding(
         title: "Thiếu hệ thống nhất quán",
         desc: `Làm việc mỗi ngày một kiểu, không có quy trình chuẩn. Hiệu suất lên xuống thất thường và không biết cần cải thiện gì.`,
       },
+      {
+        icon: "😩",
+        title: "Bắt đầu mãi không xong",
+        desc: `Biết là cần có hệ thống nhưng không biết bắt đầu từ đâu. Cứ trì hoãn vì sợ làm sai rồi phải làm lại từ đầu.`,
+      },
+      {
+        icon: "🔁",
+        title: "Lặp lại công việc thủ công",
+        desc: `Cùng một loại task nhưng mỗi lần lại phải làm lại từ đầu. Không có template chuẩn nên tốn thêm thời gian không cần thiết.`,
+      },
+      {
+        icon: "📊",
+        title: "Không theo dõi được tiến trình",
+        desc: `Không biết mình đang tiến triển đến đâu. Thiếu dữ liệu để nhìn lại và cải thiện từng tuần.`,
+      },
     ],
     solutionTitle: `${name} — hệ thống đã được thiết kế sẵn cho bạn`,
     solutionDesc: `Thay vì mày mò build từ đầu, bạn nhận ngay ${toolLabel} đã được tối ưu. Duplicate một lần, customize theo ý, dùng vĩnh viễn.`,
@@ -90,6 +105,12 @@ export function buildDefaultLanding(
       { icon: "🔗", title: "Tích hợp đầy đủ tính năng", desc: `Tận dụng toàn bộ sức mạnh của ${categoryLabel} — không giới hạn.` },
       { icon: "♾️", title: "Cập nhật miễn phí", desc: "Nhận phiên bản cải tiến khi có — không cần trả thêm bất cứ thứ gì." },
       { icon: "🛡️", title: "Hỗ trợ tận tình", desc: "Gặp vấn đề? Liên hệ qua Zalo hoặc email — phản hồi trong ngày làm việc." },
+    ],
+    goals: [
+      { icon: "⏱️", title: "Tiết kiệm hàng giờ mỗi tuần", desc: "Không còn mày mò setup hay xây lại từ đầu — tập trung 100% vào việc thực sự quan trọng." },
+      { icon: "📈", title: "Tăng năng suất rõ rệt", desc: "Hệ thống có cấu trúc giúp bạn làm việc có trọng tâm, không bị phân tán hay bỏ sót." },
+      { icon: "🧘", title: "Giảm stress, đầu óc nhẹ nhàng", desc: "Mọi thứ có chỗ cố định — không còn lo lắng quên hay bỏ sót điều quan trọng." },
+      { icon: "🎯", title: "Nhìn rõ mục tiêu mỗi ngày", desc: `${categoryLabel} giúp bạn luôn biết mình cần làm gì tiếp theo và đang tiến triển đến đâu.` },
     ],
     testimonials: [
       {
@@ -110,6 +131,12 @@ export function buildDefaultLanding(
         role: "Sinh viên · Đà Nẵng",
         avatar: "🧑‍🎓",
       },
+    ],
+    audience: [
+      { icon: "💼", title: "Người đi làm bận rộn", desc: "Muốn có hệ thống tổ chức ngay mà không có thời gian tự build từ đầu." },
+      { icon: "🧑‍💻", title: "Freelancer & Remote worker", desc: "Cần công cụ linh hoạt để quản lý nhiều dự án và khách hàng cùng lúc." },
+      { icon: "🎓", title: "Sinh viên & Người học", desc: "Muốn học hiệu quả hơn với hệ thống ghi chú và lên kế hoạch khoa học." },
+      { icon: "🚀", title: "Người mới bắt đầu", desc: `Chưa quen ${categoryLabel} nhưng muốn có hệ thống tốt ngay — không cần biết gì phức tạp.` },
     ],
     includes: [
       { title: "Template đầy đủ tính năng", desc: "Sẵn sàng dùng ngay sau khi duplicate" },

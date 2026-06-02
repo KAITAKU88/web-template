@@ -1,6 +1,8 @@
 export interface PainItem    { icon: string; title: string; desc: string; }
 export interface FeatureItem { icon: string; title: string; desc: string; }
+export interface GoalItem    { icon: string; title: string; desc: string; }
 export interface TestiItem   { text: string; name: string; role: string; avatar: string; }
+export interface AudienceItem { icon: string; title: string; desc: string; }
 export interface IncludeItem { title: string; desc: string; }
 export interface FaqItem     { q: string; a: string; }
 
@@ -12,7 +14,9 @@ export interface ProductCopy {
   solutionDesc: string;
   solutionFormula: { a: string; b: string; result: string };
   features: FeatureItem[];
+  goals?: GoalItem[];       // Section 6: Mục tiêu (4-6 items)
   testimonials: TestiItem[];
+  audience?: AudienceItem[]; // Section 8: Đối tượng sử dụng (4-6 items)
   includes: IncludeItem[];
   faqs: FaqItem[];
 }

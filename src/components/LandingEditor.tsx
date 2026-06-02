@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import type { ProductCopy, PainItem, FeatureItem, TestiItem, IncludeItem, FaqItem } from "@/lib/productContent";
+import type { ProductCopy, PainItem, FeatureItem, GoalItem, TestiItem, AudienceItem, IncludeItem, FaqItem } from "@/lib/productContent";
 import { createClient } from "@/lib/supabase/client";
 
 const MAX_TESTIMONIALS = 4;
@@ -15,7 +15,9 @@ const EMPTY: ProductCopy = {
   solutionDesc: "",
   solutionFormula: { a: "", b: "", result: "" },
   features: [{ icon: "✅", title: "", desc: "" }],
+  goals: [{ icon: "🎯", title: "", desc: "" }],
   testimonials: [{ text: "", name: "", role: "", avatar: "👤" }],
+  audience: [{ icon: "👤", title: "", desc: "" }],
   includes: [{ title: "", desc: "" }],
   faqs: [{ q: "", a: "" }],
 };
@@ -236,6 +238,22 @@ export default function LandingEditor({ value, onChange, productId }: Props) {
   function addFeature() { patch({ features: [...lp.features, { icon: "✅", title: "", desc: "" }] }); }
   function removeFeature(i: number) { patch({ features: lp.features.filter((_, idx) => idx !== i) }); }
 
+  function updateGoal(i: number, field: keyof GoalItem, val: string) {
+    const arr = [...(lp.goals ?? [])];
+    arr[i] = { ...arr[i], [field]: val };
+    patch({ goals: arr });
+  }
+  function addGoal() { patch({ goals: [...(lp.goals ?? []), { icon: "🎯", title: "", desc: "" }] }); }
+  function removeGoal(i: number) { patch({ goals: (lp.goals ?? []).filter((_, idx) => idx !== i) }); }
+
+  function updateAudience(i: number, field: keyof AudienceItem, val: string) {
+    const arr = [...(lp.audience ?? [])];
+    arr[i] = { ...arr[i], [field]: val };
+    patch({ audience: arr });
+  }
+  function addAudience() { patch({ audience: [...(lp.audience ?? []), { icon: "👤", title: "", desc: "" }] }); }
+  function removeAudience(i: number) { patch({ audience: (lp.audience ?? []).filter((_, idx) => idx !== i) }); }
+
   function updateTesti(i: number, field: keyof TestiItem, val: string) {
     const arr = [...lp.testimonials];
     arr[i] = { ...arr[i], [field]: val };
@@ -391,6 +409,33 @@ export default function LandingEditor({ value, onChange, productId }: Props) {
         <AddBtn onClick={addFeature} label="Thêm tính năng" />
       </SectionCard>
 
+      {/* ── Mục tiêu ─────────────────────────────────────────────── */}
+      <SectionCard title="Mục tiêu — Kết quả đạt được" badge={lp.goals?.length} open={!!open.goals} onToggle={() => toggle("goals")}>
+        {(lp.goals ?? []).map((g, i) => (
+          <div key={i} className="rounded-xl border border-gray-800 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-gray-500">Mục tiêu {i + 1}</span>
+              <RemoveBtn onClick={() => removeGoal(i)} />
+            </div>
+            <div className="grid grid-cols-[60px_1fr] gap-3">
+              <Field label="Icon">
+                <input value={g.icon} onChange={(e) => updateGoal(i, "icon", e.target.value)}
+                  placeholder="🎯" className={inputCls} />
+              </Field>
+              <Field label="Tên mục tiêu">
+                <input value={g.title} onChange={(e) => updateGoal(i, "title", e.target.value)}
+                  placeholder="Tiết kiệm 2 giờ mỗi ngày" className={inputCls} />
+              </Field>
+            </div>
+            <Field label="Mô tả kết quả cụ thể">
+              <input value={g.desc} onChange={(e) => updateGoal(i, "desc", e.target.value)}
+                placeholder="Sau khi dùng template, bạn sẽ..." className={inputCls} />
+            </Field>
+          </div>
+        ))}
+        <AddBtn onClick={addGoal} label="Thêm mục tiêu" />
+      </SectionCard>
+
       {/* ── Đánh giá ─────────────────────────────────────────────── */}
       <SectionCard
         title="Đánh giá khách hàng"
@@ -447,6 +492,33 @@ export default function LandingEditor({ value, onChange, productId }: Props) {
         ) : (
           <p className="text-center text-xs text-gray-600">Tối đa {MAX_TESTIMONIALS} đánh giá</p>
         )}
+      </SectionCard>
+
+      {/* ── Đối tượng sử dụng ───────────────────────────────────── */}
+      <SectionCard title="Đối tượng sử dụng" badge={lp.audience?.length} open={!!open.audience} onToggle={() => toggle("audience")}>
+        {(lp.audience ?? []).map((a, i) => (
+          <div key={i} className="rounded-xl border border-gray-800 p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-gray-500">Đối tượng {i + 1}</span>
+              <RemoveBtn onClick={() => removeAudience(i)} />
+            </div>
+            <div className="grid grid-cols-[60px_1fr] gap-3">
+              <Field label="Icon">
+                <input value={a.icon} onChange={(e) => updateAudience(i, "icon", e.target.value)}
+                  placeholder="👤" className={inputCls} />
+              </Field>
+              <Field label="Nhóm đối tượng">
+                <input value={a.title} onChange={(e) => updateAudience(i, "title", e.target.value)}
+                  placeholder="Người đi làm bận rộn" className={inputCls} />
+              </Field>
+            </div>
+            <Field label="Lý do phù hợp (1 câu)">
+              <input value={a.desc} onChange={(e) => updateAudience(i, "desc", e.target.value)}
+                placeholder="Cần hệ thống tổ chức ngay mà không cần tự build..." className={inputCls} />
+            </Field>
+          </div>
+        ))}
+        <AddBtn onClick={addAudience} label="Thêm đối tượng" />
       </SectionCard>
 
       {/* ── Bao gồm ──────────────────────────────────────────────── */}

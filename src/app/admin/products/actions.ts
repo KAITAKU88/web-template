@@ -35,6 +35,9 @@ Trả về JSON hợp lệ duy nhất (KHÔNG markdown, KHÔNG giải thích, KH
   "pains": [
     { "icon": "emoji phù hợp", "title": "Tên nỗi đau ngắn gọn (3-6 từ)", "desc": "Mô tả 1-2 câu cụ thể, đúng tâm lý người đang gặp vấn đề này. Nên có chi tiết như số liệu, tình huống quen thuộc." },
     { "icon": "...", "title": "...", "desc": "..." },
+    { "icon": "...", "title": "...", "desc": "..." },
+    { "icon": "...", "title": "...", "desc": "..." },
+    { "icon": "...", "title": "...", "desc": "..." },
     { "icon": "...", "title": "...", "desc": "..." }
   ],
   "solutionTitle": "Tiêu đề phần giải pháp — 1 câu ngắn, mạnh, khẳng định",
@@ -52,10 +55,22 @@ Trả về JSON hợp lệ duy nhất (KHÔNG markdown, KHÔNG giải thích, KH
     { "icon": "...", "title": "...", "desc": "..." },
     { "icon": "...", "title": "...", "desc": "..." }
   ],
+  "goals": [
+    { "icon": "emoji", "title": "Mục tiêu/kết quả cụ thể (3-6 từ)", "desc": "1-2 câu — sau khi dùng template này, người dùng đạt được điều gì cụ thể, đo lường được" },
+    { "icon": "...", "title": "...", "desc": "..." },
+    { "icon": "...", "title": "...", "desc": "..." },
+    { "icon": "...", "title": "...", "desc": "..." }
+  ],
   "testimonials": [
     { "text": "Review 2-4 câu — nghe như người thật viết, có chi tiết cụ thể (thời gian setup, tình huống dùng, kết quả cụ thể). KHÔNG dùng từ hoa mỹ như 'tuyệt vời', 'xuất sắc'.", "name": "Tên tiếng Việt thật", "role": "Nghề nghiệp · Thành phố VN", "avatar": "emoji người" },
     { "text": "...", "name": "...", "role": "...", "avatar": "emoji người" },
     { "text": "...", "name": "...", "role": "...", "avatar": "emoji người" }
+  ],
+  "audience": [
+    { "icon": "emoji", "title": "Nhóm đối tượng (3-5 từ)", "desc": "1 câu — lý do nhóm này đặc biệt phù hợp với template, vấn đề cụ thể nó giải quyết cho họ" },
+    { "icon": "...", "title": "...", "desc": "..." },
+    { "icon": "...", "title": "...", "desc": "..." },
+    { "icon": "...", "title": "...", "desc": "..." }
   ],
   "includes": [
     { "title": "Tên module/phần bao gồm", "desc": "1 câu ngắn mô tả dùng để làm gì" },

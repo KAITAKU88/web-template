@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/settings";
 import { formatCurrency, calcDiscountPercent, formatCount } from "@/lib/utils";
-import { getProductCopy, type ProductCopy, type PainItem, type FeatureItem, type TestiItem, type IncludeItem, type FaqItem } from "@/lib/productContent";
+import { getProductCopy, type ProductCopy, type PainItem, type FeatureItem, type GoalItem, type TestiItem, type AudienceItem, type IncludeItem, type FaqItem } from "@/lib/productContent";
 import type { Product } from "@/types";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -247,7 +247,30 @@ export default async function ProductPage({ params }: Props) {
       </section>
 
       {/* ══════════════════════════════════════════
-          6. ĐÁNH GIÁ CỦA NGƯỜI DÙNG
+          6. MỤC TIÊU — KẾT QUẢ ĐẠT ĐƯỢC
+      ══════════════════════════════════════════ */}
+      {copy.goals && copy.goals.length > 0 && (
+        <section className="card mb-2 p-6">
+          <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">Mục tiêu</span>
+          <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">Bạn sẽ đạt được gì?</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {copy.goals.map((g: GoalItem, i: number) => (
+              <div key={i} className="flex items-start gap-4 rounded-xl border border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/40 p-4">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white dark:bg-gray-800 text-xl shadow-sm">
+                  {g.icon}
+                </div>
+                <div>
+                  <div className="mb-0.5 text-sm font-bold text-gray-800 dark:text-gray-100">{g.title}</div>
+                  <div className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">{g.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ══════════════════════════════════════════
+          7. ĐÁNH GIÁ CỦA NGƯỜI DÙNG
       ══════════════════════════════════════════ */}
       <section className="mb-2 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 p-6">
         <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">Đánh giá</span>
@@ -281,7 +304,28 @@ export default async function ProductPage({ params }: Props) {
       </section>
 
       {/* ══════════════════════════════════════════
-          7. LỜI CHÀO HÀNG
+          8. ĐỐI TƯỢNG SỬ DỤNG
+      ══════════════════════════════════════════ */}
+      {copy.audience && copy.audience.length > 0 && (
+        <section className="mb-2 rounded-2xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 p-6">
+          <span className="mb-2 block text-xs font-bold uppercase tracking-widest text-brand">Dành cho ai?</span>
+          <h2 className="mb-6 text-xl font-extrabold tracking-tight text-gray-900 dark:text-white">Template này phù hợp với bạn nếu…</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {copy.audience.map((a: AudienceItem, i: number) => (
+              <div key={i} className="flex items-start gap-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+                <span className="mt-0.5 text-2xl">{a.icon}</span>
+                <div>
+                  <div className="mb-0.5 text-sm font-bold text-gray-800 dark:text-gray-100">{a.title}</div>
+                  <div className="text-xs leading-relaxed text-gray-500 dark:text-gray-400">{a.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ══════════════════════════════════════════
+          9. LỜI CHÀO HÀNG
       ══════════════════════════════════════════ */}
       <section className="card mb-2 overflow-hidden">
         <div className="bg-brand px-6 py-3 text-center text-xs font-bold uppercase tracking-widest text-white">
