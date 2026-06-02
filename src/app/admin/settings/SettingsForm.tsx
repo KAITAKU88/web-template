@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition, useState, useRef, useEffect } from "react";
+import { AI_PROVIDERS } from "@/lib/ai-providers";
 import { saveSettings } from "./actions";
 import type { SettingsMap } from "@/lib/settings";
 import SharedImageUploadField from "@/components/ImageUploadField";
@@ -286,10 +287,10 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
       >
         <ProviderField
           currentProvider={settings.ai_provider ?? ""}
-          hasClaudeKey={!!settings.claude_api_key}
-          hasGeminiKey={!!settings.gemini_api_key}
-          claudeModel={settings.claude_model ?? "claude-sonnet-4-6"}
-          geminiModel={settings.gemini_model ?? "gemini-2.0-flash"}
+          currentCustomName={settings.custom_provider_name ?? ""}
+          providerKeys={Object.fromEntries(
+            AI_PROVIDERS.map((p) => [p.value, !!(settings[p.keyName as keyof typeof settings])])
+          )}
         />
       </Section>
 
@@ -526,7 +527,26 @@ function SecretField({
   hint?: React.ReactNode;
   tooltip?: string;
 }) {
-  const [editing, setEditing] = useState(false);
+  // editing: đang nhập key mới (kể cả khi chưa có DB value)
+  const [editing, setEditing] = useState(!hasValue);
+  // localValue: giá trị đã nhập và blur ra ngoài (chờ submit)
+  const [localValue, setLocalValue] = useState("");
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const val = e.target.value.trim();
+    if (val) {
+      setLocalValue(val);
+      setEditing(false);
+    }
+  };
+
+  const handleChange = () => {
+    setLocalValue("");
+    setEditing(true);
+  };
+
+  // Hiện masked state khi: có DB value hoặc đã nhập local value
+  const showMasked = !editing && (hasValue || localValue !== "");
 
   return (
     <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
@@ -538,35 +558,38 @@ function SecretField({
         {hint && <div className="mt-0.5 text-xs text-gray-500">{hint}</div>}
       </div>
       <div className="sm:col-span-2">
-        {!editing && hasValue ? (
+        {showMasked ? (
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3.5 py-2 text-sm">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
               <span className="text-gray-500 dark:text-gray-400 font-mono tracking-widest">••••••••••••</span>
+              {localValue && <span className="text-xs text-emerald-500 ml-1">Chưa lưu</span>}
             </div>
             <button
               type="button"
-              onClick={() => setEditing(true)}
+              onClick={handleChange}
               className="rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 px-3 py-2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:border-gray-400 dark:hover:border-gray-600 transition-colors"
             >
               Thay đổi
             </button>
-            <input type="hidden" name={name} value="" />
+            {/* Nếu có localValue: submit giá trị mới. Nếu chỉ DB value: submit rỗng → server giữ nguyên */}
+            <input type="hidden" name={name} value={localValue} />
           </div>
         ) : (
           <div className="flex items-center gap-2">
             <input
               id={name}
               name={name}
-              type="text"
-              autoFocus={editing}
+              type="password"
+              autoFocus={editing && hasValue}
               placeholder={hasValue ? "Nhập key mới để thay đổi" : "Nhập API key…"}
+              onBlur={handleBlur}
               className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/50 transition-colors font-mono"
             />
-            {editing && (
+            {hasValue && (
               <button
                 type="button"
-                onClick={() => setEditing(false)}
+                onClick={() => { setEditing(false); setLocalValue(""); }}
                 className="shrink-0 text-xs text-gray-500 hover:text-gray-300"
               >
                 Hủy
@@ -719,116 +742,72 @@ function ImageUploadField({
 
 function ProviderField({
   currentProvider,
-  hasClaudeKey,
-  hasGeminiKey,
-  claudeModel,
-  geminiModel,
+  currentCustomName,
+  providerKeys,
 }: {
   currentProvider: string;
-  hasClaudeKey: boolean;
-  hasGeminiKey: boolean;
-  claudeModel: string;
-  geminiModel: string;
+  currentCustomName: string;
+  providerKeys: Record<string, boolean>;
 }) {
   const [provider, setProvider] = useState(currentProvider);
+  const selected = AI_PROVIDERS.find((p) => p.value === provider);
 
   return (
     <>
-      {/* Provider selector */}
+      {/* Dropdown */}
       <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
         <div>
           <p className="block text-sm font-medium text-gray-700 dark:text-gray-300">AI Provider</p>
-          <p className="mt-0.5 text-xs text-gray-500">Mặc định dùng Claude</p>
+          <p className="mt-0.5 text-xs text-gray-500">Dùng để tự động tạo landing page sản phẩm</p>
         </div>
-        <div className="sm:col-span-2 flex gap-3">
-          {[
-            { value: "claude", label: "Claude (Anthropic)", badge: "Trả phí", badgeCls: "bg-violet-500/20 text-violet-300" },
-            { value: "gemini", label: "Gemini (Google)", badge: "Miễn phí", badgeCls: "bg-emerald-500/20 text-emerald-300" },
-          ].map((opt) => (
-            <label
-              key={opt.value}
-              className={`flex flex-1 cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-colors ${
-                provider === opt.value
-                  ? "border-emerald-500/50 bg-emerald-500/5"
-                  : "border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600"
-              }`}
-            >
-              <input
-                type="radio"
-                name="ai_provider"
-                value={opt.value}
-                checked={provider === opt.value}
-                onChange={() => setProvider(opt.value)}
-                className="accent-emerald-500"
-              />
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">{opt.label}</p>
-                <span className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${opt.badgeCls}`}>
-                  {opt.badge}
-                </span>
-              </div>
-            </label>
-          ))}
+        <div className="sm:col-span-2">
+          <select
+            name="ai_provider"
+            value={provider}
+            onChange={(e) => setProvider(e.target.value)}
+            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30"
+          >
+            <option value="">— Chọn AI Provider —</option>
+            {AI_PROVIDERS.map((p) => (
+              <option key={p.value} value={p.value}>{p.label}</option>
+            ))}
+          </select>
         </div>
       </div>
 
-      {/* Claude API Key + Model */}
-      <div className={provider !== "claude" ? "opacity-40 pointer-events-none" : ""}>
-        <SecretField
-          label="Claude API Key"
-          name="claude_api_key"
-          hasValue={hasClaudeKey}
-          hint={
-            <span>
-              ~$0.003/lần generate ·{" "}
-              <a
-                href="https://console.anthropic.com/settings/keys"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
-              >
-                Lấy API key tại đây →
-              </a>
-            </span>
-          }
-        />
-        <Field
-          label="Claude Model"
-          name="claude_model"
-          defaultValue={claudeModel}
-          placeholder="claude-sonnet-4-6"
-          hint="Ví dụ: claude-sonnet-4-6, claude-opus-4-8, claude-haiku-4-5-20251001"
-        />
-      </div>
-
-      {/* Gemini API Key + Model */}
-      <div className={provider !== "gemini" ? "opacity-40 pointer-events-none" : ""}>
-        <SecretField
-          label="Gemini API Key"
-          name="gemini_api_key"
-          hasValue={hasGeminiKey}
-          hint={
-            <span>
-              Miễn phí 1.500 req/ngày ·{" "}
-              <a
-                href="https://aistudio.google.com/apikey"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
-              >
-                Lấy API key tại đây →
-              </a>
-            </span>
-          }
-        />
-        <Field
-          label="Gemini Model"
-          name="gemini_model"
-          defaultValue={geminiModel}
-          placeholder="gemini-2.0-flash"
-          hint="Ví dụ: gemini-2.0-flash, gemini-1.5-pro, gemini-2.0-flash-lite"
-        />
-      </div>
+      {/* API Key section — chỉ hiện khi đã chọn provider */}
+      {selected && (
+        <>
+          {provider === "custom" && (
+            <Field
+              label="Tên Provider"
+              name="custom_provider_name"
+              defaultValue={currentCustomName}
+              placeholder="Ví dụ: My Custom AI"
+              hint="Tên hiển thị cho provider tùy chỉnh của bạn"
+            />
+          )}
+          <SecretField
+            label={`${selected.label} API Key`}
+            name={selected.keyName}
+            hasValue={!!providerKeys[provider]}
+            hint={
+              selected.keyUrl ? (
+                <a
+                  href={selected.keyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
+                >
+                  Lấy API key tại đây →
+                </a>
+              ) : (
+                <span className="text-gray-500">Nhập API key của provider bạn muốn sử dụng</span>
+              )
+            }
+          />
+        </>
+      )}
     </>
   );
 }

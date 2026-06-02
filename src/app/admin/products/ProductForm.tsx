@@ -3,6 +3,7 @@
 import { useTransition, useState, useRef, useEffect, useCallback } from "react";
 import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
 import { generateLandingContent } from "./actions";
+import { AI_PROVIDERS } from "@/lib/ai-providers";
 import { buildDefaultLanding } from "@/lib/landingTemplate";
 import type { ProductCopy } from "@/lib/productContent";
 import type { Product } from "@/types";
@@ -536,23 +537,21 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
                 Chưa cấu hình AI — Generate AI sẽ không hoạt động.{" "}
                 <a href="/admin/settings" className="underline hover:text-amber-300 transition-colors">Cấu hình ngay</a>
               </p>
-            ) : aiProvider === "gemini" ? (
-              <p className="flex items-center gap-1.5 text-xs text-blue-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shrink-0" />
-                Đang dùng <span className="font-semibold">Gemini API</span>{aiModel ? ` (${aiModel})` : ""}
-              </p>
-            ) : aiProvider === "claude" ? (
-              <p className="flex items-center gap-1.5 text-xs text-violet-400">
-                <span className="h-1.5 w-1.5 rounded-full bg-violet-400 shrink-0" />
-                Đang dùng <span className="font-semibold">Claude API</span>{aiModel ? ` (${aiModel})` : ""}
-              </p>
-            ) : (
-              <p className="flex items-center gap-1.5 text-xs text-red-400">
-                <span>⚠️</span>
-                Provider không hợp lệ: &quot;{aiProvider}&quot; —{" "}
-                <a href="/admin/settings" className="underline hover:text-red-300 transition-colors">Kiểm tra cấu hình</a>
-              </p>
-            )}
+            ) : (() => {
+                const p = AI_PROVIDERS.find((p) => p.value === aiProvider);
+                return p ? (
+                  <p className="flex items-center gap-1.5 text-xs text-emerald-400">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
+                    Đang dùng <span className="font-semibold">{p.label}</span>{aiModel ? ` (${aiModel})` : ""}
+                  </p>
+                ) : (
+                  <p className="flex items-center gap-1.5 text-xs text-red-400">
+                    <span>⚠️</span>
+                    Provider không hợp lệ: &quot;{aiProvider}&quot; —{" "}
+                    <a href="/admin/settings" className="underline hover:text-red-300 transition-colors">Kiểm tra cấu hình</a>
+                  </p>
+                );
+              })()}
           </div>
         </div>
 

@@ -9,7 +9,10 @@ const ALL_KEYS = [
   "bank_code", "bank_account_number", "bank_account_holder",
   "sepay_api_key", "sepay_webhook_secret",
   "resend_api_key", "resend_from_email", "resend_from_name",
-  "ai_provider", "claude_api_key", "gemini_api_key",
+  "ai_provider", "custom_provider_name",
+  "claude_api_key", "gemini_api_key", "openai_api_key",
+  "grok_api_key", "groq_api_key", "mistral_api_key",
+  "together_api_key", "custom_api_key",
   "supabase_webhook_secret",
   "gtm_id", "ga_id", "meta_pixel_id", "tiktok_pixel_id", "google_ads_id",
   "download_link_expiry_hours", "download_link_max_accesses",
@@ -18,8 +21,10 @@ const ALL_KEYS = [
 // Sensitive keys: if submitted empty → keep existing (skip upsert)
 const SENSITIVE_KEYS = new Set([
   "sepay_api_key", "sepay_webhook_secret",
-  "resend_api_key", "claude_api_key", "gemini_api_key",
-  "supabase_webhook_secret", "meta_access_token",
+  "resend_api_key", "supabase_webhook_secret", "meta_access_token",
+  "claude_api_key", "gemini_api_key", "openai_api_key",
+  "grok_api_key", "groq_api_key", "mistral_api_key",
+  "together_api_key", "custom_api_key",
 ]);
 
 export async function saveSettings(formData: FormData) {

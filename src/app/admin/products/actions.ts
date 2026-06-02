@@ -2,10 +2,12 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenAI } from "@google/genai";
+import OpenAI from "openai";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/settings";
 import { revalidatePath } from "next/cache";
 import type { ProductCopy } from "@/lib/productContent";
+import { getProvider } from "@/lib/ai-providers";
 import { queueAutomation } from "@/lib/automation";
 
 function buildPrompt(name: string, type: string, description: string, audience: string): string {
@@ -112,6 +114,18 @@ async function generateWithClaude(prompt: string, apiKey: string, model: string)
   return parseJson(raw);
 }
 
+async function generateWithOpenAI(prompt: string, apiKey: string, model: string, baseUrl: string): Promise<ProductCopy> {
+  const client = new OpenAI({ apiKey, baseURL: baseUrl });
+  const response = await client.chat.completions.create({
+    model,
+    messages: [{ role: "user", content: prompt }],
+    max_tokens: 4096,
+  });
+  const raw = response.choices[0]?.message?.content ?? "";
+  if (!raw) throw new Error("Provider không trả về nội dung. Thử lại.");
+  return parseJson(raw);
+}
+
 async function generateWithGemini(prompt: string, apiKey: string, model: string): Promise<ProductCopy> {
   const ai = new GoogleGenAI({ apiKey });
   let response;
@@ -149,24 +163,37 @@ export async function generateLandingContent(
     const prompt = buildPrompt(name, type, description, audience);
 
     if (!provider) {
-      return { error: "Chưa cấu hình AI provider. Vào Admin → Cấu hình → AI để chọn Gemini hoặc Claude." };
+      return { error: "Chưa cấu hình AI provider. Vào Admin → Cấu hình → AI để chọn provider." };
     }
 
-    if (provider === "gemini") {
-      const apiKey = settings.gemini_api_key;
-      if (!apiKey) return { error: "Gemini API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key." };
-      const model = settings.gemini_model ?? "gemini-2.0-flash";
-      return { data: await generateWithGemini(prompt, apiKey, model) };
+    const providerInfo = getProvider(provider);
+    if (!providerInfo) {
+      return { error: `AI provider không hợp lệ: "${provider}". Vào Admin → Cấu hình → AI để cấu hình lại.` };
+    }
+
+    const apiKey = settings[providerInfo.keyName as keyof typeof settings] as string | null;
+    if (!apiKey) {
+      return { error: `${providerInfo.label} API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key.` };
     }
 
     if (provider === "claude") {
-      const apiKey = settings.claude_api_key;
-      if (!apiKey) return { error: "Claude API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key." };
-      const model = settings.claude_model ?? "claude-sonnet-4-6";
+      const model = (settings.claude_model as string | null) ?? providerInfo.defaultModel;
       return { data: await generateWithClaude(prompt, apiKey, model) };
     }
 
-    return { error: `AI provider không hợp lệ: "${provider}". Vào Admin → Cấu hình → AI để cấu hình lại.` };
+    if (provider === "gemini") {
+      const model = (settings.gemini_model as string | null) ?? providerInfo.defaultModel;
+      return { data: await generateWithGemini(prompt, apiKey, model) };
+    }
+
+    // OpenAI-compatible providers
+    if (providerInfo.baseUrl) {
+      const modelKey = `${provider}_model` as keyof typeof settings;
+      const model = (settings[modelKey] as string | null) ?? providerInfo.defaultModel;
+      return { data: await generateWithOpenAI(prompt, apiKey, model, providerInfo.baseUrl) };
+    }
+
+    return { error: `Provider "${providerInfo.label}" chưa được hỗ trợ để generate landing page.` };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Lỗi không xác định khi gọi AI.";
     return { error: msg };
