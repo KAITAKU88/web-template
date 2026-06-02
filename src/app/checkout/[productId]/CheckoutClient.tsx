@@ -330,7 +330,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
             </div>
 
             {error && (
-              <div className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</div>
+              <div className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-700 dark:text-red-400">{error}</div>
             )}
 
             {/* ── Order Bump ── */}
@@ -493,7 +493,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
                   <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">Chọn ứng dụng ngân hàng</h3>
                   <button onClick={() => setShowBankModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">✕</button>
                 </div>
-                <p className="mb-3 text-xs text-blue-400 bg-blue-500/10 rounded-xl px-3 py-2">
+                <p className="mb-3 text-xs text-blue-700 dark:text-blue-400 bg-blue-500/10 rounded-xl px-3 py-2">
                   💡 Lưu mã QR → Mở app → Quét mã QR → Chọn ảnh từ thư viện ảnh
                 </p>
                 <div className="grid grid-cols-4 gap-3">
@@ -599,7 +599,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
             <div className="rounded-2xl border-2 border-dashed border-orange-400 dark:border-orange-600 bg-gradient-to-b from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 p-5">
               <div className="mb-3 flex items-center justify-between">
                 <span className="text-sm font-bold text-orange-700 dark:text-orange-400">🎁 Quà tặng đặc biệt dành cho bạn</span>
-                <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 font-mono text-xs font-bold text-red-400">
+                <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 font-mono text-xs font-bold text-red-700 dark:text-red-400">
                   ⏰ {formatTime(upsellCountdown)}
                 </span>
               </div>
@@ -658,8 +658,8 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
 
           {/* Thông báo email */}
           <div className="rounded-xl bg-blue-500/10 px-4 py-3 text-sm">
-            <p className="font-medium text-blue-400">📧 Email xác nhận đã được gửi</p>
-            <p className="mt-0.5 text-blue-400">
+            <p className="font-medium text-blue-700 dark:text-blue-400">📧 Email xác nhận đã được gửi</p>
+            <p className="mt-0.5 text-blue-700 dark:text-blue-400">
               {isBundleOrder
                 ? <>Toàn bộ template trong combo đang được gửi đến <strong>{email}</strong>.</>
                 : <>Link tải đã gửi đến <strong>{email}</strong>.</>

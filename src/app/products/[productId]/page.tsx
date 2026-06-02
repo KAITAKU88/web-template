@@ -128,7 +128,7 @@ export default async function ProductPage({ params }: Props) {
               {hasDiscount && (
                 <div className="mt-0.5 flex items-center gap-2">
                   <span className="text-sm text-gray-400 line-through">{formatCurrency(product.original_price!)}</span>
-                  <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-400">
+                  <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:text-red-400">
                     Tiết kiệm {formatCurrency(product.original_price! - product.price)}
                   </span>
                 </div>
@@ -312,7 +312,7 @@ export default async function ProductPage({ params }: Props) {
             {hasDiscount && (
               <div className="mb-3 flex items-center gap-2">
                 <span className="text-sm text-gray-400 line-through">{formatCurrency(product.original_price!)}</span>
-                <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-400">
+                <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:text-red-400">
                   -{calcDiscountPercent(product.price, product.original_price!)}%
                 </span>
               </div>

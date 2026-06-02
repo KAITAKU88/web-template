@@ -212,7 +212,7 @@ export default function ProductDetail({ product }: { product: Product }) {
               <>
                 <span className="text-base text-gray-400 line-through mb-0.5">{formatCurrency(product.original_price)}</span>
                 {/* đã đồng bộ design system — token: bg-red-500/10 text-red-400 rounded-full */}
-                <span className="mb-0.5 rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-400">-{discount}%</span>
+                <span className="mb-0.5 rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:text-red-400">-{discount}%</span>
               </>
             )}
           </div>
@@ -284,7 +284,7 @@ export default function ProductDetail({ product }: { product: Product }) {
                 </div>
 
                 {/* đã đồng bộ design system — error token */}
-                {error && <div className="rounded-xl bg-red-500/10 px-4 py-2 text-sm text-red-400">{error}</div>}
+                {error && <div className="rounded-xl bg-red-500/10 px-4 py-2 text-sm text-red-700 dark:text-red-400">{error}</div>}
 
                 <button
                   type="submit"
