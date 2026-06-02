@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { slugifyFilename } from "@/lib/utils";
-import { recordStorageFile, getPartnerFilePaths, deleteStorageFileRecord } from "@/lib/storage-files";
+import { recordStorageFile, getPartnerFilePaths, deleteStorageFileRecord, renameStorageFileRecord } from "@/lib/storage-files";
 
 const BUCKETS = [
   { id: "product-images", label: "Ảnh sản phẩm", icon: "🖼️" },
@@ -234,6 +234,7 @@ export default function StorageBrowser({ partnerFolder, creatorId }: { partnerFo
     const { error } = await supabase.storage.from(bucket).move(oldPath, newPath);
     if (error) { alert(error.message); return; }
     await updateDbRefs(getPublicUrl(oldPath), getPublicUrl(newPath));
+    await renameStorageFileRecord(bucket, oldPath, newPath);
     setRenamingItem(null);
     load();
   }
@@ -248,7 +249,10 @@ export default function StorageBrowser({ partnerFolder, creatorId }: { partnerFo
     for (const filePath of allFiles) {
       const newFilePath = newPrefix + filePath.slice(oldPrefix.length);
       const { error } = await supabase.storage.from(bucket).move(filePath, newFilePath);
-      if (!error) await updateDbRefs(getPublicUrl(filePath), getPublicUrl(newFilePath));
+      if (!error) {
+        await updateDbRefs(getPublicUrl(filePath), getPublicUrl(newFilePath));
+        await renameStorageFileRecord(bucket, filePath, newFilePath);
+      }
     }
     await supabase.storage.from(bucket)
       .move(`${oldPrefix}/.emptyFolderPlaceholder`, `${newPrefix}/.emptyFolderPlaceholder`)
@@ -275,7 +279,10 @@ export default function StorageBrowser({ partnerFolder, creatorId }: { partnerFo
       const newPath = moveTarget ? `${moveTarget}/${filename}` : filename;
       if (oldPath === newPath) continue;
       const { error } = await supabase.storage.from(bucket).move(oldPath, newPath);
-      if (!error) await updateDbRefs(getPublicUrl(oldPath), getPublicUrl(newPath));
+      if (!error) {
+        await updateDbRefs(getPublicUrl(oldPath), getPublicUrl(newPath));
+        await renameStorageFileRecord(bucket, oldPath, newPath);
+      }
     }
     setShowMoveModal(false);
     load();

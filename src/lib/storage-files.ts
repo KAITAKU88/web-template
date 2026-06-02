@@ -25,3 +25,9 @@ export async function deleteStorageFileRecord(bucket: string, path: string) {
   const supabase = createAdminClient();
   await supabase.from("storage_files").delete().eq("bucket", bucket).eq("path", path);
 }
+
+/** Cập nhật path khi đổi tên file */
+export async function renameStorageFileRecord(bucket: string, oldPath: string, newPath: string) {
+  const supabase = createAdminClient();
+  await supabase.from("storage_files").update({ path: newPath }).eq("bucket", bucket).eq("path", oldPath);
+}
