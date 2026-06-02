@@ -145,8 +145,12 @@ export async function generateLandingContent(
 ): Promise<{ data: ProductCopy } | { error: string }> {
   try {
     const settings = await getSettings();
-    const provider = settings.ai_provider ?? "claude";
+    const provider = settings.ai_provider;
     const prompt = buildPrompt(name, type, description, audience);
+
+    if (!provider) {
+      return { error: "Chưa cấu hình AI provider. Vào Admin → Cấu hình → AI để chọn Gemini hoặc Claude." };
+    }
 
     if (provider === "gemini") {
       const apiKey = settings.gemini_api_key;
@@ -154,9 +158,13 @@ export async function generateLandingContent(
       return { data: await generateWithGemini(prompt, apiKey) };
     }
 
-    const apiKey = settings.claude_api_key;
-    if (!apiKey) return { error: "Claude API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key." };
-    return { data: await generateWithClaude(prompt, apiKey) };
+    if (provider === "claude") {
+      const apiKey = settings.claude_api_key;
+      if (!apiKey) return { error: "Claude API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key." };
+      return { data: await generateWithClaude(prompt, apiKey) };
+    }
+
+    return { error: `AI provider không hợp lệ: "${provider}". Vào Admin → Cấu hình → AI để cấu hình lại.` };
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Lỗi không xác định khi gọi AI.";
     return { error: msg };

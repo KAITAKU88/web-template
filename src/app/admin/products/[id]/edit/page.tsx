@@ -6,16 +6,18 @@ import { updateProduct } from "../../actions";
 import { redirect } from "next/navigation";
 import type { Product } from "@/types";
 import { adminPath } from "@/lib/admin-redirect";
+import { getSettings } from "@/lib/settings";
 
 interface Props { params: Promise<{ id: string }> }
 
 export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
   const supabase = createAdminClient();
-  const [{ data }, { data: catData }, productsPath] = await Promise.all([
+  const [{ data }, { data: catData }, productsPath, settings] = await Promise.all([
     supabase.from("products").select("*").eq("id", id).single(),
     supabase.from("categories").select("id, name").order("sort_order"),
     adminPath("/products"),
+    getSettings(),
   ]);
   if (!data) notFound();
 
@@ -37,7 +39,7 @@ export default async function EditProductPage({ params }: Props) {
         <h1 className="text-2xl font-bold text-white">Chỉnh sửa: {product.name}</h1>
       </div>
 
-      <ProductFormWithCancel product={product} onSubmit={handleUpdate} submitLabel="Lưu thay đổi" categories={categories} />
+      <ProductFormWithCancel product={product} onSubmit={handleUpdate} submitLabel="Lưu thay đổi" categories={categories} aiProvider={settings.ai_provider ?? null} />
     </div>
   );
 }
