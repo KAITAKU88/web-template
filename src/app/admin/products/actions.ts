@@ -142,24 +142,24 @@ export async function generateLandingContent(
   type: string,
   description: string,
   audience: string,
-): Promise<ProductCopy> {
-  const settings = await getSettings();
-  const provider = settings.ai_provider ?? "claude";
-  const prompt = buildPrompt(name, type, description, audience);
-
+): Promise<{ data: ProductCopy } | { error: string }> {
   try {
+    const settings = await getSettings();
+    const provider = settings.ai_provider ?? "claude";
+    const prompt = buildPrompt(name, type, description, audience);
+
     if (provider === "gemini") {
       const apiKey = settings.gemini_api_key;
-      if (!apiKey) throw new Error("Gemini API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key.");
-      return await generateWithGemini(prompt, apiKey);
+      if (!apiKey) return { error: "Gemini API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key." };
+      return { data: await generateWithGemini(prompt, apiKey) };
     }
 
     const apiKey = settings.claude_api_key;
-    if (!apiKey) throw new Error("Claude API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key.");
-    return await generateWithClaude(prompt, apiKey);
+    if (!apiKey) return { error: "Claude API key chưa được cấu hình. Vào Admin → Cấu hình → AI để nhập key." };
+    return { data: await generateWithClaude(prompt, apiKey) };
   } catch (err) {
-    if (err instanceof Error) throw err;
-    throw new Error("Lỗi không xác định khi gọi AI. Kiểm tra API key và thử lại.");
+    const msg = err instanceof Error ? err.message : "Lỗi không xác định khi gọi AI.";
+    return { error: msg };
   }
 }
 

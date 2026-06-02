@@ -102,17 +102,17 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
 
     setGenError(null);
     startGenerate(async () => {
-      try {
-        const content = await generateLandingContent(
-          name,
-          fd.get("type") as string,
-          fd.get("description") as string ?? "",
-          "",
-        );
-        setLanding(content);
+      const result = await generateLandingContent(
+        name,
+        fd.get("type") as string,
+        fd.get("description") as string ?? "",
+        "",
+      );
+      if ("error" in result) {
+        setGenError(result.error);
+      } else {
+        setLanding(result.data);
         setIsDirty(true);
-      } catch (e) {
-        setGenError(e instanceof Error ? e.message : "Lỗi khi gọi AI. Thử dùng Template mặc định.");
       }
     });
   }
