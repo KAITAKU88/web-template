@@ -20,6 +20,7 @@ export interface Product {
   status: "published" | "draft"; // 'published' = hiển thị, 'draft' = bản nháp
   is_combo: boolean;             // true = sản phẩm combo (nhiều link tải)
   combo_product_ids: string[];   // UUID[] các sản phẩm trong combo
+  creator_id: string | null;     // NULL = owner, UUID = partner tạo sản phẩm
   created_at: string;
 }
 

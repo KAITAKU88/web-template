@@ -22,6 +22,12 @@ export default async function EditProductPage({ params }: Props) {
   if (!data) notFound();
 
   const product = data as Product;
+
+  // Partner chỉ được sửa sản phẩm do chính họ tạo
+  if (session.role === "partner" && product.creator_id !== session.staffId) {
+    redirect(productsPath);
+  }
+
   const categories = catData ?? [{ id: "notion", name: "Notion" }, { id: "google_sheet", name: "Google Sheets" }];
 
   async function handleUpdate(formData: FormData) {

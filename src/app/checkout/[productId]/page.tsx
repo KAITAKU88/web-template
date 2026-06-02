@@ -34,15 +34,26 @@ export default async function CheckoutPage({ params }: Props) {
 
   if (error || !product || product.status === "draft") notFound();
 
+  // creator_id của sản phẩm đang mua — dùng để giới hạn upsell cùng chủ sở hữu
+  const creatorId = product.creator_id as string | null;
+
+  // Helper: filter cùng creator_id (null = owner, uuid = partner)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const withCreator = (q: any) =>
+    creatorId ? q.eq("creator_id", creatorId) : q.is("creator_id", null);
+
   // Tìm sản phẩm bán kèm: ưu tiên cùng loại, phổ biến nhất, khác sản phẩm hiện tại, không phải combo
-  let companionQuery = supabase
-    .from("products")
-    .select("id, name, price")
-    .eq("status", "published")
-    .neq("id", product.id)
-    .neq("is_combo", true)
-    .order("download_count", { ascending: false })
-    .limit(1);
+  // Chỉ upsell sản phẩm cùng creator (owner upsell owner, partner A upsell partner A)
+  let companionQuery = withCreator(
+    supabase
+      .from("products")
+      .select("id, name, price")
+      .eq("status", "published")
+      .neq("id", product.id)
+      .neq("is_combo", true)
+      .order("download_count", { ascending: false })
+      .limit(1)
+  );
 
   if (product.type) companionQuery = companionQuery.eq("type", product.type);
 
@@ -59,22 +70,25 @@ export default async function CheckoutPage({ params }: Props) {
 
   // Fetch bundle: 2–3 sản phẩm phổ biến nhất, khác sản phẩm đang mua, không phải combo
   // Không hiện bundle upsell khi đang mua combo (combo đã rẻ, không cần thêm ưu đãi)
-  const { data: bundleRaw } = product.is_combo ? { data: null } : await supabase
-    .from("products")
-    .select("id, name, price")
-    .eq("status", "published")
-    .neq("id", product.id)
-    .neq("is_combo", true)
-    .order("download_count", { ascending: false })
-    .limit(3);
+  // Chỉ upsell sản phẩm cùng creator
+  const { data: bundleRaw } = product.is_combo ? { data: null } : await withCreator(
+    supabase
+      .from("products")
+      .select("id, name, price")
+      .eq("status", "published")
+      .neq("id", product.id)
+      .neq("is_combo", true)
+      .order("download_count", { ascending: false })
+      .limit(3)
+  );
 
   const bundle: BundleOffer | null =
     bundleRaw && bundleRaw.length >= 2
       ? {
           items: bundleRaw,
-          originalPrice: bundleRaw.reduce((s, p) => s + p.price, 0),
+          originalPrice: bundleRaw.reduce((s: number, p: { price: number }) => s + p.price, 0),
           salePrice: Math.round(
-            bundleRaw.reduce((s, p) => s + p.price, 0) * 0.5 / 1000
+            bundleRaw.reduce((s: number, p: { price: number }) => s + p.price, 0) * 0.5 / 1000
           ) * 1000,
         }
       : null;

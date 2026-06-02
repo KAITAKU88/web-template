@@ -56,7 +56,15 @@ export async function createProduct(formData: FormData) {
 
 export async function updateProduct(id: string, formData: FormData) {
   const supabase = createAdminClient();
-  const { staffId } = await getAdminSession();
+  const { role, staffId } = await getAdminSession();
+
+  // Partner chỉ được sửa sản phẩm do chính họ tạo — validate ở server
+  if (role === "partner" && staffId) {
+    const { data: existing } = await supabase.from("products").select("creator_id").eq("id", id).single();
+    if (!existing || existing.creator_id !== staffId) {
+      throw new Error("Không có quyền chỉnh sửa sản phẩm này.");
+    }
+  }
 
   const landingRaw = formData.get("landing_content") as string | null;
   const landing = landingRaw ? JSON.parse(landingRaw) : null;
@@ -93,7 +101,16 @@ export async function updateProduct(id: string, formData: FormData) {
 
 export async function deleteProduct(id: string) {
   const supabase = createAdminClient();
-  const { staffId } = await getAdminSession();
+  const { role, staffId } = await getAdminSession();
+
+  // Partner chỉ được xóa sản phẩm do chính họ tạo
+  if (role === "partner" && staffId) {
+    const { data: existing } = await supabase.from("products").select("creator_id").eq("id", id).single();
+    if (!existing || existing.creator_id !== staffId) {
+      throw new Error("Không có quyền xóa sản phẩm này.");
+    }
+  }
+
   const { error } = await supabase.from("products").delete().eq("id", id);
   if (error) throw new Error(error.message);
   logActivity(staffId, "delete_product", "product", id);
