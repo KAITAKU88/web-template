@@ -23,7 +23,7 @@
     filter: brightness(0.88);
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-gray-700 shadow-sm transition hover:bg-gray-50 active:scale-95;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-6 py-3 text-sm font-semibold text-gray-700 dark:text-gray-200 shadow-sm transition hover:bg-gray-50 dark:hover:bg-gray-600 active:scale-95;
   }
   .card {
     @apply rounded-2xl bg-white dark:bg-gray-800 shadow ring-1 ring-gray-200 dark:ring-gray-700;

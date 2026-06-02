@@ -232,24 +232,24 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
     <div className="mx-auto max-w-lg">
       {/* Breadcrumb */}
       <div className="mb-6 flex items-center gap-2 text-sm text-gray-400">
-        <Link href="/" className="hover:text-gray-600">Trang chủ</Link>
+        <Link href="/" className="hover:text-gray-600 dark:hover:text-gray-300">Trang chủ</Link>
         <span>/</span>
-        <Link href={productUrl(product)} className="hover:text-gray-600 truncate max-w-[140px]">
+        <Link href={productUrl(product)} className="hover:text-gray-600 dark:hover:text-gray-300 truncate max-w-[140px]">
           {product.name}
         </Link>
         <span>/</span>
-        <span className="font-medium text-gray-700">Thanh toán</span>
+        <span className="font-medium text-gray-700 dark:text-gray-200">Thanh toán</span>
       </div>
 
       {/* Product summary */}
       <div className="card mb-6 flex items-center gap-4 p-4">
-        <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-green-50 text-3xl">
+        <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-xl bg-green-50 dark:bg-green-900/30 text-3xl">
           {product.type === "notion" ? "📓" : "📊"}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-gray-900 truncate">{product.name}</div>
+          <div className="font-semibold text-gray-900 dark:text-white truncate">{product.name}</div>
           {product.description && (
-            <div className="text-sm text-gray-500 truncate">{product.description}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400 truncate">{product.description}</div>
           )}
         </div>
         <div className="text-lg font-bold text-brand flex-shrink-0">
@@ -260,13 +260,13 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
       {/* ── Step: Form ── */}
       {step === "form" && (
         <div className="card p-6">
-          <h1 className="mb-1 text-xl font-bold text-gray-900">Nhập thông tin</h1>
-          <p className="mb-6 text-sm text-gray-500">
+          <h1 className="mb-1 text-xl font-bold text-gray-900 dark:text-white">Nhập thông tin</h1>
+          <p className="mb-6 text-sm text-gray-500 dark:text-gray-400">
             Link template sẽ được gửi tự động đến email của bạn sau khi thanh toán.
           </p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email nhận template <span className="text-red-500">*</span>
               </label>
               <input
@@ -276,17 +276,17 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
                 onChange={(e) => { setEmail(e.target.value); setEmailTouched(true); }}
                 onBlur={() => setEmailTouched(true)}
                 placeholder="ban@example.com"
-                className={`w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:ring-2 ${
+                className={`w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:ring-2 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
                   emailError
-                    ? "border-red-400 focus:border-red-400 focus:ring-red-100"
-                    : "border-gray-200 focus:border-green-500 focus:ring-green-100"
+                    ? "border-red-400 focus:border-red-400 focus:ring-red-100 dark:border-red-500 dark:focus:ring-red-900/30"
+                    : "border-gray-200 dark:border-gray-600 focus:border-green-500 focus:ring-green-100 dark:focus:ring-green-900/20"
                 }`}
               />
               {emailError && <p className="mt-1.5 text-xs text-red-500">{emailError}</p>}
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700">
+              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Số điện thoại
               </label>
               <input
@@ -294,7 +294,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="0912 345 678"
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100"
+                className="w-full rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 px-4 py-3 text-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100 dark:focus:ring-green-900/20"
               />
               <p className="mt-1.5 text-xs text-gray-400">
                 Không bắt buộc — cung cấp số điện thoại để được hỗ trợ nhanh hơn nếu có sự cố.
@@ -309,19 +309,19 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
                     value={discountInput}
                     onChange={(e) => { setDiscountInput(e.target.value.toUpperCase()); setDiscountError(""); }}
                     placeholder="Mã giảm giá (nếu có)"
-                    className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100 uppercase"
+                    className="flex-1 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 px-4 py-2.5 text-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100 dark:focus:ring-green-900/20 uppercase"
                   />
                   <button type="button" onClick={handleApplyDiscount} disabled={discountApplying || !discountInput.trim()}
-                    className="shrink-0 rounded-xl bg-gray-100 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-200 disabled:opacity-50 transition-colors">
+                    className="shrink-0 rounded-xl bg-gray-100 dark:bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors">
                     {discountApplying ? "…" : "Áp dụng"}
                   </button>
                 </div>
               ) : (
-                <div className="flex items-center justify-between rounded-xl bg-green-50 border border-green-200 px-4 py-2.5">
+                <div className="flex items-center justify-between rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 px-4 py-2.5">
                   <div className="flex items-center gap-2 text-sm">
-                    <span className="text-green-600">✓</span>
-                    <span className="font-mono font-bold text-green-700">{discountCode}</span>
-                    <span className="text-green-600">— giảm {formatCurrency(discountAmount)}</span>
+                    <span className="text-green-600 dark:text-green-400">✓</span>
+                    <span className="font-mono font-bold text-green-700 dark:text-green-400">{discountCode}</span>
+                    <span className="text-green-600 dark:text-green-400">— giảm {formatCurrency(discountAmount)}</span>
                   </div>
                   <button type="button" onClick={handleRemoveDiscount} className="text-xs text-gray-400 hover:text-red-500">Xóa</button>
                 </div>
@@ -330,7 +330,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
             </div>
 
             {error && (
-              <div className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-600">{error}</div>
+              <div className="rounded-xl bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</div>
             )}
 
             {/* ── Order Bump ── */}
@@ -342,8 +342,8 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
                 onKeyDown={(e) => e.key === " " && setBumpChecked((v) => !v)}
                 className={`cursor-pointer rounded-xl border-2 border-dashed p-4 transition select-none ${
                   bumpChecked
-                    ? "border-amber-400 bg-amber-50"
-                    : "border-amber-300 bg-amber-50/60 hover:bg-amber-50"
+                    ? "border-amber-400 bg-amber-50 dark:bg-amber-900/20"
+                    : "border-amber-300 bg-amber-50/60 dark:bg-amber-900/10 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                 }`}
               >
                 <div className="flex items-start gap-3">
@@ -352,20 +352,20 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
                     className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded border-2 transition ${
                       bumpChecked
                         ? "border-amber-500 bg-amber-500"
-                        : "border-gray-300 bg-white"
+                        : "border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-700"
                     }`}
                   >
                     {bumpChecked && <span className="text-xs font-bold text-white">✓</span>}
                   </div>
 
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-800">
+                    <p className="text-sm font-semibold text-gray-800 dark:text-gray-100">
                       Thêm vào đơn hàng:{" "}
                       <span className="italic">"{companion.name}"</span>
                     </p>
-                    <p className="mt-0.5 text-sm text-gray-700">
+                    <p className="mt-0.5 text-sm text-gray-700 dark:text-gray-200">
                       Chỉ{" "}
-                      <span className="font-bold text-amber-600">
+                      <span className="font-bold text-amber-600 dark:text-amber-400">
                         {formatCurrency(companion.bumpPrice)}
                       </span>{" "}
                       <span className="text-xs text-gray-400 line-through">
@@ -399,7 +399,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
 
             <Link
               href={productUrl(product)}
-              className="block text-center text-sm text-gray-400 hover:text-gray-600 transition"
+              className="block text-center text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition"
             >
               ← Đổi ý, quay lại trang sản phẩm
             </Link>
@@ -411,25 +411,25 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
       {step === "waiting" && (
         <div className="card p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h1 className="text-xl font-bold text-gray-900">Quét mã QR để thanh toán</h1>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Quét mã QR để thanh toán</h1>
             <span
               className={`font-mono text-lg font-bold tabular-nums ${
-                countdown < 60 ? "text-red-500" : "text-gray-700"
+                countdown < 60 ? "text-red-500" : "text-gray-700 dark:text-gray-200"
               }`}
             >
               {formatTime(countdown)}
             </span>
           </div>
 
-          <div className="mb-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          <div className="mb-4 rounded-xl bg-amber-50 dark:bg-amber-900/20 px-4 py-3 text-sm text-amber-700 dark:text-amber-300">
             <strong>Nội dung chuyển khoản:</strong>{" "}
             <span className="font-mono font-bold">{orderId}</span>
-            <span className="ml-2 text-xs text-amber-500">(bắt buộc, không thay đổi)</span>
+            <span className="ml-2 text-xs text-amber-500 dark:text-amber-400">(bắt buộc, không thay đổi)</span>
           </div>
 
           <div className="mb-4 flex justify-center">
             {qrUrl ? (
-              <div className="rounded-2xl border-4 border-green-100 p-2 shadow-inner">
+              <div className="rounded-2xl border-4 border-green-100 dark:border-green-900 p-2 shadow-inner">
                 <Image
                   src={qrUrl}
                   alt="VietQR thanh toán"
@@ -440,7 +440,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
                 />
               </div>
             ) : (
-              <div className="h-64 w-64 animate-pulse rounded-2xl bg-gray-100" />
+              <div className="h-64 w-64 animate-pulse rounded-2xl bg-gray-100 dark:bg-gray-700" />
             )}
           </div>
 
@@ -461,7 +461,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
                   window.open(qrUrl, "_blank");
                 }
               }}
-              className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-brand bg-white px-4 py-3 text-sm font-semibold text-brand shadow-sm transition hover:bg-brand-subtle active:scale-95"
+              className="mb-2 flex w-full items-center justify-center gap-2 rounded-xl border border-brand bg-white dark:bg-gray-800 px-4 py-3 text-sm font-semibold text-brand shadow-sm transition hover:bg-brand-subtle active:scale-95"
             >
               <span>⬇️</span>
               Lưu mã QR về máy
@@ -486,14 +486,14 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
               onClick={() => setShowBankModal(false)}
             >
               <div
-                className="w-full max-w-lg rounded-t-2xl bg-white p-5 pb-8"
+                className="w-full max-w-lg rounded-t-2xl bg-white dark:bg-gray-800 p-5 pb-8"
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="mb-4 flex items-center justify-between">
-                  <h3 className="text-base font-semibold text-gray-800">Chọn ứng dụng ngân hàng</h3>
-                  <button onClick={() => setShowBankModal(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+                  <h3 className="text-base font-semibold text-gray-800 dark:text-gray-100">Chọn ứng dụng ngân hàng</h3>
+                  <button onClick={() => setShowBankModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-xl leading-none">✕</button>
                 </div>
-                <p className="mb-3 text-xs text-blue-400 bg-blue-500/10 rounded-xl px-3 py-2"> {/* đã đồng bộ design system — dark token */}
+                <p className="mb-3 text-xs text-blue-400 bg-blue-500/10 rounded-xl px-3 py-2">
                   💡 Lưu mã QR → Mở app → Quét mã QR → Chọn ảnh từ thư viện ảnh
                 </p>
                 <div className="grid grid-cols-4 gap-3">
@@ -520,7 +520,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
                       href={`${paymentUrl}&app=${bank.code}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-100 p-2 text-center text-xs text-gray-700 hover:bg-gray-50 active:scale-95 transition"
+                      className="flex flex-col items-center gap-1.5 rounded-xl border border-gray-100 dark:border-gray-700 p-2 text-center text-xs text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-95 transition"
                     >
                       <div
                         className="flex h-10 w-10 items-center justify-center rounded-xl text-[10px] font-bold text-white"
@@ -536,12 +536,12 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
             </div>
           )}
 
-          <div className="space-y-2 text-center text-sm text-gray-500">
-            <p>Số tiền: <strong className="text-gray-900">{formatCurrency(orderAmount)}</strong></p>
-            <p>Email nhận: <strong className="text-gray-900">{email}</strong></p>
+          <div className="space-y-2 text-center text-sm text-gray-500 dark:text-gray-400">
+            <p>Số tiền: <strong className="text-gray-900 dark:text-white">{formatCurrency(orderAmount)}</strong></p>
+            <p>Email nhận: <strong className="text-gray-900 dark:text-white">{email}</strong></p>
           </div>
 
-          <div className="mt-5 rounded-xl bg-gray-50 p-4 text-xs text-gray-400 space-y-1">
+          <div className="mt-5 rounded-xl bg-gray-50 dark:bg-gray-700/50 p-4 text-xs text-gray-400 space-y-1">
             <p>✅ Hệ thống tự động xác nhận ngay sau khi nhận được tiền</p>
             <p>✅ Link template được gửi qua email trong vòng vài phút</p>
             <p>⏳ Mã QR hết hạn sau {formatTime(countdown)}</p>
@@ -549,24 +549,24 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
 
           <div className="mt-4 flex items-center justify-center gap-2">
             <span className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
-            <span className="text-sm text-gray-500">Đang chờ xác nhận thanh toán...</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Đang chờ xác nhận thanh toán...</span>
           </div>
 
           {/* Nút hủy */}
-          <div className="mt-6 border-t border-gray-100 pt-4">
+          <div className="mt-6 border-t border-gray-100 dark:border-gray-700 pt-4">
             {confirmCancel ? (
-              <div className="rounded-xl border border-orange-100 bg-orange-50 p-4 text-center">
-                <p className="mb-3 text-sm text-gray-700">Bạn có chắc muốn hủy đơn hàng này?</p>
+              <div className="rounded-xl border border-orange-100 dark:border-orange-800/50 bg-orange-50 dark:bg-orange-900/20 p-4 text-center">
+                <p className="mb-3 text-sm text-gray-700 dark:text-gray-200">Bạn có chắc muốn hủy đơn hàng này?</p>
                 <div className="flex justify-center gap-2">
                   <button
                     onClick={handleConfirmCancel}
-                    className="rounded-xl bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600" /* đã đồng bộ design system */
+                    className="rounded-xl bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600"
                   >
                     Xác nhận hủy đơn
                   </button>
                   <button
                     onClick={() => setConfirmCancel(false)}
-                    className="rounded-xl border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50" /* đã đồng bộ design system */
+                    className="rounded-xl border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-200 transition hover:bg-gray-50 dark:hover:bg-gray-600"
                   >
                     Tiếp tục mua
                   </button>
@@ -575,7 +575,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
             ) : (
               <button
                 onClick={() => setConfirmCancel(true)}
-                className="w-full py-1 text-center text-xs text-gray-300 transition hover:text-gray-500"
+                className="w-full py-1 text-center text-xs text-gray-300 dark:text-gray-500 transition hover:text-gray-500 dark:hover:text-gray-300"
               >
                 Hủy đơn
               </button>
@@ -590,40 +590,40 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
           {/* Header */}
           <div className="card p-6 text-center">
             <div className="mb-2 text-5xl">🎉</div>
-            <h1 className="mb-1 text-2xl font-bold text-gray-900">Thanh toán thành công!</h1>
-            <p className="text-sm text-gray-500">Cảm ơn bạn đã tin tưởng {siteName}</p>
+            <h1 className="mb-1 text-2xl font-bold text-gray-900 dark:text-white">Thanh toán thành công!</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Cảm ơn bạn đã tin tưởng {siteName}</p>
           </div>
 
           {/* Upsell banner với countdown — ẩn nếu đã mua bundle */}
           {bundle && upsellCountdown > 0 && !isBundleOrder && (
-            <div className="rounded-2xl border-2 border-dashed border-orange-400 bg-gradient-to-b from-orange-50 to-amber-50 p-5">
+            <div className="rounded-2xl border-2 border-dashed border-orange-400 dark:border-orange-600 bg-gradient-to-b from-orange-50 to-amber-50 dark:from-orange-900/20 dark:to-amber-900/20 p-5">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm font-bold text-orange-700">🎁 Quà tặng đặc biệt dành cho bạn</span>
-                <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 font-mono text-xs font-bold text-red-400"> {/* đã đồng bộ design system — badge token */}
+                <span className="text-sm font-bold text-orange-700 dark:text-orange-400">🎁 Quà tặng đặc biệt dành cho bạn</span>
+                <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 font-mono text-xs font-bold text-red-400">
                   ⏰ {formatTime(upsellCountdown)}
                 </span>
               </div>
 
-              <p className="mb-3 text-sm font-semibold leading-snug text-gray-800">
+              <p className="mb-3 text-sm font-semibold leading-snug text-gray-800 dark:text-gray-100">
                 Sở hữu toàn bộ hệ sinh thái quản lý cuộc sống toàn diện
-                <span className="text-orange-600"> với giá giảm 50%</span>
+                <span className="text-orange-600 dark:text-orange-400"> với giá giảm 50%</span>
               </p>
 
-              <div className="mb-3 space-y-1.5 rounded-xl bg-white/60 p-3">
+              <div className="mb-3 space-y-1.5 rounded-xl bg-white/60 dark:bg-gray-800/60 p-3">
                 {bundle.items.map((item) => (
                   <div key={item.id} className="flex items-center justify-between text-xs">
-                    <span className="text-gray-700">📄 {item.name}</span>
-                    <span className="font-medium text-gray-500">{formatCurrency(item.price)}</span>
+                    <span className="text-gray-700 dark:text-gray-300">📄 {item.name}</span>
+                    <span className="font-medium text-gray-500 dark:text-gray-400">{formatCurrency(item.price)}</span>
                   </div>
                 ))}
-                <div className="flex items-center justify-between border-t border-orange-200 pt-1.5 text-xs font-medium">
-                  <span className="text-gray-600">Tổng giá lẻ</span>
+                <div className="flex items-center justify-between border-t border-orange-200 dark:border-orange-800 pt-1.5 text-xs font-medium">
+                  <span className="text-gray-600 dark:text-gray-300">Tổng giá lẻ</span>
                   <span className="text-gray-400 line-through">{formatCurrency(bundle.originalPrice)}</span>
                 </div>
               </div>
 
               <div className="mb-3 flex items-baseline gap-2">
-                <span className="text-2xl font-extrabold text-orange-600">
+                <span className="text-2xl font-extrabold text-orange-600 dark:text-orange-400">
                   {formatCurrency(bundle.salePrice)}
                 </span>
                 <span className="text-xs text-gray-400">
@@ -638,7 +638,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
               >
                 {loading ? "Đang tạo đơn hàng..." : "Sở hữu combo ngay →"}
               </button>
-              <p className="mt-2 text-center text-xs italic text-orange-500/80">
+              <p className="mt-2 text-center text-xs italic text-orange-500/80 dark:text-orange-400/70">
                 Ưu đãi chỉ dành riêng cho khách vừa mua — hết hạn sau {formatTime(upsellCountdown)}
               </p>
             </div>
@@ -657,9 +657,9 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
           )}
 
           {/* Thông báo email */}
-          <div className="rounded-xl bg-blue-50 px-4 py-3 text-sm">
-            <p className="font-medium text-blue-700">📧 Email xác nhận đã được gửi</p>
-            <p className="mt-0.5 text-blue-600">
+          <div className="rounded-xl bg-blue-500/10 px-4 py-3 text-sm">
+            <p className="font-medium text-blue-400">📧 Email xác nhận đã được gửi</p>
+            <p className="mt-0.5 text-blue-400">
               {isBundleOrder
                 ? <>Toàn bộ template trong combo đang được gửi đến <strong>{email}</strong>.</>
                 : <>Link tải đã gửi đến <strong>{email}</strong>.</>
@@ -671,7 +671,7 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
           {/* Mã đơn + về trang chủ */}
           <div className="text-center">
             <p className="mb-3 text-xs text-gray-400">
-              Mã đơn hàng: <span className="font-mono font-medium text-gray-600">{orderId}</span>
+              Mã đơn hàng: <span className="font-mono font-medium text-gray-600 dark:text-gray-400">{orderId}</span>
             </p>
             <Link href="/" className="btn-secondary">← Về trang chủ</Link>
           </div>
@@ -682,8 +682,8 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
       {step === "cancelled" && (
         <div className="card p-8 text-center">
           <div className="mb-4 text-5xl">⏰</div>
-          <h1 className="mb-2 text-xl font-bold text-gray-900">Đơn hàng đã bị hủy</h1>
-          <p className="mb-6 text-gray-500">
+          <h1 className="mb-2 text-xl font-bold text-gray-900 dark:text-white">Đơn hàng đã bị hủy</h1>
+          <p className="mb-6 text-gray-500 dark:text-gray-400">
             Mã QR thanh toán đã không còn hiệu lực.
           </p>
           <Link href={productUrl(product)} className="btn-primary">
