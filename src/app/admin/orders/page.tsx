@@ -133,7 +133,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
       </div>
 
       {/* Filters */}
-      <div className="space-y-3">
+      <div className="flex flex-wrap items-start gap-x-6 gap-y-2">
         {/* Thời gian */}
         <div className="flex items-center gap-2">
           <span className="text-xs text-gray-500 w-16 shrink-0">Thời gian</span>
