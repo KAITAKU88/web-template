@@ -122,7 +122,7 @@ export default async function ProductPage({ params }: Props) {
           )}
 
           {/* Giá + CTA */}
-          <div className="flex items-end justify-center gap-5">
+          <div className="flex items-end justify-between gap-5">
             <div>
               <div className="text-3xl font-extrabold text-brand">{formatCurrency(product.price)}</div>
               {hasDiscount && (
@@ -140,7 +140,7 @@ export default async function ProductPage({ params }: Props) {
           </div>
 
           {/* Trust badges */}
-          <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-400">
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 text-xs text-gray-400">
             <span>✓ Thanh toán 1 lần — dùng vĩnh viễn</span>
             <span>✓ Nhận link qua email tức thì</span>
             <span>✓ Tự do chỉnh sửa</span>
