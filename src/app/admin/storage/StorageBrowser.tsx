@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { slugifyFilename } from "@/lib/utils";
-import { compressToWebP } from "@/lib/browser-utils";
+import { recordStorageFile, getPartnerFilePaths, deleteStorageFileRecord } from "@/lib/storage-files";
 
 const BUCKETS = [
   { id: "product-images", label: "Ảnh sản phẩm", icon: "🖼️" },
@@ -22,17 +22,14 @@ interface StorageFile {
   isFolder?: boolean;
 }
 
-export default function StorageBrowser() {
+export default function StorageBrowser({ partnerFolder, creatorId }: { partnerFolder?: string; creatorId?: string }) {
   const [bucket, setBucket] = useState(BUCKETS[0].id);
-  const [folder, setFolder] = useState("");
+  const [folder, setFolder] = useState(partnerFolder ?? "");
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [newFolderName, setNewFolderName] = useState("");
   const [showNewFolder, setShowNewFolder] = useState(false);
-  const [dragOver, setDragOver] = useState(false);
   const [view, setView] = useState<"grid" | "list">("grid");
   const [folderError, setFolderError] = useState("");
   const [search, setSearch] = useState("");
@@ -44,7 +41,6 @@ export default function StorageBrowser() {
   const [statsLoading, setStatsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
   const breadcrumbs = folder ? folder.split("/") : [];
 
@@ -127,26 +123,13 @@ export default function StorageBrowser() {
 
   // ── Navigation ───────────────────────────────────────────────────
   const openFolder = (name: string) => { setFolder((f) => f ? `${f}/${name}` : name); setSearch(""); };
-  const navigateTo = (idx: number) => { setFolder(breadcrumbs.slice(0, idx + 1).join("/")); setSearch(""); };
-
-  // ── Upload ───────────────────────────────────────────────────────
-  async function handleUpload(fileList: FileList) {
-    const raw = Array.from(fileList).filter((f) => f.type.startsWith("image/"));
-    if (!raw.length) return;
-    setUploading(true);
-    setUploadProgress(0);
-    let done = 0;
-    for (const file of raw) {
-      const compressed = await compressToWebP(file);
-      const prefix = folder ? `${folder}/` : "";
-      const path = `${prefix}${slugifyFilename(compressed.name)}`;
-      await supabase.storage.from(bucket).upload(path, compressed, { upsert: true });
-      done++;
-      setUploadProgress(Math.round((done / raw.length) * 100));
-    }
-    setUploading(false);
-    load();
-  }
+  const navigateTo = (idx: number) => {
+    const newPath = breadcrumbs.slice(0, idx + 1).join("/");
+    // Partner không được navigate lên trên folder của mình
+    if (partnerFolder && !newPath.startsWith(partnerFolder)) return;
+    setFolder(newPath);
+    setSearch("");
+  };
 
   // ── Create folder ─────────────────────────────────────────────────
   async function handleCreateFolder() {
@@ -199,16 +182,32 @@ export default function StorageBrowser() {
     const fileItems = selectedItems.filter((f) => !f.isFolder);
     if (!confirm(`Xóa ${selected.size} mục đã chọn?`)) return;
     // Delete files
+    const deletedUrls: string[] = [];
     if (fileItems.length) {
       const paths = fileItems.map((f) => folder ? `${folder}/${f.name}` : f.name);
       await supabase.storage.from(bucket).remove(paths);
+      for (const p of paths) {
+        deletedUrls.push(getPublicUrl(p));
+        await deleteStorageFileRecord(bucket, p);
+      }
     }
     // Delete folders recursively
     for (const f of folders) {
       const prefix = folder ? `${folder}/${f.name}` : f.name;
       const allFiles = await listAllRecursive(prefix);
       const toDelete = [...allFiles, `${prefix}/.emptyFolderPlaceholder`];
-      if (toDelete.length) await supabase.storage.from(bucket).remove(toDelete);
+      if (toDelete.length) {
+        await supabase.storage.from(bucket).remove(toDelete);
+        allFiles.forEach((p) => deletedUrls.push(getPublicUrl(p)));
+      }
+    }
+    // Xóa tham chiếu URL khỏi DB (products, settings)
+    if (deletedUrls.length) {
+      fetch("/api/admin/remove-image-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ urls: deletedUrls }),
+      }).catch(() => {});
     }
     load();
   }
@@ -309,31 +308,40 @@ export default function StorageBrowser() {
         </div>
       </div>
 
-      {/* Bucket tabs */}
-      <div className="flex gap-2 flex-wrap">
-        {BUCKETS.map((b) => (
-          <button type="button" key={b.id} onClick={() => { setBucket(b.id); setFolder(""); setSearch(""); }}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
-              bucket === b.id ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:text-gray-900 dark:hover:text-white border border-transparent"
-            }`}>
-            <span>{b.icon}</span>{b.label}
-          </button>
-        ))}
-      </div>
+      {/* Bucket tabs — ẩn với partner */}
+      {!partnerFolder && (
+        <div className="flex gap-2 flex-wrap">
+          {BUCKETS.map((b) => (
+            <button type="button" key={b.id} onClick={() => { setBucket(b.id); setFolder(""); setSearch(""); }}
+              className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
+                bucket === b.id ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:text-gray-900 dark:hover:text-white border border-transparent"
+              }`}>
+              <span>{b.icon}</span>{b.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Toolbar */}
       <div className="flex items-center gap-2 flex-wrap rounded-2xl border border-gray-200 dark:border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 px-4 py-3">
-        {/* Breadcrumb */}
+        {/* Breadcrumb — partner chỉ thấy path từ folder của mình trở xuống */}
         <div className="flex items-center gap-1 flex-1 text-sm min-w-0">
-          <button type="button" onClick={() => { setFolder(""); setSearch(""); }} className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors shrink-0">
-            {BUCKETS.find((b) => b.id === bucket)?.label}
-          </button>
-          {breadcrumbs.map((part, i) => (
-            <span key={i} className="flex items-center gap-1">
-              <span className="text-gray-600">/</span>
-              <button type="button" onClick={() => navigateTo(i)} className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">{part}</button>
-            </span>
-          ))}
+          {!partnerFolder && (
+            <button type="button" onClick={() => { setFolder(""); setSearch(""); }} className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors shrink-0">
+              {BUCKETS.find((b) => b.id === bucket)?.label}
+            </button>
+          )}
+          {breadcrumbs.map((part, i) => {
+            // Partner: ẩn các segment trên partnerFolder, chỉ hiện từ root của họ
+            const partnerDepth = partnerFolder ? partnerFolder.split("/").length : 0;
+            if (partnerFolder && i < partnerDepth - 1) return null;
+            return (
+              <span key={i} className="flex items-center gap-1">
+                <span className="text-gray-600">/</span>
+                <button type="button" onClick={() => navigateTo(i)} className="text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">{part}</button>
+              </span>
+            );
+          })}
         </div>
 
         {/* Search */}
@@ -347,17 +355,6 @@ export default function StorageBrowser() {
 
         {/* Static actions */}
         <div className="flex items-center gap-2 shrink-0">
-          <label className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-medium cursor-pointer transition-colors ${
-            uploading ? "bg-gray-700 text-gray-500" : "bg-emerald-500 text-white hover:bg-emerald-400"
-          }`}>
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-            </svg>
-            {uploading ? `${uploadProgress}%` : "Upload"}
-            <input ref={fileInputRef} type="file" multiple accept="image/*" className="hidden" disabled={uploading}
-              onChange={(e) => { if (e.target.files) handleUpload(e.target.files); e.target.value = ""; }} />
-          </label>
-
           <button type="button" onClick={() => setView(view === "grid" ? "list" : "grid")}
             className="rounded-xl border border-gray-300 dark:border-gray-700 p-1.5 text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
             {view === "grid"
@@ -418,12 +415,7 @@ export default function StorageBrowser() {
       )}
 
       {/* File area */}
-      <div
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={(e) => { e.preventDefault(); setDragOver(false); if (e.dataTransfer.files) handleUpload(e.dataTransfer.files); }}
-        className={`rounded-2xl border-2 transition-colors min-h-[300px] ${dragOver ? "border-emerald-400 bg-emerald-500/5" : "border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"}`}
-      >
+      <div className="rounded-2xl border-2 border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 min-h-[300px]">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="h-6 w-6 rounded-full border-2 border-emerald-500 border-t-transparent animate-spin" />
@@ -434,8 +426,8 @@ export default function StorageBrowser() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
             </svg>
             <div className="text-center">
-              <p className="text-sm font-medium text-gray-400">Kéo thả ảnh vào đây để upload</p>
-              <p className="text-xs mt-1">Ảnh tự động nén → WebP. Dùng nút Upload ở trên.</p>
+              <p className="text-sm font-medium text-gray-400">Thư mục trống</p>
+              <p className="text-xs mt-1">Upload ảnh từ phần tạo/sửa sản phẩm để ảnh được lưu đúng thư mục.</p>
             </div>
           </div>
         ) : visible.length === 0 ? (
@@ -628,15 +620,6 @@ export default function StorageBrowser() {
         </div>
       )}
 
-      {dragOver && (
-        // đã đồng bộ design system — bỏ backdrop-blur-sm (gây compositing bug trong AdminShell fixed container)
-        <div className="fixed inset-0 z-40 flex items-center justify-center bg-emerald-500/5 pointer-events-none">
-          <div className="rounded-2xl border-2 border-emerald-500 bg-white dark:bg-gray-900 px-10 py-8 text-center">
-            <div className="text-4xl mb-3">⬆️</div>
-            <p className="text-lg font-semibold text-emerald-400">Thả ảnh để upload</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
