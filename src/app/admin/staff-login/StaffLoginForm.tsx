@@ -7,7 +7,7 @@ import Link from "next/link";
 const LOGIN_TABS = [
   { label: "Owner",          href: "/admin/login"        },
   { label: "Quản lý",        href: "/manager/login"      },
-  { label: "Cộng tác viên",  href: "/collaborator/login" },
+  { label: "Nhân viên",  href: "/collaborator/login" },
 ];
 
 function LoginTabs({ active }: { active: string }) {
@@ -72,7 +72,7 @@ export default function StaffLoginForm({ brandName }: { brandName: string }) {
           </div>
           <h1 className="text-xl font-bold text-white">{brandName}</h1>
           <p className="mt-1 text-sm text-gray-400">
-            {pathname === "/manager/login" ? "Đăng nhập Quản lý" : "Đăng nhập Cộng tác viên"}
+            {pathname === "/manager/login" ? "Đăng nhập Quản lý" : "Đăng nhập Nhân viên"}
           </p>
         </div>
 

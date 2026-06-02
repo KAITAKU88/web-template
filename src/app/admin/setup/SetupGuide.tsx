@@ -264,7 +264,7 @@ const PHASES: Phase[] = [
       {
         id: "sec-staff",
         title: "Cấu hình quyền nhân viên (nếu có team)",
-        desc: "Nếu có người hỗ trợ quản lý, tạo tài khoản nhân viên thay vì share mật khẩu admin.\n\nAdmin → Nhân viên → Thêm nhân viên:\n  Quản lý: xem + sửa sản phẩm, xem đơn hàng, xem khách hàng\n  Cộng tác viên: chỉ xem (không sửa được)\n\nNhân viên đăng nhập tại /manager/login (Quản lý) hoặc /collaborator/login (Cộng tác viên).",
+        desc: "Nếu có người hỗ trợ quản lý, tạo tài khoản nhân viên thay vì share mật khẩu admin.\n\nAdmin → Người dùng → Thêm nhân viên:\n  Quản lý: xem + sửa sản phẩm, xem đơn hàng, xem khách hàng\n  Nhân viên: chỉ xem (không sửa được)\n\nNhân viên đăng nhập tại /manager/login (Quản lý) hoặc /collaborator/login (Nhân viên).",
         links: [{ label: "Quản lý nhân viên", href: "/admin/staff", variant: "primary" }],
         tips: "Không chia sẻ mật khẩu admin với bất kỳ ai — tạo tài khoản nhân viên riêng với quyền phù hợp.",
       },

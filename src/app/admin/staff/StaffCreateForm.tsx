@@ -51,7 +51,7 @@ export default function StaffCreateForm() {
             className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500">
             <option value="" disabled>Chọn vai trò...</option>
             <option value="manager">Quản lý — Toàn quyền trừ Cấu hình</option>
-            <option value="collaborator">Cộng tác viên — Chỉ xem</option>
+            <option value="collaborator">Nhân viên — Chỉ xem</option>
           </select>
         </div>
 

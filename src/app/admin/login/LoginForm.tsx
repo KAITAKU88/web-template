@@ -7,7 +7,7 @@ import Link from "next/link";
 const LOGIN_TABS = [
   { label: "Owner",          href: "/admin/login"        },
   { label: "Quản lý",        href: "/manager/login"      },
-  { label: "Cộng tác viên",  href: "/collaborator/login" },
+  { label: "Nhân viên",  href: "/collaborator/login" },
 ];
 
 function LoginTabs({ active }: { active: string }) {
