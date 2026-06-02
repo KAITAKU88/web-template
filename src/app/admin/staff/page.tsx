@@ -38,7 +38,7 @@ export default async function StaffPage() {
   }));
 
   return (
-    <div className="p-4 md:p-6 space-y-8 max-w-4xl">
+    <div className="p-4 md:p-6 space-y-8">
       <div>
         <h1 className="text-xl font-bold text-gray-900 dark:text-white">Người dùng</h1>
         <p className="mt-1 text-sm text-gray-400">
