@@ -538,7 +538,7 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
             ) : aiProvider === "gemini" ? (
               <p className="flex items-center gap-1.5 text-xs text-blue-400">
                 <span className="h-1.5 w-1.5 rounded-full bg-blue-400 shrink-0" />
-                Đang dùng <span className="font-semibold">Gemini API</span> (gemini-1.5-flash)
+                Đang dùng <span className="font-semibold">Gemini API</span> (gemini-2.0-flash)
               </p>
             ) : aiProvider === "claude" ? (
               <p className="flex items-center gap-1.5 text-xs text-violet-400">
