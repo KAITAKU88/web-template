@@ -2,8 +2,6 @@
 
 import { useTransition, useState, useRef, useEffect, useCallback } from "react";
 import { useUnsavedChanges } from "@/hooks/useUnsavedChanges";
-import { generateLandingContent } from "./actions";
-import { AI_PROVIDERS } from "@/lib/ai-providers";
 import { buildDefaultLanding } from "@/lib/landingTemplate";
 import type { ProductCopy } from "@/lib/productContent";
 import type { Product } from "@/types";
@@ -22,8 +20,6 @@ interface Props {
   onCancel?: () => void;
   submitLabel?: string;
   categories?: Category[];
-  aiProvider?: string | null;
-  aiModel?: string | null;
   staffId?: string | null;
 }
 
@@ -32,14 +28,12 @@ const DEFAULT_CATEGORIES: Category[] = [
   { id: "google_sheet", name: "Google Sheets" },
 ];
 
-export default function ProductForm({ product, onSubmit, onCancel, submitLabel = "Lưu sản phẩm", categories = DEFAULT_CATEGORIES, aiProvider, aiModel, staffId }: Props) {
+export default function ProductForm({ product, onSubmit, onCancel, submitLabel = "Lưu sản phẩm", categories = DEFAULT_CATEGORIES, staffId }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const [saving, startSave] = useTransition();
-  const [generating, startGenerate] = useTransition();
   const [landing, setLanding] = useState<ProductCopy | null>(
     product?.landing_content ?? null
   );
-  const [genError, setGenError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [downloadCount, setDownloadCount] = useState<number>(
     product?.download_count ?? Math.floor(Math.random() * 1451) + 50
@@ -90,36 +84,14 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
     if (!formRef.current) return;
     const fd = new FormData(formRef.current);
     const name = (fd.get("name") as string).trim();
-    if (!name) { setGenError("Vui lòng nhập tên sản phẩm trước"); return; }
-    setGenError(null);
+    if (!name) return;
     const category = (fd.get("type") as string) || "notion";
     const description = (fd.get("description") as string) || "";
     setLanding(buildDefaultLanding(name, category, description));
     setIsDirty(true);
   }
 
-  function handleGenerate() {
-    if (!formRef.current) return;
-    const fd = new FormData(formRef.current);
-    const name = (fd.get("name") as string).trim();
-    if (!name) { setGenError("Vui lòng nhập tên sản phẩm trước"); return; }
 
-    setGenError(null);
-    startGenerate(async () => {
-      const result = await generateLandingContent(
-        name,
-        fd.get("type") as string,
-        fd.get("description") as string ?? "",
-        "",
-      );
-      if ("error" in result) {
-        setGenError(result.error);
-      } else {
-        setLanding(result.data);
-        setIsDirty(true);
-      }
-    });
-  }
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -462,7 +434,7 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
               {galleryImages.map((url, i) => (
                 <div key={i} className="relative group aspect-video rounded-xl overflow-hidden border border-gray-700 bg-gray-800">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={url} alt={`Gallery ${i + 1}`} className="h-full w-full object-cover" />
+                  <img src={url} alt={`Gallery ${i + 1}`} className="h-full w-full object-cover" loading="lazy" />
                   {/* Order badge */}
                   <div className="absolute left-1.5 top-1.5 rounded-full bg-black/60 px-1.5 py-0.5 text-xs text-white font-mono">{i + 1}</div>
                   {/* Remove button */}
@@ -509,74 +481,16 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Landing Page</h2>
             <p className="mt-0.5 text-xs text-gray-500">Tạo trang bán hàng: headline → nỗi đau → giải pháp → tính năng → testimonial → FAQ</p>
           </div>
-          {/* Gợi ý AI */}
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={handleUseTemplate}
-                className="flex items-center gap-2 rounded-xl bg-emerald-700 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-600 transition-colors"
-              >
-                📋 Template mặc định
-              </button>
-              <button
-                type="button"
-                onClick={handleGenerate}
-                disabled={generating}
-                className="flex items-center gap-2 rounded-xl bg-violet-600 px-3 py-2 text-xs font-semibold text-white hover:bg-violet-500 disabled:opacity-50 transition-colors"
-              >
-                {generating ? (
-                  <>
-                    <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                    Đang tạo…
-                  </>
-                ) : "✨ Generate AI"}
-              </button>
-            </div>
-            {/* Trạng thái AI provider */}
-            {!aiProvider ? (
-              <p className="flex items-center gap-1.5 text-xs text-amber-400">
-                <span>⚠️</span>
-                Chưa cấu hình AI — Generate AI sẽ không hoạt động.{" "}
-                <a href="/admin/settings" className="underline hover:text-amber-300 transition-colors">Cấu hình ngay</a>
-              </p>
-            ) : (() => {
-                const p = AI_PROVIDERS.find((p) => p.value === aiProvider);
-                return p ? (
-                  <p className="flex items-center gap-1.5 text-xs text-emerald-400">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shrink-0" />
-                    Đang dùng <span className="font-semibold">{p.label}</span>{aiModel ? ` (${aiModel})` : ""}
-                  </p>
-                ) : (
-                  <p className="flex items-center gap-1.5 text-xs text-red-400">
-                    <span>⚠️</span>
-                    Provider không hợp lệ: &quot;{aiProvider}&quot; —{" "}
-                    <a href="/admin/settings" className="underline hover:text-red-300 transition-colors">Kiểm tra cấu hình</a>
-                  </p>
-                );
-              })()}
-          </div>
+          <button
+              type="button"
+              onClick={handleUseTemplate}
+              className="flex items-center gap-2 rounded-xl bg-emerald-700 px-3 py-2 text-xs font-semibold text-white hover:bg-emerald-600 transition-colors"
+            >
+              📋 Template mặc định
+            </button>
         </div>
 
         <div className="p-6 space-y-4">
-          {/* Hints cho AI */}
-          <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1.5">Mô tả gợi ý cho AI</label>
-            <textarea
-              name="description"
-              rows={2}
-              defaultValue={product?.description ?? ""}
-              placeholder="Template giúp quản lý công việc theo hệ thống PARA, dành cho người đi làm bận rộn muốn tăng năng suất..."
-              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
-            />
-          </div>
-
-          {genError && (
-            <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-              {genError}
-            </p>
-          )}
-
           {/* Editor thủ công */}
           <LandingEditor
             value={landing}

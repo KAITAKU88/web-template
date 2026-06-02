@@ -27,6 +27,7 @@ export default function StorageBrowser({ partnerFolder, creatorId }: { partnerFo
   const [folder, setFolder] = useState(partnerFolder ?? "");
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [loading, setLoading] = useState(false);
+  const [folderSizes, setFolderSizes] = useState<Record<string, number>>({});
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [newFolderName, setNewFolderName] = useState("");
   const [showNewFolder, setShowNewFolder] = useState(false);
@@ -62,6 +63,18 @@ export default function StorageBrowser({ partnerFolder, creatorId }: { partnerFo
       });
     setFiles(items);
     setLoading(false);
+
+    // Tính dung lượng các folder con (chỉ 1 cấp, song song)
+    const folderItems = items.filter((f) => f.isFolder);
+    if (folderItems.length > 0) {
+      const sizes: Record<string, number> = {};
+      await Promise.all(folderItems.map(async (f) => {
+        const prefix = folder ? `${folder}/${f.name}` : f.name;
+        const { data: inner } = await supabase.storage.from(bucket).list(prefix, { limit: 500 });
+        sizes[f.name] = (inner ?? []).reduce((s, file) => s + (file.metadata?.size ?? 0), 0);
+      }));
+      setFolderSizes(sizes);
+    }
   }, [bucket, folder, supabase]);
 
   useEffect(() => { load(); }, [load]);
@@ -568,9 +581,15 @@ export default function StorageBrowser({ partnerFolder, creatorId }: { partnerFo
                       </div>
                     )}
                   </td>
-                  <td className="px-4 py-2 text-right text-xs text-gray-500">{formatSize(file.size)}</td>
+                  <td className="px-4 py-2 text-right text-xs text-gray-500">
+                    {file.isFolder
+                      ? folderSizes[file.name] !== undefined
+                        ? formatSize(folderSizes[file.name])
+                        : <span className="text-gray-600 animate-pulse">…</span>
+                      : formatSize(file.size)}
+                  </td>
                   <td className="px-4 py-2 text-right text-xs text-gray-600">
-                    {file.updatedAt ? new Date(file.updatedAt).toLocaleDateString("vi-VN") : "—"}
+                    {file.isFolder ? "—" : file.updatedAt ? new Date(file.updatedAt).toLocaleDateString("vi-VN") : "—"}
                   </td>
                 </tr>
               ))}

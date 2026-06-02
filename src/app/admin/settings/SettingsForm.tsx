@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition, useState, useRef, useEffect } from "react";
-import { AI_PROVIDERS } from "@/lib/ai-providers";
 import { saveSettings } from "./actions";
 import type { SettingsMap } from "@/lib/settings";
 import SharedImageUploadField from "@/components/ImageUploadField";
@@ -280,64 +279,49 @@ export default function SettingsForm({ settings }: { settings: SettingsMap }) {
         />
       </Section>
 
-      {/* ── AI Provider ───────────────────────────────────────── */}
-      <Section
-        title="AI — Sinh Landing Page"
-        description="Tự động tạo nội dung marketing khi thêm sản phẩm mới"
-      >
-        <ProviderField
-          currentProvider={settings.ai_provider ?? ""}
-          currentCustomName={settings.custom_provider_name ?? ""}
-          providerKeys={Object.fromEntries(
-            AI_PROVIDERS.map((p) => [p.value, !!(settings[p.keyName as keyof typeof settings])])
-          )}
-        />
-      </Section>
-
       {/* ── Link bảo vệ tải template ─────────────────────────── */}
       <Section
         title="Link bảo vệ tải template"
         description="Bọc link gốc trong link riêng có thời hạn — chống share link tràn lan"
       >
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-300">
-            Thời hạn link (giờ)
-          </label>
-          <select
-            name="download_link_expiry_hours"
-            defaultValue={settings.download_link_expiry_hours ?? "0"}
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
-          >
-            <option value="0">Không giới hạn (link vĩnh cửu)</option>
-            <option value="24">24 giờ</option>
-            <option value="48">48 giờ</option>
-            <option value="72">72 giờ (3 ngày)</option>
-            <option value="168">168 giờ (7 ngày)</option>
-            <option value="720">720 giờ (30 ngày)</option>
-          </select>
-          <p className="mt-1.5 text-xs text-gray-500">
-            Khi đặt &gt; 0: email giao hàng sẽ có link /api/download/... thay vì link Notion/GSheet gốc.
-            Khách mở link sau thời hạn sẽ thấy thông báo hết hạn.
-          </p>
+        <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Thời hạn link (giờ)</label>
+            <p className="mt-0.5 text-xs text-gray-500">Khi đặt &gt; 0: gửi link bảo vệ thay vì link gốc</p>
+          </div>
+          <div className="sm:col-span-2">
+            <select
+              name="download_link_expiry_hours"
+              defaultValue={settings.download_link_expiry_hours ?? "0"}
+              className="w-full max-w-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
+            >
+              <option value="0">Không giới hạn (link vĩnh cửu)</option>
+              <option value="24">24 giờ</option>
+              <option value="48">48 giờ</option>
+              <option value="72">72 giờ (3 ngày)</option>
+              <option value="168">168 giờ (7 ngày)</option>
+              <option value="720">720 giờ (30 ngày)</option>
+            </select>
+          </div>
         </div>
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-300">
-            Giới hạn lượt truy cập
-          </label>
-          <select
-            name="download_link_max_accesses"
-            defaultValue={settings.download_link_max_accesses ?? "0"}
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
-          >
-            <option value="0">Không giới hạn</option>
-            <option value="1">1 lần</option>
-            <option value="3">3 lần</option>
-            <option value="5">5 lần</option>
-            <option value="10">10 lần</option>
-          </select>
-          <p className="mt-1.5 text-xs text-gray-500">
-            Sau khi vượt giới hạn, link hiện thông báo hết lượt truy cập.
-          </p>
+        <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Giới hạn lượt truy cập</label>
+            <p className="mt-0.5 text-xs text-gray-500">Sau khi vượt giới hạn, link hiện thông báo hết lượt</p>
+          </div>
+          <div className="sm:col-span-2">
+            <select
+              name="download_link_max_accesses"
+              defaultValue={settings.download_link_max_accesses ?? "0"}
+              className="w-full max-w-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500"
+            >
+              <option value="0">Không giới hạn</option>
+              <option value="1">1 lần</option>
+              <option value="3">3 lần</option>
+              <option value="5">5 lần</option>
+              <option value="10">10 lần</option>
+            </select>
+          </div>
         </div>
       </Section>
 
@@ -740,74 +724,3 @@ function ImageUploadField({
   );
 }
 
-function ProviderField({
-  currentProvider,
-  currentCustomName,
-  providerKeys,
-}: {
-  currentProvider: string;
-  currentCustomName: string;
-  providerKeys: Record<string, boolean>;
-}) {
-  const [provider, setProvider] = useState(currentProvider);
-  const selected = AI_PROVIDERS.find((p) => p.value === provider);
-
-  return (
-    <>
-      {/* Dropdown */}
-      <div className="grid grid-cols-1 gap-2 px-6 py-4 sm:grid-cols-3 sm:gap-4">
-        <div>
-          <p className="block text-sm font-medium text-gray-700 dark:text-gray-300">AI Provider</p>
-          <p className="mt-0.5 text-xs text-gray-500">Dùng để tự động tạo landing page sản phẩm</p>
-        </div>
-        <div className="sm:col-span-2">
-          <select
-            name="ai_provider"
-            value={provider}
-            onChange={(e) => setProvider(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2.5 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30"
-          >
-            <option value="">— Chọn AI Provider —</option>
-            {AI_PROVIDERS.map((p) => (
-              <option key={p.value} value={p.value}>{p.label}</option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* API Key section — chỉ hiện khi đã chọn provider */}
-      {selected && (
-        <>
-          {provider === "custom" && (
-            <Field
-              label="Tên Provider"
-              name="custom_provider_name"
-              defaultValue={currentCustomName}
-              placeholder="Ví dụ: My Custom AI"
-              hint="Tên hiển thị cho provider tùy chỉnh của bạn"
-            />
-          )}
-          <SecretField
-            label={`${selected.label} API Key`}
-            name={selected.keyName}
-            hasValue={!!providerKeys[provider]}
-            hint={
-              selected.keyUrl ? (
-                <a
-                  href={selected.keyUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
-                >
-                  Lấy API key tại đây →
-                </a>
-              ) : (
-                <span className="text-gray-500">Nhập API key của provider bạn muốn sử dụng</span>
-              )
-            }
-          />
-        </>
-      )}
-    </>
-  );
-}

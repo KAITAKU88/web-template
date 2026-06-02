@@ -6,7 +6,6 @@ import { updateProduct } from "../../actions";
 import { redirect } from "next/navigation";
 import type { Product } from "@/types";
 import { adminPath } from "@/lib/admin-redirect";
-import { getSettings } from "@/lib/settings";
 import { getAdminSession } from "@/lib/get-role";
 
 interface Props { params: Promise<{ id: string }> }
@@ -14,11 +13,10 @@ interface Props { params: Promise<{ id: string }> }
 export default async function EditProductPage({ params }: Props) {
   const { id } = await params;
   const supabase = createAdminClient();
-  const [{ data }, { data: catData }, productsPath, settings, session] = await Promise.all([
+  const [{ data }, { data: catData }, productsPath, session] = await Promise.all([
     supabase.from("products").select("*").eq("id", id).single(),
     supabase.from("categories").select("id, name").order("sort_order"),
     adminPath("/products"),
-    getSettings(),
     getAdminSession(),
   ]);
   if (!data) notFound();
@@ -46,8 +44,6 @@ export default async function EditProductPage({ params }: Props) {
         onSubmit={handleUpdate}
         submitLabel="Lưu thay đổi"
         categories={categories}
-        aiProvider={settings.ai_provider ?? null}
-        aiModel={settings.ai_provider === "gemini" ? (settings.gemini_model ?? "gemini-2.0-flash") : settings.ai_provider === "claude" ? (settings.claude_model ?? "claude-sonnet-4-6") : null}
         staffId={session.staffId}
       />
     </div>

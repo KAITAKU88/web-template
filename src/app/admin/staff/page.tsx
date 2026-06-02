@@ -76,7 +76,7 @@ export default async function StaffPage() {
                   <th className="px-4 py-3 text-center">Login hôm nay</th>
                   <th className="px-4 py-3 text-center">Login 7 ngày</th>
                   <th className="px-4 py-3 text-center">Login 30 ngày</th>
-                  <th className="px-4 py-3 text-center">Thao tác</th>
+                  <th className="px-4 py-3 text-center" title="Số hành động: tạo/sửa/xóa sản phẩm và các thao tác khác (không tính đăng nhập)">Hành động</th>
                   <th className="px-4 py-3 text-left">Lần cuối</th>
                 </tr>
               </thead>
