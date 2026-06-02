@@ -17,6 +17,7 @@ const ROLE_BASE: Record<string, string> = {
   owner:        "/admin",
   manager:      "/manager",
   collaborator: "/collaborator",
+  partner:      "/partner",
 };
 
 
@@ -46,6 +47,7 @@ const PUBLIC_PATHS = [
   "/admin/staff-login",
   "/manager/login",
   "/collaborator/login",
+  "/partner/login",
 ];
 
 export async function middleware(req: NextRequest) {
@@ -55,8 +57,9 @@ export async function middleware(req: NextRequest) {
   const isAdminPath        = pathname.startsWith("/admin");
   const isManagerPath      = pathname.startsWith("/manager");
   const isCollaboratorPath = pathname.startsWith("/collaborator");
+  const isPartnerPath      = pathname.startsWith("/partner");
 
-  if (!isAdminPath && !isManagerPath && !isCollaboratorPath) {
+  if (!isAdminPath && !isManagerPath && !isCollaboratorPath && !isPartnerPath) {
     return NextResponse.next();
   }
 
@@ -88,29 +91,56 @@ export async function middleware(req: NextRequest) {
     const equivalent = pathname.replace("/collaborator", basePath);
     return NextResponse.redirect(new URL(equivalent, req.url));
   }
+  if (isPartnerPath && role !== "partner") {
+    const equivalent = pathname.replace("/partner", basePath);
+    return NextResponse.redirect(new URL(equivalent, req.url));
+  }
 
   // Owner-only pages — check theo sub-path (bỏ prefix role)
   const OWNER_ONLY_PAGES = ["/settings", "/setup", "/staff"];
-  const subPath = pathname.replace(/^\/(admin|manager|collaborator)/, "");
+  const subPath = pathname.replace(/^\/(admin|manager|collaborator|partner)/, "");
   if (OWNER_ONLY_PAGES.some((p) => subPath.startsWith(p)) && role !== "owner") {
     return NextResponse.redirect(new URL(basePath, req.url));
+  }
+
+  // Partner chỉ được xem Tổng quan, Sản phẩm, Đơn hàng, Thư viện ảnh
+  const PARTNER_ALLOWED = ["/", "/products", "/orders"];
+  if (role === "partner") {
+    const cleanPath = subPath || "/"; // "/partner" → subPath="" → treat as "/"
+    if (!PARTNER_ALLOWED.some((p) => cleanPath === p || cleanPath.startsWith(p + "/"))) {
+      return NextResponse.redirect(new URL(basePath, req.url));
+    }
   }
 
   // Collaborator chỉ được xem, không được thêm/sửa
   const WRITE_PAGES = ["/products/new", "/products/", "/categories"];
   if (role === "collaborator" && WRITE_PAGES.some((p) => subPath.startsWith(p))) {
-    // Cho phép xem list, chặn edit/new
     if (subPath.includes("/new") || subPath.includes("/edit")) {
       return NextResponse.redirect(new URL(basePath, req.url));
     }
   }
 
-  // Truyền role qua request header
+  // Truyền role và staffId qua request header
   const requestHeaders = new Headers(req.headers);
   requestHeaders.set("x-admin-role", role);
+
+  // Lấy staffId từ token để filter data theo partner
+  if (role === "partner" || role === "manager" || role === "collaborator") {
+    const token = req.cookies.get("admin_token")?.value ?? "";
+    if (token.startsWith("staff:")) {
+      const rest = token.slice(6);
+      const lastColon = rest.lastIndexOf(":");
+      if (lastColon > -1) {
+        const payload = rest.slice(0, lastColon);
+        const staffId = payload.slice(0, payload.indexOf(":"));
+        if (staffId) requestHeaders.set("x-staff-id", staffId);
+      }
+    }
+  }
+
   return NextResponse.next({ request: { headers: requestHeaders } });
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/manager/:path*", "/collaborator/:path*", "/manager/login", "/collaborator/login"],
+  matcher: ["/admin/:path*", "/manager/:path*", "/collaborator/:path*", "/partner/:path*", "/manager/login", "/collaborator/login", "/partner/login"],
 };

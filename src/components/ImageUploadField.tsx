@@ -16,6 +16,7 @@ interface Props {
   hint?: string;
   previewSize?: "sm" | "md" | "lg";
   onChange?: (url: string) => void;
+  creatorId?: string | null; // staffId của người upload — để record ownership
 }
 
 export default function ImageUploadField({
@@ -28,6 +29,7 @@ export default function ImageUploadField({
   hint,
   previewSize = "sm",
   onChange,
+  creatorId,
 }: Props) {
   const [value, setValue] = useState(defaultValue);
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -113,6 +115,7 @@ export default function ImageUploadField({
           accept={accept}
           onSelect={update}
           onClose={() => setPickerOpen(false)}
+          creatorId={creatorId}
         />
       )}
     </>

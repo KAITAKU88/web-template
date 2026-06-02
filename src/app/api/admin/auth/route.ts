@@ -7,6 +7,7 @@ const ROLE_BASE: Record<string, string> = {
   owner:        "/admin",
   manager:      "/manager",
   collaborator: "/collaborator",
+  partner:      "/partner",
 };
 
 export async function POST(req: NextRequest) {
@@ -32,6 +33,12 @@ export async function POST(req: NextRequest) {
 
       token = await createStaffToken(staff.id, staff.role);
       role = staff.role;
+
+      // Ghi log đăng nhập
+      createAdminClient()
+        .from("activity_logs")
+        .insert({ staff_id: staff.id, action_type: "login" })
+        .then(() => {});
     } catch {
       return NextResponse.json({ error: "Lỗi hệ thống." }, { status: 500 });
     }

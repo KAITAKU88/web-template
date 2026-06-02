@@ -13,28 +13,47 @@ async function hmac(data: string, secret: string): Promise<string> {
   return btoa(String.fromCharCode(...new Uint8Array(sig)));
 }
 
-export async function getAdminRole(): Promise<AdminRole> {
+interface AdminSession {
+  role: AdminRole;
+  staffId: string | null; // null khi là owner
+}
+
+async function parseToken(raw: string): Promise<AdminSession> {
   try {
-    const cookieStore = await cookies();
-    const raw = cookieStore.get("admin_token")?.value ?? "";
     let token = raw;
     try { if (raw) token = decodeURIComponent(raw); } catch { token = raw; }
 
-    if (!token) return "owner";
+    if (!token) return { role: "owner", staffId: null };
 
     if (token.startsWith("staff:")) {
       const rest = token.slice(6);
       const lastColon = rest.lastIndexOf(":");
-      if (lastColon === -1) return "owner";
+      if (lastColon === -1) return { role: "owner", staffId: null };
       const payload = rest.slice(0, lastColon);
       const sig = rest.slice(lastColon + 1);
       const secret = process.env.ADMIN_SECRET ?? "";
       const expected = await hmac(payload, secret);
-      if (sig !== expected) return "owner";
-      const role = payload.slice(payload.indexOf(":") + 1);
-      if (role === "manager" || role === "collaborator") return role;
+      if (sig !== expected) return { role: "owner", staffId: null };
+      const colonIdx = payload.indexOf(":");
+      const staffId = payload.slice(0, colonIdx);
+      const role = payload.slice(colonIdx + 1) as AdminRole;
+      const validRoles: AdminRole[] = ["manager", "collaborator", "partner"];
+      if (validRoles.includes(role)) return { role, staffId };
     }
-  } catch {}
+  } catch { /* fall through */ }
 
-  return "owner";
+  return { role: "owner", staffId: null };
+}
+
+export async function getAdminRole(): Promise<AdminRole> {
+  const cookieStore = await cookies();
+  const raw = cookieStore.get("admin_token")?.value ?? "";
+  const { role } = await parseToken(raw);
+  return role;
+}
+
+export async function getAdminSession(): Promise<AdminSession> {
+  const cookieStore = await cookies();
+  const raw = cookieStore.get("admin_token")?.value ?? "";
+  return parseToken(raw);
 }

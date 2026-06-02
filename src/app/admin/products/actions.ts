@@ -5,6 +5,7 @@ import { GoogleGenAI } from "@google/genai";
 import OpenAI from "openai";
 import { createAdminClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/settings";
+import { getAdminSession } from "@/lib/get-role";
 import { revalidatePath } from "next/cache";
 import type { ProductCopy } from "@/lib/productContent";
 import { getProvider } from "@/lib/ai-providers";
@@ -202,6 +203,7 @@ export async function generateLandingContent(
 
 export async function createProduct(formData: FormData) {
   const supabase = createAdminClient();
+  const { role, staffId } = await getAdminSession();
 
   const landingRaw = formData.get("landing_content") as string | null;
   const landing = landingRaw ? JSON.parse(landingRaw) : null;
@@ -227,6 +229,8 @@ export async function createProduct(formData: FormData) {
     is_combo: isCombo,
     combo_product_ids: comboProductIds,
     status: "draft",
+    // Partner: tự động gán creator_id
+    creator_id: (role === "partner" && staffId) ? staffId : null,
   });
 
   if (error) throw new Error(error.message);

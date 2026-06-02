@@ -6,12 +6,15 @@ const nextConfig: NextConfig = {
       // Login pages dùng trang riêng
       { source: "/manager/login",      destination: "/admin/staff-login" },
       { source: "/collaborator/login", destination: "/admin/staff-login" },
+      { source: "/partner/login",      destination: "/admin/staff-login" },
       // Root path (dashboard)
       { source: "/manager",      destination: "/admin" },
       { source: "/collaborator", destination: "/admin" },
+      { source: "/partner",      destination: "/admin" },
       // Sub-pages
       { source: "/manager/:path*",      destination: "/admin/:path*" },
       { source: "/collaborator/:path*", destination: "/admin/:path*" },
+      { source: "/partner/:path*",      destination: "/admin/:path*" },
     ];
   },
   images: {

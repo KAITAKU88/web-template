@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
-import { getAdminRole } from "@/lib/get-role";
+import { getAdminSession } from "@/lib/get-role";
 import Link from "next/link";
 import AdminProductsClient from "./AdminProductsClient";
 
@@ -7,12 +7,20 @@ export const dynamic = "force-dynamic";
 
 export default async function AdminProductsPage() {
   const supabase = createAdminClient();
-  const [role, { data: products }, { data: categories }] = await Promise.all([
-    getAdminRole(),
-    supabase
-      .from("products")
-      .select("id, name, type, price, original_price, image_url, landing_content, download_count, created_at, status, slug, rating, rating_count, is_combo")
-      .order("created_at", { ascending: false }),
+  const { role, staffId } = await getAdminSession();
+
+  let productsQuery = supabase
+    .from("products")
+    .select("id, name, type, price, original_price, image_url, landing_content, download_count, created_at, status, slug, rating, rating_count, is_combo, creator_id")
+    .order("created_at", { ascending: false });
+
+  // Partner chỉ thấy sản phẩm do chính họ tạo
+  if (role === "partner" && staffId) {
+    productsQuery = productsQuery.eq("creator_id", staffId);
+  }
+
+  const [{ data: products }, { data: categories }] = await Promise.all([
+    productsQuery,
     supabase.from("categories").select("id, name").order("sort_order"),
   ]);
 

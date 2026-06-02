@@ -24,6 +24,7 @@ interface Props {
   categories?: Category[];
   aiProvider?: string | null;
   aiModel?: string | null;
+  staffId?: string | null;
 }
 
 const DEFAULT_CATEGORIES: Category[] = [
@@ -31,7 +32,7 @@ const DEFAULT_CATEGORIES: Category[] = [
   { id: "google_sheet", name: "Google Sheets" },
 ];
 
-export default function ProductForm({ product, onSubmit, onCancel, submitLabel = "Lưu sản phẩm", categories = DEFAULT_CATEGORIES, aiProvider, aiModel }: Props) {
+export default function ProductForm({ product, onSubmit, onCancel, submitLabel = "Lưu sản phẩm", categories = DEFAULT_CATEGORIES, aiProvider, aiModel, staffId }: Props) {
   const formRef = useRef<HTMLFormElement>(null);
   const [saving, startSave] = useTransition();
   const [generating, startGenerate] = useTransition();
@@ -335,6 +336,7 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
               placeholder="https://... hoặc tải ảnh lên"
               previewSize="md"
               hint="Tỉ lệ 4:3 hoặc 16:9 — tối đa 3 MB (JPG, PNG, WebP, GIF)"
+              creatorId={staffId}
             />
           </div>
 
@@ -496,6 +498,7 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
           }}
           onClose={() => setGalleryPickerOpen(false)}
           multiSelect
+          creatorId={staffId}
         />
       )}
 

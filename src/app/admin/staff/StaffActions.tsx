@@ -3,10 +3,11 @@
 import { useState, useTransition } from "react";
 import { toggleStaffActive, deleteStaff, resetStaffPassword } from "./actions";
 
-const ROLE_LABEL: Record<string, string> = { manager: "Quản lý", collaborator: "Nhân viên" };
+const ROLE_LABEL: Record<string, string> = { manager: "Quản lý", collaborator: "Nhân viên", partner: "Cộng tác viên" };
 const ROLE_COLOR: Record<string, string> = {
-  manager: "bg-blue-500/15 text-blue-400",
+  manager:      "bg-blue-500/15 text-blue-400",
   collaborator: "bg-gray-500/15 text-gray-400",
+  partner:      "bg-amber-500/15 text-amber-400",
 };
 
 interface Staff {

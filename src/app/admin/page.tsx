@@ -1,4 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/server";
+import { getAdminSession } from "@/lib/get-role";
 import { formatCurrency } from "@/lib/utils";
 
 const VN_TZ_OFFSET = 7 * 60 * 60 * 1000;
@@ -8,12 +9,41 @@ function toVnDate(iso: string) {
   return d.toISOString().slice(0, 10);
 }
 
-async function getStats() {
+async function getStats(partnerProductIds?: string[]) {
   const supabase = createAdminClient();
+  // partnerProductIds: nếu có thì chỉ lấy data liên quan sản phẩm của partner
 
   const now = new Date();
   const ago30d = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
   const ago7d  = new Date(now.getTime() -  7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const pids = partnerProductIds;
+  // Khi partner không có sản phẩm nào, dùng UUID không tồn tại để trả về empty
+  const EMPTY_ID = "00000000-0000-0000-0000-000000000000";
+  const pidList = pids?.length ? pids : pids !== undefined ? [EMPTY_ID] : null;
+  const today0 = new Date(new Date().setHours(0, 0, 0, 0)).toISOString();
+
+  // Build queries với filter theo pidList nếu là partner
+  const qTotal    = pidList ? supabase.from("orders").select("*", { count: "exact", head: true }).in("product_id", pidList) : supabase.from("orders").select("*", { count: "exact", head: true });
+  const qSuccess  = pidList ? supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "success").in("product_id", pidList) : supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "success");
+  const qPending  = pidList ? supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "pending").in("product_id", pidList) : supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "pending");
+  const qRevenue  = pidList ? supabase.from("orders").select("amount").eq("status", "success").in("product_id", pidList) : supabase.from("orders").select("amount").eq("status", "success");
+  const qToday    = pidList ? supabase.from("orders").select("amount").eq("status", "success").gte("paid_at", today0).in("product_id", pidList) : supabase.from("orders").select("amount").eq("status", "success").gte("paid_at", today0);
+  const qRecent   = pidList
+    ? supabase.from("orders").select("id, customer_email, amount, status, paid_at, created_at, products!orders_product_id_fkey(name)").order("created_at", { ascending: false }).limit(10).in("product_id", pidList)
+    : supabase.from("orders").select("id, customer_email, amount, status, paid_at, created_at, products!orders_product_id_fkey(name)").order("created_at", { ascending: false }).limit(10);
+  const qProducts = pidList
+    ? supabase.from("products").select("id, name, type, price").in("id", pidList).order("created_at", { ascending: true })
+    : supabase.from("products").select("id, name, type, price").order("created_at", { ascending: true });
+  const qFunnel   = pidList
+    ? supabase.from("click_events").select("event_type").in("event_type", ["product_view", "buy_click", "qr_generate", "purchase"]).gte("created_at", ago30d).in("product_id", pidList)
+    : supabase.from("click_events").select("event_type").in("event_type", ["product_view", "buy_click", "qr_generate", "purchase"]).gte("created_at", ago30d);
+  const qRevDay   = pidList
+    ? supabase.from("orders").select("paid_at, amount").eq("status", "success").gte("paid_at", ago7d).order("paid_at").in("product_id", pidList)
+    : supabase.from("orders").select("paid_at, amount").eq("status", "success").gte("paid_at", ago7d).order("paid_at");
+  const qTopProd  = pidList
+    ? supabase.from("click_events").select("product_id, products!click_events_product_id_fkey(name)").eq("event_type", "buy_click").not("product_id", "is", null).gte("created_at", ago30d).in("product_id", pidList)
+    : supabase.from("click_events").select("product_id, products!click_events_product_id_fkey(name)").eq("event_type", "buy_click").not("product_id", "is", null).gte("created_at", ago30d);
 
   const [
     { count: totalOrders },
@@ -26,35 +56,7 @@ async function getStats() {
     { data: clickEvents },
     { data: revenueByDay },
     { data: topProducts },
-  ] = await Promise.all([
-    supabase.from("orders").select("*", { count: "exact", head: true }),
-    supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "success"),
-    supabase.from("orders").select("*", { count: "exact", head: true }).eq("status", "pending"),
-    supabase.from("orders").select("amount").eq("status", "success"),
-    supabase.from("orders").select("amount").eq("status", "success")
-      .gte("paid_at", new Date(new Date().setHours(0, 0, 0, 0)).toISOString()),
-    supabase.from("orders")
-      .select("id, customer_email, amount, status, paid_at, created_at, products!orders_product_id_fkey(name)")
-      .order("created_at", { ascending: false }).limit(10),
-    supabase.from("products").select("id, name, type, price").order("created_at", { ascending: true }),
-    // Funnel: click events 30 ngày
-    supabase.from("click_events")
-      .select("event_type")
-      .in("event_type", ["product_view", "buy_click", "qr_generate", "purchase"])
-      .gte("created_at", ago30d),
-    // Doanh thu 7 ngày
-    supabase.from("orders")
-      .select("paid_at, amount")
-      .eq("status", "success")
-      .gte("paid_at", ago7d)
-      .order("paid_at"),
-    // Top sản phẩm được click nhiều nhất (30 ngày)
-    supabase.from("click_events")
-      .select("product_id, products!click_events_product_id_fkey(name)")
-      .eq("event_type", "buy_click")
-      .not("product_id", "is", null)
-      .gte("created_at", ago30d),
-  ]);
+  ] = await Promise.all([qTotal, qSuccess, qPending, qRevenue, qToday, qRecent, qProducts, qFunnel, qRevDay, qTopProd]);
 
   const totalRevenue = (revenueData ?? []).reduce((s: number, r: { amount: number }) => s + r.amount, 0);
   const todayRevenue = (todayData ?? []).reduce((s: number, r: { amount: number }) => s + r.amount, 0);
@@ -121,7 +123,14 @@ const STATUS_LABEL: Record<string, { label: string; cls: string }> = {
 };
 
 export default async function AdminDashboardPage() {
-  const stats = await getStats();
+  const { role, staffId } = await getAdminSession();
+  const supabaseForPartner = role === "partner" && staffId ? createAdminClient() : null;
+  let partnerProductIds: string[] | undefined;
+  if (supabaseForPartner && staffId) {
+    const { data } = await supabaseForPartner.from("products").select("id").eq("creator_id", staffId);
+    partnerProductIds = (data ?? []).map((p) => p.id);
+  }
+  const stats = await getStats(partnerProductIds);
 
   return (
     <div className="p-4 md:p-6 space-y-8">

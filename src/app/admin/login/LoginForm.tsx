@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const LOGIN_TABS = [
-  { label: "Owner",          href: "/admin/login"        },
-  { label: "Quản lý",        href: "/manager/login"      },
-  { label: "Nhân viên",  href: "/collaborator/login" },
+  { label: "Owner",     href: "/admin/login"        },
+  { label: "Quản lý",   href: "/manager/login"      },
+  { label: "Nhân viên", href: "/collaborator/login" },
+  { label: "CTV",       href: "/partner/login"      },
 ];
 
 function LoginTabs({ active }: { active: string }) {

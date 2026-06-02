@@ -3,6 +3,7 @@ import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 import { expireStaleOrders, EXPIRE_MINUTES } from "@/lib/expireOrders";
 import ResendEmailButton from "./ResendEmailButton";
+import { getAdminSession } from "@/lib/get-role";
 
 const STATUS_OPTIONS = [
   { value: "", label: "Tất cả" },
@@ -70,12 +71,33 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
   const pageSize    = 20;
 
   const supabase = createAdminClient();
+  const { role, staffId } = await getAdminSession();
+
+  // Partner: lấy danh sách product_id của họ trước
+  let partnerProductIds: string[] | null = null;
+  if (role === "partner" && staffId) {
+    const { data: myProducts } = await supabase
+      .from("products")
+      .select("id")
+      .eq("creator_id", staffId);
+    partnerProductIds = (myProducts ?? []).map((p) => p.id);
+  }
 
   let query = supabase
     .from("orders")
     .select("id, customer_email, customer_phone, amount, status, paid_at, created_at, product_id, bump_product_id, main_product:products!orders_product_id_fkey(name), bump_product:products!orders_bump_product_id_fkey(name)", { count: "exact" })
     .order("created_at", { ascending: false })
     .range((page - 1) * pageSize, page * pageSize - 1);
+
+  // Partner chỉ thấy đơn hàng liên quan sản phẩm của mình
+  if (partnerProductIds !== null) {
+    if (partnerProductIds.length === 0) {
+      // Không có sản phẩm nào → không có đơn hàng
+      query = query.eq("product_id", "00000000-0000-0000-0000-000000000000");
+    } else {
+      query = query.in("product_id", partnerProductIds);
+    }
+  }
 
   if (status) query = query.eq("status", status);
   if (emailFilter) query = query.ilike("customer_email", `%${emailFilter}%`);

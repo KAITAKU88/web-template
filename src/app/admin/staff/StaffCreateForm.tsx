@@ -52,6 +52,7 @@ export default function StaffCreateForm() {
             <option value="" disabled>Chọn vai trò...</option>
             <option value="manager">Quản lý — Toàn quyền trừ Cấu hình</option>
             <option value="collaborator">Nhân viên — Chỉ xem</option>
+            <option value="partner">Cộng tác viên — Quản lý sản phẩm của mình</option>
           </select>
         </div>
 

@@ -5,9 +5,10 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 
 const LOGIN_TABS = [
-  { label: "Owner",          href: "/admin/login"        },
-  { label: "Quản lý",        href: "/manager/login"      },
-  { label: "Nhân viên",  href: "/collaborator/login" },
+  { label: "Owner",           href: "/admin/login"        },
+  { label: "Quản lý",         href: "/manager/login"      },
+  { label: "Nhân viên",       href: "/collaborator/login" },
+  { label: "CTV",              href: "/partner/login"      },
 ];
 
 function LoginTabs({ active }: { active: string }) {
@@ -72,7 +73,7 @@ export default function StaffLoginForm({ brandName }: { brandName: string }) {
           </div>
           <h1 className="text-xl font-bold text-white">{brandName}</h1>
           <p className="mt-1 text-sm text-gray-400">
-            {pathname === "/manager/login" ? "Đăng nhập Quản lý" : "Đăng nhập Nhân viên"}
+            {pathname === "/manager/login" ? "Đăng nhập Quản lý" : pathname === "/partner/login" ? "Đăng nhập Cộng tác viên" : "Đăng nhập Nhân viên"}
           </p>
         </div>
 

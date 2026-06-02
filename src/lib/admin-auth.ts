@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/server";
 import { getSettings } from "@/lib/settings";
 
-export type AdminRole = "owner" | "manager" | "collaborator";
+export type AdminRole = "owner" | "manager" | "collaborator" | "partner";
 
 export interface AdminSession {
   type: "owner" | "staff";
@@ -102,5 +102,11 @@ export function canAccessRoute(role: AdminRole, pathname: string): boolean {
 
 export function canDo(role: AdminRole, action: "create" | "edit" | "delete"): boolean {
   if (role === "owner" || role === "manager") return true;
+  if (role === "partner") return true; // partner: full CRUD on own content
   return false; // collaborator: view only
+}
+
+// Partner chỉ có quyền trên content của chính họ
+export function isPartner(role: AdminRole): boolean {
+  return role === "partner";
 }

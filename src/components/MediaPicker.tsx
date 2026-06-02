@@ -5,6 +5,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { slugifyFilename } from "@/lib/utils";
 import { compressToWebP } from "@/lib/browser-utils";
+import { recordStorageFile, getPartnerFilePaths, deleteStorageFileRecord } from "@/lib/storage-files";
 
 interface Props {
   bucket: string;
@@ -13,6 +14,7 @@ interface Props {
   multiSelect?: boolean;
   onSelect: (url: string) => void;
   onClose: () => void;
+  creatorId?: string | null; // staffId — nếu có, chỉ show/record ảnh của người này
 }
 
 type Tab = "upload" | "library";
@@ -23,7 +25,7 @@ interface StorageFile {
   updatedAt: string;
 }
 
-export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,image/png,image/webp,image/gif", multiSelect = false, onSelect, onClose }: Props) {
+export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,image/png,image/webp,image/gif", multiSelect = false, onSelect, onClose, creatorId }: Props) {
   const [tab, setTab] = useState<Tab>("upload");
   const [files, setFiles] = useState<StorageFile[]>([]);
   const [loading, setLoading] = useState(false);
@@ -39,37 +41,35 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
     setLoading(true);
     const all: StorageFile[] = [];
 
-    // Load root level — collect files + subfolder names
-    const { data: rootData } = await supabase.storage.from(bucket).list(undefined, {
-      sortBy: { column: "updated_at", order: "desc" },
-      limit: 300,
-    });
-    const subfolders: string[] = [];
-    for (const f of rootData ?? []) {
-      if (f.name === ".emptyFolderPlaceholder") continue;
-      if (!f.metadata) { subfolders.push(f.name); continue; }
-      const { data: u } = supabase.storage.from(bucket).getPublicUrl(f.name);
-      all.push({ name: f.name, url: u.publicUrl, updatedAt: f.updated_at ?? "" });
-    }
-
-    // Load each subfolder (1 level deep)
-    for (const sub of subfolders) {
-      const { data: subData } = await supabase.storage.from(bucket).list(sub, {
+    if (creatorId) {
+      // Partner: chỉ load file do họ upload (từ storage_files table), lọc theo folder nếu có
+      const allowedPaths = await getPartnerFilePaths(bucket, creatorId);
+      const prefix = folder ? `${folder}/` : "";
+      for (const path of allowedPaths) {
+        if (prefix && !path.startsWith(prefix)) continue; // chỉ đúng folder
+        const { data: u } = supabase.storage.from(bucket).getPublicUrl(path);
+        const name = path.split("/").pop() ?? path;
+        all.push({ name, url: u.publicUrl, updatedAt: "" });
+      }
+    } else {
+      // Admin/Manager: chỉ load đúng folder được chỉ định (hoặc root nếu không có folder)
+      const targetFolder = folder || undefined;
+      const { data: folderData } = await supabase.storage.from(bucket).list(targetFolder, {
         sortBy: { column: "updated_at", order: "desc" },
-        limit: 200,
+        limit: 300,
       });
-      for (const f of subData ?? []) {
+      for (const f of folderData ?? []) {
         if (f.name === ".emptyFolderPlaceholder" || !f.metadata) continue;
-        const path = `${sub}/${f.name}`;
+        const path = folder ? `${folder}/${f.name}` : f.name;
         const { data: u } = supabase.storage.from(bucket).getPublicUrl(path);
         all.push({ name: f.name, url: u.publicUrl, updatedAt: f.updated_at ?? "" });
       }
+      all.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
     }
 
-    all.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
     setFiles(all);
     setLoading(false);
-  }, [bucket, supabase]);
+  }, [bucket, supabase, creatorId]);
 
   useEffect(() => {
     if (tab === "library") loadLibrary();
@@ -88,6 +88,8 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
       const { error } = await supabase.storage.from(bucket).upload(path, compressed, { upsert: true });
       if (!error) {
         urls.push(supabase.storage.from(bucket).getPublicUrl(path).data.publicUrl);
+        // Record ownership
+        if (creatorId) await recordStorageFile(bucket, path, creatorId);
       }
       setUploadProgress((p) => ({ ...p, done: p.done + 1 }));
     }
@@ -133,6 +135,7 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
     if (!confirm(`Xóa ảnh "${file.name}"?`)) return;
     const path = folder ? `${folder}/${file.name}` : file.name;
     await supabase.storage.from(bucket).remove([path]);
+    await deleteStorageFileRecord(bucket, path);
     setFiles((prev) => prev.filter((f) => f.name !== file.name));
     if (selected === file.url) setSelected(null);
   }
@@ -148,7 +151,7 @@ export default function MediaPicker({ bucket, folder = "", accept = "image/jpeg,
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800 shrink-0">
           <h2 className="text-base font-semibold text-white">Chọn ảnh</h2>
-          <button type="button" onClick={onClose} className="rounded-xl p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 transition-colors"> /* đã đồng bộ design system */
+          <button type="button" onClick={onClose} className="rounded-xl p-1.5 text-gray-500 hover:text-white hover:bg-gray-800 transition-colors">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
