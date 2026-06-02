@@ -34,17 +34,18 @@ export default async function CheckoutPage({ params }: Props) {
 
   if (error || !product || product.status === "draft") notFound();
 
-  // Tìm sản phẩm bán kèm: ưu tiên cùng loại, phổ biến nhất, khác sản phẩm hiện tại
+  // Tìm sản phẩm bán kèm: ưu tiên cùng loại, phổ biến nhất, khác sản phẩm hiện tại, không phải combo
   let companionQuery = supabase
     .from("products")
     .select("id, name, price")
     .neq("id", product.id)
+    .neq("is_combo", true)
     .order("download_count", { ascending: false })
     .limit(1);
 
   if (product.type) companionQuery = companionQuery.eq("type", product.type);
 
-  const { data: companionRaw } = await companionQuery.maybeSingle();
+  const { data: companionRaw } = product.is_combo ? { data: null } : await companionQuery.maybeSingle();
 
   const companion: BumpCompanion | null = companionRaw
     ? {
@@ -55,11 +56,13 @@ export default async function CheckoutPage({ params }: Props) {
       }
     : null;
 
-  // Fetch bundle: 2–3 sản phẩm phổ biến nhất, khác sản phẩm đang mua
-  const { data: bundleRaw } = await supabase
+  // Fetch bundle: 2–3 sản phẩm phổ biến nhất, khác sản phẩm đang mua, không phải combo
+  // Không hiện bundle upsell khi đang mua combo (combo đã rẻ, không cần thêm ưu đãi)
+  const { data: bundleRaw } = product.is_combo ? { data: null } : await supabase
     .from("products")
     .select("id, name, price")
     .neq("id", product.id)
+    .neq("is_combo", true)
     .order("download_count", { ascending: false })
     .limit(3);
 
