@@ -13,7 +13,7 @@ interface OrderRow {
 export default async function CustomersPage() {
   const supabase = createAdminClient();
 
-  const [{ data: orders }, { data: groupMembers }, { data: groups }] = await Promise.all([
+  const [{ data: orders }, { data: groupMembers }, { data: groups }, { data: profiles }] = await Promise.all([
     supabase
       .from("orders")
       .select("customer_email, customer_phone, amount, paid_at")
@@ -26,7 +26,15 @@ export default async function CustomersPage() {
       .from("customer_groups")
       .select("id, name, color")
       .order("created_at"),
+    supabase
+      .from("customer_profiles")
+      .select("email, phone"),
   ]);
+
+  // Map profile phone theo email (phone từ CSV import — ưu tiên hơn phone từ orders)
+  const profilePhoneMap = new Map<string, string>(
+    (profiles ?? []).filter((p) => p.phone).map((p) => [p.email, p.phone as string])
+  );
 
   // Aggregate customers từ orders
   const customerMap = new Map<string, {
@@ -77,6 +85,12 @@ export default async function CustomersPage() {
         groups: [m.group_id],
       });
     }
+  }
+
+  // Áp profile phone lên mọi customer (ghi đè phone từ orders nếu có profile phone)
+  for (const [email, phone] of profilePhoneMap) {
+    const c = customerMap.get(email);
+    if (c) c.phone = phone;
   }
 
   const customers = Array.from(customerMap.values());

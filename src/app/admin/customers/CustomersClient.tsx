@@ -35,14 +35,21 @@ function parseCSV(text: string): string[][] {
     .split(/\r?\n/)
     .filter((line) => line.trim())
     .map((line) => {
-      // Handle quoted fields
+      // RFC 4180: handle quoted fields and escaped quotes ("")
       const cols: string[] = [];
-      let cur = "", inQ = false;
-      for (let i = 0; i < line.length; i++) {
+      let cur = "", inQ = false, i = 0;
+      while (i < line.length) {
         const ch = line[i];
-        if (ch === '"') { inQ = !inQ; }
-        else if (ch === "," && !inQ) { cols.push(cur.trim()); cur = ""; }
-        else cur += ch;
+        if (inQ) {
+          if (ch === '"' && line[i + 1] === '"') { cur += '"'; i += 2; continue; } // escaped quote
+          if (ch === '"') { inQ = false; i++; continue; }
+          cur += ch;
+        } else {
+          if (ch === '"') { inQ = true; i++; continue; }
+          if (ch === ",") { cols.push(cur.trim()); cur = ""; i++; continue; }
+          cur += ch;
+        }
+        i++;
       }
       cols.push(cur.trim());
       return cols;
@@ -77,7 +84,6 @@ export default function CustomersClient({
 
   // ── CSV Import modal ────────────────────────────────────────────────
   const [showImportModal, setShowImportModal] = useState(false);
-  const [importForGroupId, setImportForGroupId] = useState<string>(""); // pre-fill when opened from a group
   const [csvRows, setCsvRows] = useState<string[][]>([]);
   const [csvHeaders, setCsvHeaders] = useState<string[]>([]);
   const [emailColIdx, setEmailColIdx] = useState(-1);
@@ -86,6 +92,7 @@ export default function CustomersClient({
   const [importStatus, setImportStatus] = useState<"idle" | "importing" | "done" | "error">("idle");
   const [importResult, setImportResult] = useState<{ added: number; errors: string[] } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const readIdRef = useRef(0); // guard against stale FileReader callbacks
 
   // ── Filter ───────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
@@ -169,7 +176,6 @@ export default function CustomersClient({
 
   // ── CSV Import handlers ───────────────────────────────────────────────
   function openImportModal(groupId = "") {
-    setImportForGroupId(groupId);
     setImportGroupId(groupId || (groups[0]?.id ?? ""));
     setCsvRows([]); setCsvHeaders([]);
     setEmailColIdx(-1); setPhoneColIdx(-1);
@@ -180,8 +186,11 @@ export default function CustomersClient({
   function handleCsvFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Increment readId so any in-flight callback from a previous pick is discarded
+    const myReadId = ++readIdRef.current;
     const reader = new FileReader();
     reader.onload = (ev) => {
+      if (readIdRef.current !== myReadId) return; // stale read — user already picked another file
       const text = ev.target?.result as string;
       const parsed = parseCSV(text);
       if (!parsed.length) return;
@@ -199,16 +208,28 @@ export default function CustomersClient({
 
   async function handleImport() {
     if (emailColIdx === -1) return;
-    const emails = csvRows.map((r) => r[emailColIdx]).filter(Boolean);
-    if (!emails.length || !importGroupId) return;
+    const rows = csvRows
+      .map((r) => ({
+        email: r[emailColIdx] ?? "",
+        phone: phoneColIdx >= 0 ? (r[phoneColIdx] ?? "") : undefined,
+      }))
+      .filter((r) => r.email.trim());
+    if (!rows.length || !importGroupId) return;
     setImportStatus("importing");
-    const result = await bulkAddToGroup(emails, importGroupId);
+    const result = await bulkAddToGroup(rows, importGroupId);
     setImportResult(result);
     setImportStatus(result.errors.length > 0 && result.added === 0 ? "error" : "done");
   }
 
-  const totalRevenue = customers.reduce((s, c) => s + c.total_revenue, 0);
+  const totalRevenue = useMemo(() => customers.reduce((s, c) => s + c.total_revenue, 0), [customers]);
   const hasActiveFilter = filterMinOrders > 0 || filterMinRevenue > 0 || filterGroup !== "all" || search;
+
+  function resetFilters() {
+    setSearch("");
+    setFilterGroup("all");
+    setFilterMinOrders(0);
+    setFilterMinRevenue(0);
+  }
 
   return (
     <div className="p-4 md:p-6 space-y-6">
@@ -259,12 +280,7 @@ export default function CustomersClient({
           </div>
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => {
-                setFilterGroup("all");
-                setFilterMinOrders(0);
-                setFilterMinRevenue(0);
-                setSearch("");
-              }}
+              onClick={resetFilters}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 filterGroup === "all" ? "bg-emerald-500/20 text-emerald-400" : "bg-gray-100 dark:bg-gray-800 text-gray-400 hover:bg-gray-700"
               }`}
@@ -277,10 +293,12 @@ export default function CustomersClient({
                 <div key={g.id} className="flex items-center gap-1">
                   <button
                     onClick={() => {
-                      setFilterGroup(filterGroup === g.id ? "all" : g.id);
-                      setFilterMinOrders(0);
-                      setFilterMinRevenue(0);
-                      setSearch("");
+                      if (filterGroup === g.id) {
+                        resetFilters(); // toggling off → full reset
+                      } else {
+                        setSearch(""); setFilterMinOrders(0); setFilterMinRevenue(0);
+                        setFilterGroup(g.id); // selecting new group — must be last
+                      }
                     }}
                     className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                       filterGroup === g.id ? "ring-2 ring-white/20" : ""
@@ -316,7 +334,7 @@ export default function CustomersClient({
           <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Bộ lọc</span>
           {hasActiveFilter && (
             <button
-              onClick={() => { setSearch(""); setFilterGroup("all"); setFilterMinOrders(0); setFilterMinRevenue(0); }}
+              onClick={resetFilters}
               className="text-xs text-gray-500 hover:text-red-400 transition-colors"
             >
               Xóa bộ lọc
@@ -599,7 +617,7 @@ export default function CustomersClient({
                     </select>
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs text-gray-500">Cột SĐT (tuỳ chọn)</label>
+                    <label className="mb-1 block text-xs text-gray-500">Cột SĐT <span className="text-gray-600">(tuỳ chọn — lưu vào hồ sơ)</span></label>
                     <select value={phoneColIdx} onChange={(e) => setPhoneColIdx(Number(e.target.value))}
                       className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-3 py-2 text-sm text-gray-900 dark:text-white outline-none focus:border-emerald-500">
                       <option value={-1}>— Không chọn —</option>
@@ -620,9 +638,11 @@ export default function CustomersClient({
                         <span className="text-gray-900 dark:text-white font-mono flex-1">
                           {emailColIdx >= 0 ? row[emailColIdx] || "—" : "—"}
                         </span>
-                        <span className="text-gray-500 font-mono">
-                          {phoneColIdx >= 0 ? row[phoneColIdx] || "—" : ""}
-                        </span>
+                        {phoneColIdx >= 0 && (
+                          <span className="text-gray-500 font-mono w-28 shrink-0">
+                            {row[phoneColIdx] || "—"}
+                          </span>
+                        )}
                       </div>
                     ))}
                   </div>
