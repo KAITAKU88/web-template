@@ -1,45 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import type { AdminRole } from "@/lib/admin-auth";
-
-type Theme = "light" | "dark" | "system";
-
-function applyTheme(t: Theme) {
-  const root = document.documentElement;
-  if (t === "dark") root.classList.add("dark");
-  else if (t === "light") root.classList.remove("dark");
-  else root.classList.toggle("dark", window.matchMedia("(prefers-color-scheme: dark)").matches);
-}
-
-function ThemeToggle() {
-  const [theme, setTheme] = useState<Theme>("system");
-  useEffect(() => {
-    const stored = (localStorage.getItem("theme") as Theme) || "system";
-    setTheme(stored);
-  }, []);
-  function cycleTheme() {
-    const next: Record<Theme, Theme> = { system: "light", light: "dark", dark: "system" };
-    const t = next[theme];
-    setTheme(t);
-    localStorage.setItem("theme", t);
-    applyTheme(t);
-  }
-  const icons: Record<Theme, string> = { light: "☀️", dark: "🌙", system: "💻" };
-  const labels: Record<Theme, string> = { light: "Sáng", dark: "Tối", system: "Tự động" };
-  return (
-    <button
-      onClick={cycleTheme}
-      title={`Giao diện: ${labels[theme]} — nhấn để đổi`}
-      className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
-    >
-      <span className="text-base">{icons[theme]}</span>
-      <span>Giao diện: {labels[theme]}</span>
-    </button>
-  );
-}
 
 type NavItem = {
   href: string;
@@ -248,7 +212,6 @@ export default function AdminSidebar({
             {ROLE_LABEL[role]}
           </span>
         </div>
-        <ThemeToggle />
         <button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-red-500 dark:hover:text-red-400"
