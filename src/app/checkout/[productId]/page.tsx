@@ -38,6 +38,7 @@ export default async function CheckoutPage({ params }: Props) {
   let companionQuery = supabase
     .from("products")
     .select("id, name, price")
+    .eq("status", "published")
     .neq("id", product.id)
     .neq("is_combo", true)
     .order("download_count", { ascending: false })
@@ -61,6 +62,7 @@ export default async function CheckoutPage({ params }: Props) {
   const { data: bundleRaw } = product.is_combo ? { data: null } : await supabase
     .from("products")
     .select("id, name, price")
+    .eq("status", "published")
     .neq("id", product.id)
     .neq("is_combo", true)
     .order("download_count", { ascending: false })
