@@ -107,7 +107,7 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
           name,
           fd.get("type") as string,
           fd.get("description") as string ?? "",
-          fd.get("audience") as string ?? "",
+          "",
         );
         setLanding(content);
         setIsDirty(true);
@@ -529,27 +529,16 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
         </div>
 
         <div className="p-6 space-y-4">
-          {/* Hints cho AI — thu gọn */}
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">Mô tả ngắn (gợi ý cho AI)</label>
-              <textarea
-                name="description"
-                rows={2}
-                defaultValue={product?.description ?? ""}
-                placeholder="Template giúp quản lý công việc theo hệ thống PARA..."
-                className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-400 mb-1.5">Đối tượng mục tiêu (gợi ý cho AI)</label>
-              <textarea
-                name="audience"
-                rows={2}
-                placeholder="Người đi làm văn phòng, freelancer..."
-                className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
-              />
-            </div>
+          {/* Hints cho AI */}
+          <div>
+            <label className="block text-xs font-medium text-gray-400 mb-1.5">Mô tả gợi ý cho AI</label>
+            <textarea
+              name="description"
+              rows={2}
+              defaultValue={product?.description ?? ""}
+              placeholder="Template giúp quản lý công việc theo hệ thống PARA, dành cho người đi làm bận rộn muốn tăng năng suất..."
+              className="w-full rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 px-3.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-600 outline-none focus:border-emerald-500 resize-none"
+            />
           </div>
 
           <p className="text-xs text-gray-600">
@@ -568,6 +557,7 @@ export default function ProductForm({ product, onSubmit, onCancel, submitLabel =
             value={landing}
             onChange={setLanding}
             productId={product?.id}
+            productSlug={product?.slug ?? (slug || undefined)}
           />
           {landing && (
             <button

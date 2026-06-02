@@ -26,6 +26,7 @@ interface Props {
   value: ProductCopy | null;
   onChange: (v: ProductCopy) => void;
   productId?: string;
+  productSlug?: string;
 }
 
 function isImageUrl(s: string) {
@@ -169,7 +170,7 @@ function RemoveBtn({ onClick }: { onClick: () => void }) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function LandingEditor({ value, onChange, productId }: Props) {
+export default function LandingEditor({ value, onChange, productId, productSlug }: Props) {
   const [open, setOpen] = useState<Record<string, boolean>>({ hero: true });
   const [uploadingIdx, setUploadingIdx] = useState<Record<number, boolean>>({});
 
@@ -287,15 +288,19 @@ export default function LandingEditor({ value, onChange, productId }: Props) {
       <div className="flex items-center justify-between">
         <p className="text-xs text-gray-500">Chỉnh sửa từng phần. Header, footer và nút thanh toán cố định theo template.</p>
         <div className="flex gap-2">
-          {productId && (
+          {(productId || productSlug) ? (
             <a
-              href={`/products/${productId}`}
+              href={`/products/${productSlug || productId}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 rounded-xl border border-gray-700 px-3 py-1.5 text-xs text-gray-400 hover:border-emerald-500 hover:text-emerald-400 transition-colors"
             >
               👁 Preview
             </a>
+          ) : (
+            <span className="flex items-center gap-1.5 rounded-xl border border-gray-700 px-3 py-1.5 text-xs text-gray-600 cursor-not-allowed" title="Lưu sản phẩm trước để xem preview">
+              👁 Preview
+            </span>
           )}
           <button
             type="button"
@@ -362,23 +367,46 @@ export default function LandingEditor({ value, onChange, productId }: Props) {
           <input value={lp.solutionTitle} onChange={(e) => patch({ solutionTitle: e.target.value })}
             placeholder="Một nơi duy nhất cho mọi thứ" className={inputCls} />
         </Field>
-        <Field label="Mô tả giải pháp">
-          <textarea rows={2} value={lp.solutionDesc} onChange={(e) => patch({ solutionDesc: e.target.value })}
-            placeholder="Template hoạt động như..." className={textareaCls} />
+        <Field label="Mô tả giải pháp (tự động mở rộng)">
+          <textarea
+            rows={3}
+            value={lp.solutionDesc}
+            onChange={(e) => {
+              patch({ solutionDesc: e.target.value });
+              e.target.style.height = "auto";
+              e.target.style.height = e.target.scrollHeight + "px";
+            }}
+            placeholder="Template hoạt động như..."
+            className={`${textareaCls} resize-none overflow-hidden`}
+            style={{ minHeight: "80px" }}
+          />
         </Field>
         <div className="space-y-2">
-          <label className="block text-xs font-medium text-gray-400">Công thức (A + B = Kết quả)</label>
-          <div className="grid grid-cols-3 gap-2">
-            <input value={lp.solutionFormula.a}
-              onChange={(e) => patch({ solutionFormula: { ...lp.solutionFormula, a: e.target.value } })}
-              placeholder="📥 Yếu tố 1" className={inputCls} />
-            <input value={lp.solutionFormula.b}
-              onChange={(e) => patch({ solutionFormula: { ...lp.solutionFormula, b: e.target.value } })}
-              placeholder="🗂️ Yếu tố 2" className={inputCls} />
-            <input value={lp.solutionFormula.result}
-              onChange={(e) => patch({ solutionFormula: { ...lp.solutionFormula, result: e.target.value } })}
-              placeholder="🧠 Kết quả" className={inputCls} />
-          </div>
+          <label className="block text-xs font-medium text-gray-400">Công thức (A + B = Kết quả) — icon riêng với text</label>
+          {(["a", "b", "result"] as const).map((key, idx) => {
+            const full = lp.solutionFormula[key] ?? "";
+            const spaceIdx = full.indexOf(" ");
+            const icon = spaceIdx > -1 ? full.slice(0, spaceIdx) : full;
+            const text = spaceIdx > -1 ? full.slice(spaceIdx + 1) : "";
+            const label = key === "a" ? "Yếu tố 1" : key === "b" ? "Yếu tố 2" : "Kết quả";
+            return (
+              <div key={key} className="flex items-center gap-1">
+                <span className="shrink-0 text-xs text-gray-600 w-16">{label}</span>
+                <input
+                  value={icon}
+                  onChange={(e) => patch({ solutionFormula: { ...lp.solutionFormula, [key]: `${e.target.value} ${text}`.trim() } })}
+                  placeholder="📥"
+                  className={`${inputCls} w-14 shrink-0 text-center`}
+                />
+                <input
+                  value={text}
+                  onChange={(e) => patch({ solutionFormula: { ...lp.solutionFormula, [key]: `${icon} ${e.target.value}`.trim() } })}
+                  placeholder={idx === 2 ? "Không bao giờ quên" : "Capture nhanh"}
+                  className={`${inputCls} flex-1`}
+                />
+              </div>
+            );
+          })}
         </div>
       </SectionCard>
 
