@@ -1,4 +1,4 @@
-// ci-test
+// Trang chủ — danh sách sản phẩm
 import { Suspense } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type { Product } from "@/types";

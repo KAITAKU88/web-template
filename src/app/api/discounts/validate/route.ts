@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { calcDiscountAmount } from "@/lib/discount";
 
 export async function POST(req: NextRequest) {
   const { code, product_id, amount } = await req.json() as {
@@ -31,9 +32,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `Đơn hàng tối thiểu ${dc.min_amount?.toLocaleString("vi-VN")}đ` }, { status: 400 });
   }
 
-  const discountAmount = dc.type === "percent"
-    ? Math.min(Math.round(amount * (dc.value / 100) / 1000) * 1000, amount)
-    : Math.min(dc.value as number, amount);
+  const discountAmount = calcDiscountAmount({ type: dc.type, value: dc.value as number }, amount);
 
   return NextResponse.json({
     id: dc.id,

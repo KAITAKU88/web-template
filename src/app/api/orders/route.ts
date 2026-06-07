@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { generateOrderId, buildVietQRUrl, buildPaymentDeepLink } from "@/lib/utils";
+import { calcDiscountAmount } from "@/lib/discount";
 import { getSettings } from "@/lib/settings";
 import type { CreateOrderRequest } from "@/types";
 
@@ -73,9 +74,7 @@ export async function POST(req: NextRequest) {
           !(dc.product_id && dc.product_id !== product_id) &&
           subtotal >= (dc.min_amount ?? 0)) {
         discountCodeId = dc.id;
-        discountAmount = dc.type === "percent"
-          ? Math.min(Math.round(subtotal * (dc.value / 100) / 1000) * 1000, subtotal)
-          : Math.min(dc.value as number, subtotal);
+        discountAmount = calcDiscountAmount({ type: dc.type, value: dc.value as number }, subtotal);
       }
     }
 

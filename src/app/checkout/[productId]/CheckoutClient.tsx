@@ -304,15 +304,15 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
             {/* ── Mã giảm giá ── */}
             <div>
               {!discountCode ? (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <input
                     value={discountInput}
                     onChange={(e) => { setDiscountInput(e.target.value.toUpperCase()); setDiscountError(""); }}
                     placeholder="Mã giảm giá (nếu có)"
-                    className="flex-1 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 px-4 py-2.5 text-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100 dark:focus:ring-green-900/20 uppercase"
+                    className="w-full min-w-0 rounded-xl border border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 px-4 py-2.5 text-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100 dark:focus:ring-green-900/20 uppercase sm:flex-1"
                   />
                   <button type="button" onClick={handleApplyDiscount} disabled={discountApplying || !discountInput.trim()}
-                    className="shrink-0 rounded-xl bg-gray-100 dark:bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors">
+                    className="w-full shrink-0 rounded-xl bg-gray-100 dark:bg-gray-700 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-50 transition-colors sm:w-auto">
                     {discountApplying ? "…" : "Áp dụng"}
                   </button>
                 </div>

@@ -122,12 +122,12 @@ export default async function ProductPage({ params }: Props) {
           )}
 
           {/* Giá + CTA + Trust badges — cùng một khối, center */}
-          <div className="mx-auto w-fit">
-            <div className="flex w-full items-end justify-between gap-8">
-              <div>
+          <div className="w-full">
+            <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between sm:gap-6">
+              <div className="min-w-0">
                 <div className="text-3xl font-extrabold text-brand">{formatCurrency(product.price)}</div>
                 {hasDiscount && (
-                  <div className="mt-0.5 flex items-center gap-2">
+                  <div className="mt-0.5 flex flex-wrap items-center gap-2">
                     <span className="text-sm text-gray-400 line-through">{formatCurrency(product.original_price!)}</span>
                     <span className="rounded-full bg-red-500/10 px-2.5 py-0.5 text-xs font-medium text-red-700 dark:text-red-400">
                       Tiết kiệm {formatCurrency(product.original_price! - product.price)}
@@ -135,7 +135,7 @@ export default async function ProductPage({ params }: Props) {
                   </div>
                 )}
               </div>
-              <Link href={`/checkout/${product.slug ?? product.id}`} className="btn-primary shrink-0">
+              <Link href={`/checkout/${product.slug ?? product.id}`} className="btn-primary w-full shrink-0 text-center sm:w-auto">
                 Mua ngay →
               </Link>
             </div>
