@@ -123,9 +123,13 @@ function SearchBarInner() {
 
   return (
     <div ref={containerRef} className="relative w-full">
+      <label htmlFor="header-search" className="sr-only">Tìm kiếm template</label>
       <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs">🔍</span>
       <input
-        type="text"
+        id="header-search"
+        name="q"
+        type="search"
+        autoComplete="off"
         value={value}
         onChange={(e) => handleChange(e.target.value)}
         onFocus={() => { if (!isHomepage && results.length > 0) setShowDropdown(true); }}

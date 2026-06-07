@@ -68,4 +68,13 @@ describe("Smoke E2E (HTTP)", () => {
     });
     expect(res.status).toBe(400);
   });
+
+  it("POST /api/discounts/validate từ chối mã không tồn tại", async () => {
+    const res = await fetch(`${BASE}/api/discounts/validate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code: "NOTREAL", amount: 100_000 }),
+    });
+    expect(res.status).toBe(400);
+  });
 });

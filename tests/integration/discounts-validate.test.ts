@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { NextRequest } from "next/server";
 
-const mockSingle = vi.fn();
+const mockMaybeSingle = vi.fn();
 
 vi.mock("@/lib/supabase/server", () => ({
   createAdminClient: () => ({
     from: () => ({
       select: () => ({
         eq: () => ({
-          single: mockSingle,
+          maybeSingle: mockMaybeSingle,
         }),
       }),
     }),
@@ -31,18 +31,18 @@ describe("POST /api/discounts/validate", () => {
     expect(res.status).toBe(400);
   });
 
-  it("404 khi mã không tồn tại", async () => {
-    mockSingle.mockResolvedValue({ data: null, error: { message: "not found" } });
+  it("400 khi mã không tồn tại", async () => {
+    mockMaybeSingle.mockResolvedValue({ data: null, error: null });
     const req = new NextRequest("http://localhost/api/discounts/validate", {
       method: "POST",
       body: JSON.stringify({ code: "INVALID", amount: 100_000 }),
     });
     const res = await POST(req);
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(400);
   });
 
   it("trả discount_amount cho mã % hợp lệ", async () => {
-    mockSingle.mockResolvedValue({
+    mockMaybeSingle.mockResolvedValue({
       data: {
         id: "dc-1",
         code: "SALE10",
@@ -70,7 +70,7 @@ describe("POST /api/discounts/validate", () => {
   });
 
   it("400 khi đơn dưới min_amount", async () => {
-    mockSingle.mockResolvedValue({
+    mockMaybeSingle.mockResolvedValue({
       data: {
         id: "dc-2",
         code: "MIN100",

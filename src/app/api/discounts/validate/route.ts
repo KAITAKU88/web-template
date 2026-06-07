@@ -10,14 +10,18 @@ export async function POST(req: NextRequest) {
   if (!code?.trim()) return NextResponse.json({ error: "Thiếu mã giảm giá" }, { status: 400 });
 
   const supabase = createAdminClient();
-  const { data: dc } = await supabase
+  const { data: dc, error: dbError } = await supabase
     .from("discount_codes")
     .select("id, code, type, value, product_id, min_amount, max_uses, used_count, expires_at, is_active")
     .eq("code", code.trim().toUpperCase())
-    .single();
+    .maybeSingle();
 
+  if (dbError) {
+    console.error("[discounts/validate]", dbError.message);
+    return NextResponse.json({ error: "Không thể kiểm tra mã giảm giá" }, { status: 500 });
+  }
   if (!dc || !dc.is_active) {
-    return NextResponse.json({ error: "Mã giảm giá không hợp lệ hoặc đã hết hiệu lực" }, { status: 404 });
+    return NextResponse.json({ error: "Mã giảm giá không hợp lệ hoặc đã hết hiệu lực" }, { status: 400 });
   }
   if (dc.expires_at && new Date(dc.expires_at) < new Date()) {
     return NextResponse.json({ error: "Mã giảm giá đã hết hạn" }, { status: 400 });

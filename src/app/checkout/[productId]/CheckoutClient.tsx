@@ -266,11 +266,14 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
           </p>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="checkout-email" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Email nhận template <span className="text-red-500">*</span>
               </label>
               <input
+                id="checkout-email"
+                name="customer_email"
                 type="email"
+                autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setEmailTouched(true); }}
@@ -286,11 +289,14 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="checkout-phone" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Số điện thoại
               </label>
               <input
+                id="checkout-phone"
+                name="customer_phone"
                 type="tel"
+                autoComplete="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="0912 345 678"
@@ -305,7 +311,10 @@ export default function CheckoutClient({ product, companion, bundle, siteName = 
             <div>
               {!discountCode ? (
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  <label htmlFor="checkout-discount" className="sr-only">Mã giảm giá</label>
                   <input
+                    id="checkout-discount"
+                    name="discount_code"
                     value={discountInput}
                     onChange={(e) => { setDiscountInput(e.target.value.toUpperCase()); setDiscountError(""); }}
                     placeholder="Mã giảm giá (nếu có)"

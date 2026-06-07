@@ -62,8 +62,12 @@ export default function OrdersPage() {
       </div>
 
       <form onSubmit={handleSearch} className="mb-8 flex gap-3">
+        <label htmlFor="orders-email" className="sr-only">Email tra cứu đơn hàng</label>
         <input
+          id="orders-email"
+          name="email"
           type="email"
+          autoComplete="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}

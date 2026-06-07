@@ -247,12 +247,17 @@ export default function ProductDetail({ product }: { product: Product }) {
                 </div>
                 {/* Email */}
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label htmlFor="product-email" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Email nhận template <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
                     <input
-                      type="email" required value={email}
+                      id="product-email"
+                      name="customer_email"
+                      type="email"
+                      autoComplete="email"
+                      required
+                      value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="ban@example.com"
                       className={`w-full rounded-xl border px-4 py-3 text-sm outline-none transition pr-9 dark:bg-gray-700 dark:text-white ${
@@ -271,12 +276,16 @@ export default function ProductDetail({ product }: { product: Product }) {
 
                 {/* Phone */}
                 <div>
-                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <label htmlFor="product-phone" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Số điện thoại
                     <span className="ml-1.5 text-xs font-normal text-gray-400">(không bắt buộc — để được hỗ trợ nhanh hơn)</span>
                   </label>
                   <input
-                    type="tel" value={phone}
+                    id="product-phone"
+                    name="customer_phone"
+                    type="tel"
+                    autoComplete="tel"
+                    value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="09xxxxxxxx"
                     className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-green-500 focus:ring-2 focus:ring-green-100 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
